@@ -11,6 +11,7 @@ import profile from './Images/profile.png';
 import profile_a from './Images/profile_a.png';
 import search from './Images/search.png';
 import vector from './Images/vector.png';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
     const inputRef = useRef(null);
@@ -129,10 +130,10 @@ const Navbar = () => {
             </div>
 
             <div className='w-[242px] h-[40px] flex items-center gap-[48px]'>
-                <a href="/likes"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain' src={location.pathname == '/likes' ? like_a : like}/></a>
-                <a href="/orders"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain' src={location.pathname == '/orders' ? cube_a : cube} /></a>
-                <a href="/basket"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain' src={location.pathname == '/basket' ? basket_a : basket} /></a>
-                <a href="/profile"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain' src={location.pathname == '/profile' ? profile_a : profile} /></a>
+                <Link to="/likes"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain' src={location.pathname == '/likes' ? like_a : like}/></Link>
+                <Link to="/orders"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain' src={location.pathname == '/orders' ? cube_a : cube} /></Link>
+                <Link to="/basket"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain' src={location.pathname == '/basket' ? basket_a : basket} /></Link>
+                <Link to="/profile"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain' src={location.pathname == '/profile' ? profile_a : profile} /></Link>
             </div>
         </div>
     );
