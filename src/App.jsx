@@ -12,7 +12,7 @@ const App = () => {
 
   return (
     <Router>
-      <div className='w-[375px] sm:w-[1440px] m-auto'>
+      <div className='w-[375px] sm:w-[1440px] '>
         <Navbar />
         <div>
           <Routes>
