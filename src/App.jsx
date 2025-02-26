@@ -15,10 +15,10 @@ const App = () => {
     <div className='w-[375px] sm:w-[1440px] m-auto'>
       <Navbar />
 
-      {/* <Language /> */}
-      {/* <Region /> */}
-      {/* <Borrow /> */}
-      {/* <Category /> */}
+      <Language />
+      <Region />
+      <Borrow />
+      <Category />
 
       <div>
         <Home />
