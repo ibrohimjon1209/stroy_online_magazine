@@ -11,19 +11,6 @@ const App = () => {
   const [userSignIn, setUserSignIn] = useState(false);
 
   return (
-<<<<<<< HEAD
-    <div className='w-[375px] sm:w-[1440px] m-auto'>
-      <Navbar />
-
-      <Language />
-      <Region />
-      <Borrow />
-      <Category />
-
-      <div>
-        <Home />
-
-=======
     <Router>
       <div className='w-[375px] sm:w-[1440px] m-auto'>
         <Navbar />
@@ -36,7 +23,6 @@ const App = () => {
             <Route path='/profile' element={<Profile />} />
           </Routes>
         </div>
->>>>>>> e37ba24cd50b10e45f6e344f5f33076773b22828
       </div>
     </Router>
   );
