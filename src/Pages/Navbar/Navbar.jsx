@@ -1,10 +1,14 @@
 import React, { useState, useRef } from 'react';
-
+import { useLocation } from 'react-router-dom';
 import logo from './Images/logo.png';
-import cube from './Images/cube.png';
+import cube from './Images/orders.png';
+import cube_a from './Images/orders_a.png';
 import like from './Images/like.png';
-import cart from './Images/cart.png';
+import like_a from './Images/like_a.png';
+import basket from './Images/cart.png';
+import basket_a from './Images/basket_a.png';
 import profile from './Images/profile.png';
+import profile_a from './Images/profile_a.png';
 import search from './Images/search.png';
 import vector from './Images/vector.png';
 
@@ -12,7 +16,8 @@ const Navbar = () => {
     const inputRef = useRef(null);
     const [isOpen, setIsOpen] = useState(false);
     const [is_search_open, set_is_search_open] = useState(false);
-
+    const location = useLocation();
+    console.log(location.pathname);
     const handleSearchClick = () => {
         set_is_search_open(true);
         if (inputRef.current) {
@@ -124,10 +129,10 @@ const Navbar = () => {
             </div>
 
             <div className='w-[242px] h-[40px] flex items-center gap-[48px]'>
-                <a href="/like"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-200' src={like} /></a>
-                <a href="/like"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-200' src={cube} /></a>
-                <a href="/like"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-200' src={cart} /></a>
-                <a href="/like"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-200' src={profile} /></a>
+                <a href="/likes"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain' src={location.pathname == '/likes' ? like_a : like}/></a>
+                <a href="/orders"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain' src={location.pathname == '/orders' ? cube_a : cube} /></a>
+                <a href="/basket"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain' src={location.pathname == '/basket' ? basket_a : basket} /></a>
+                <a href="/profile"><img className='hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain' src={location.pathname == '/profile' ? profile_a : profile} /></a>
             </div>
         </div>
     );
