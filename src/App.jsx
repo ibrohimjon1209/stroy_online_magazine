@@ -6,23 +6,23 @@ import Likes from './Pages/Navbar/chields/likes/likes_main';
 import Basket from './Pages/Navbar/chields/basket/basket_main';
 import Orders from './Pages/Navbar/chields/orders/orders_main';
 import Profile from './Pages/Navbar/chields/profile/profile';
+import Not_found from './Pages/Not_found/not_found';
 
 const App = () => {
   const [userSignIn, setUserSignIn] = useState(false);
-
+  const [is_found, set_is_found] = useState(true);
   return (
     <Router>
-      <div className='w-[375px] sm:w-[1440px] m-auto'>
-        <Navbar />
-        <div>
+      <div className={`${is_found ? 'w-[375px] sm:w-[1440px]' : 'w-full'} m-auto`}>
+          {is_found ? <Navbar />: ''}
           <Routes>
+            <Route path='/*' element={<Not_found  set_is_found={set_is_found} />}/>
             <Route path='/' element={<Home />} />
             <Route path='/likes' element={<Likes />} />
             <Route path='/basket' element={<Basket />} />
             <Route path='/orders' element={<Orders />} />
             <Route path='/profile' element={<Profile />} />
           </Routes>
-        </div>
       </div>
     </Router>
   );
