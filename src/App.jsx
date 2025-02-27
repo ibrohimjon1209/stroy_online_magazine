@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Navbar from "./Pages/Navbar/Navbar";
 import Home from "./Pages/Home/Home";
@@ -12,19 +12,36 @@ import InternetChecker from "./Pages/offline_page/offline_page";
 const App = () => {
   const [userSignIn, setUserSignIn] = useState(false);
   const [is_found, set_is_found] = useState(true);
+  const [is_online, set_is_online] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const updateOnlineStatus = () => {
+      set_is_online(navigator.onLine);
+    };
+    window.addEventListener("online", updateOnlineStatus);
+    window.addEventListener("offline", updateOnlineStatus);
+
+    return () => {
+      window.removeEventListener("online", updateOnlineStatus);
+      window.removeEventListener("offline", updateOnlineStatus);
+    };
+  }, []);
+
+  if (!is_online) {
+    return <InternetChecker />;
+  }
 
   return (
     <Router>
       <div className={`${is_found ? "w-[375px] sm:w-[1440px]" : "w-full"} m-auto`}>
-        <InternetChecker />
-        {is_found ? <Navbar /> : ""}
+        {is_found && <Navbar />}
         <Routes>
-          <Route path="/*" element={<Not_found set_is_found={set_is_found} />} />
           <Route path="/" element={<Home />} />
           <Route path="/likes" element={<Likes />} />
           <Route path="/basket" element={<Basket />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="*" element={<Not_found set_is_found={set_is_found} />} />
         </Routes>
       </div>
     </Router>
