@@ -8,11 +8,14 @@ import Orders from "./Pages/Navbar/chields/orders/orders_main";
 import Profile from "./Pages/Navbar/chields/profile/profile";
 import Not_found from "./Pages/Not_found/not_found";
 import InternetChecker from "./Pages/offline_page/offline_page";
+import Formalization from "./Pages/Formalization/formalization_main";
+import MapPage from "./Pages/Map/map_main";
 
 const App = () => {
   const [userSignIn, setUserSignIn] = useState(false);
   const [is_found, set_is_found] = useState(true);
   const [is_online, set_is_online] = useState(navigator.onLine);
+  const [selectedLocation, setSelectedLocation] = useState(null); // 📌 Tanlangan joy
 
   useEffect(() => {
     const updateOnlineStatus = () => {
@@ -40,8 +43,10 @@ const App = () => {
           <Route path="/likes" element={<Likes />} />
           <Route path="/basket" element={<Basket />} />
           <Route path="/orders" element={<Orders />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/*" element={<Profile userSignIn={userSignIn} />} />
           <Route path="*" element={<Not_found set_is_found={set_is_found} />} />
+          <Route path="/formalization" element={<Formalization userSignIn={userSignIn} />} />
+          <Route path="/map" element={<MapPage setSelectedLocation={setSelectedLocation} />} />
         </Routes>
       </div>
     </Router>

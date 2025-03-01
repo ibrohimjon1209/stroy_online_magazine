@@ -1,5 +1,4 @@
 import React, { useState, useRef } from "react";
-import { useLocation } from "react-router";
 import logo from "./Images/logo.png";
 import cube from "./Images/orders.png";
 import cube_a from "./Images/orders_a.png";
@@ -23,8 +22,7 @@ const Navbar = () => {
   const [is_orders_hovered, set_is_orders_hovered] = useState(false);
   const [is_basket_hovered, set_is_basket_hovered] = useState(false);
   const [is_profile_hovered, set_is_profile_hovered] = useState(false);
-  const location = useLocation();
-  console.log(location.pathname);
+  const [active, set_active] = useState("");
   const handleSearchClick = () => {
     set_is_search_open(true);
     if (inputRef.current) {
@@ -82,7 +80,7 @@ const Navbar = () => {
 
   const to_home = () => navigate("/");
   return (
-    <div className="w-full h-[80px] flex justify-between gap-[20px] items-center px-[4.2%] sticky top-0 bg-[#DCC38B]">
+    <div className="w-full h-[80px] flex justify-between gap-[20px] z-50 items-center px-[4.2%] sticky top-0 bg-[#DCC38B]">
       <div className="w-[247px] h-full flex items-center gap-[5px]">
         <img src={logo} alt="Logo" className="cursor-pointer" onClick={to_home} />
         <h1 className="font-inter font-[600] text-[20px] cursor-pointer leading-[22px] text-black" onClick={to_home}>
@@ -160,7 +158,8 @@ const Navbar = () => {
         <Link to="/likes">
           <img
             className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
-            src={location.pathname == "/likes" || is_likes_hovered ? like_a : like}
+            src={active == "likes" || is_likes_hovered ? like_a : like}
+            onClick={()=>{set_active("likes")}}
             onMouseEnter={() => set_is_likes_hovered(true)}
             onMouseLeave={() => set_is_likes_hovered(false)}
           />
@@ -168,7 +167,8 @@ const Navbar = () => {
         <Link to="/orders">
           <img
             className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
-            src={location.pathname == "/orders" || is_orders_hovered ? cube_a : cube}
+            src={active == "orders" || is_orders_hovered ? cube_a : cube}
+            onClick={()=>{set_active("orders")}}
             onMouseEnter={() => set_is_orders_hovered(true)}
             onMouseLeave={() => set_is_orders_hovered(false)}
           />
@@ -176,15 +176,17 @@ const Navbar = () => {
         <Link to="/basket">
           <img
             className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
-            src={location.pathname == "/basket" || is_basket_hovered ? basket_a : basket}
+            src={active == "basket" || is_basket_hovered ? basket_a : basket}
+            onClick={()=>{set_active("basket")}}
             onMouseEnter={() => set_is_basket_hovered(true)}
             onMouseLeave={() => set_is_basket_hovered(false)}
           />
         </Link>
-        <Link to="/profile">
+        <Link to="/profile/orders">
           <img
             className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
-            src={location.pathname == "/profile" || is_profile_hovered ? profile_a : profile}
+            src={active == "profile" || is_profile_hovered ? profile_a : profile}
+            onClick={()=>{set_active("profile")}}
             onMouseEnter={() => set_is_profile_hovered(true)}
             onMouseLeave={() => set_is_profile_hovered(false)}
           />

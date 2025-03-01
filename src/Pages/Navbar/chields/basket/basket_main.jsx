@@ -1,5 +1,6 @@
 import { Minus, Plus, Check } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
+import { Link } from "react-router-dom"
 import photo from "./photo.png"
 
 export default function Basket_main() {
@@ -109,9 +110,9 @@ export default function Basket_main() {
             </div>
           </div>
           </div>
-          <button className="w-full py-4 bg-[#E6D1A7] rounded-xl font-inter font-[600] text-[15px] leading-[22px] text-black hover:bg-[#dac59b] transition-colors cursor-pointer duration-300">
-            Rasmiylashtirish
-          </button>
+          <Link to="/formalization" className="w-full flex items-center justify-center py-4 bg-[#E6D1A7] rounded-xl font-inter font-[600] text-[15px] leading-[22px] text-black hover:bg-[#dac59b] transition-colors cursor-pointer duration-300">
+          Rasmiylashtirish
+          </Link>
         </div>
       </div>
     </div>
