@@ -84,7 +84,14 @@ const App = () => {
         <Route path="/likes" element={<Likes />} />
         <Route path="/basket" element={<Basket />} />
         <Route path="/orders" element={<Orders />} />
+<<<<<<< HEAD
         <Route path="/profile/*" element={<Profile userSignIn={userSignIn} />} />
+=======
+        <Route
+          path="/profile/*"
+          element={<Profile userSignIn={userSignIn}/>}
+        />
+>>>>>>> 48fcb8b5a393d65c4abcfde51c6223c87f25da9f
         <Route path="*" element={<Not_found set_is_found={set_is_found} />} />
         <Route path="/formalization" element={<Formalization userSignIn={userSignIn} />} />
         <Route path="/delivery/*" element={<Delivery setSelectedLocation={setSelectedLocation} />} />
@@ -92,7 +99,7 @@ const App = () => {
         <Route path="/payment-variant" element={<Payment_variant />} />
         <Route path="/category" element={<Category />} />
       </Routes>
-      <Footer />
+    {is_found && <Footer />}
     </div>
   );
 };

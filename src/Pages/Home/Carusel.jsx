@@ -1,89 +1,77 @@
-"use client"
+import { useState, useEffect, useCallback } from "react";
+import banner1 from "./Images/banner1.png";
+import banner2 from "./Images/banner2.png";
+import banner3 from "./Images/banner1.png";
 
-import { useState, useEffect } from "react"
-
-const Carousel = () => {
-    const [currentSlide, setCurrentSlide] = useState(0)
-
-    // Sample placeholder slides (replace with actual images later)
-    const slides = [
-        { id: 1, color: "bg-yellow-400" },
-        { id: 2, color: "bg-green-500" },
-        { id: 3, color: "bg-red-500" },
-        { id: 4, color: "bg-blue-500" },
-    ]
-
-    // Auto-slide effect
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1))
-        }, 7000)
-
-        return () => clearInterval(interval)
-    }, [slides.length])
-
-    // Calculate visible slides
-    const getVisibleSlides = () => {
-        const slidesArray = [...slides]
-        // Add last slide to beginning and first slide to end for infinite effect
-        return [...slidesArray.slice(-1), ...slidesArray, ...slidesArray.slice(0, 1)]
-    }
-
-    const visibleSlides = getVisibleSlides()
-    const containerWidth = 1444 // Container width
-    const slideWidth = 900 // Main slide width
-    const peekAmount = (containerWidth - slideWidth) / 2 // Amount of adjacent slides to show
-
-    return (
-        <div className="w-full h-[500px] bg-yellow-500 mt-[30px]">
-            {/* <div className="relative w-full overflow-hidden h-[450px] m-auto">
-                <div
-                    className="absolute left-[700px] right-1/2 -translate-x-1/2 flex transition-transform duration-1000 ease-in-out h-full"
-                    style={{
-                        width: `${visibleSlides.length * slideWidth}px`,
-                        transform: `translateX(${-(currentSlide + 1) * slideWidth + peekAmount}px)`,
-                    }}
-                >
-                    {visibleSlides.map((slide, index) => (
-                        <div
-                            key={`${slide.id}-${index}`}
-                            className="relative h-full shrink-0"
-                            style={{
-                                width: `${slideWidth}px`,
-                            }}
-                        >
-                            <div className={`absolute inset-4 rounded-2xl ${slide.color} shadow-lg`}>
-                                <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center">
-                                    <div className="bg-yellow-100 rounded-xl p-4 mb-4 w-full">
-                                        <p className="text-black font-bold text-xl">STROY BAZA bilan uy qurush yanada oson</p>
-                                    </div>
-                                    <div className="bg-red-600 rounded-xl p-4 mb-4 w-full">
-                                        <p className="text-white font-bold">Sizning qadriyatlaringiz maskani !</p>
-                                    </div>
-                                    <div className="bg-yellow-100 rounded-xl p-3 w-auto">
-                                        <p className="text-black">Faqat 16-17-18-yanvar</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-10">
-                    {slides.map((_, index) => (
-                        <button
-                            key={index}
-                            className={`w-3 h-3 rounded-full ${currentSlide === index ? "bg-white" : "bg-white/50"}`}
-                            onClick={() => setCurrentSlide(index)}
-                        />
-                    ))}
-                </div>
-
-
-            </div> */}
-        </div>
-    )
+function cn(...classes) {
+  return classes.filter(Boolean).join(" ");
 }
 
-export default Carousel
+export default function KitchenCarousel() {
+  const [currentSlide, setCurrentSlide] = useState(0);
 
+  const slides = [
+    {
+      image: banner1,
+    },
+    {
+      image: banner2,
+    },
+    {
+      image: banner3,
+    }
+  ];
+
+  const extendedSlides = [slides[slides.length - 1], ...slides, slides[0]];
+
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => {
+      const next = prev + 1;
+      if (next >= slides.length) {
+        return 0;
+      }
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      nextSlide();
+    }, 7000);
+    return () => clearInterval(interval);
+  }, [nextSlide]);
+
+  return (
+    <div className="relative w-full h-[360px] mx-auto overflow-hidden mt-[30px]">
+      <div
+        className="flex transition-transform duration-500 ease-in-out"
+        style={{
+          transform: `translateX(calc(-${(currentSlide + 1) * 80}% + 10%))`,
+        }}
+      >
+        {extendedSlides.map((slide, index) => (
+          <div
+            key={index}
+            className="w-full md:w-4/5 flex-shrink-0 relative px-2"
+          >
+            <img src={slide.image} alt="" />
+          </div>
+        ))}
+      </div>
+
+      {/* Dots */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            className={cn(
+              "cursor-pointer w-3 h-3 rounded-full transition-all",
+              currentSlide === index ? "bg-[#DCC38B] w-8" : "bg-[#D5D5D5]"
+            )}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}

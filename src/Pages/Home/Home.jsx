@@ -43,7 +43,7 @@ const Home = () => {
             <div className='w-full h-auto flex flex-col'>
 
                 <Carusel />
-                <div className='popular flex flex-col w-[350px] sm:w-[1440px] m-auto h-auto px-[77px] mt-[50px]'>
+                <div className='popular flex flex-col w-[350px] sm:w-[1440px] m-auto h-auto px-[77px]'>
                     <h1 className='font-inter font-[600] text-[28px] text-black'>Ommabop tavarlar</h1>
 
                     <div className='mt-[20px] flex flex-wrap gap-x-[45px] gap-y-[40px]'>
