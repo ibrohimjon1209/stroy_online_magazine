@@ -1,64 +1,29 @@
-import { useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import React from "react";
+import { Routes, Route, useLocation, Link } from "react-router-dom";
+import Addresses from "./addresses";
+import Map from "./map";
+import { ChevronLeft } from "lucide-react";
 
-// Marker ikonkasi
-const customIcon = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
-  iconSize: [35, 35],
-});
-
-const MapPage = ({ setSelectedLocation }) => {
-  const [position, setPosition] = useState([40.7836, 72.3501]); // 📌 Andijon koordinatasi
-  const [address, setAddress] = useState(`Koordinata: ${position[0].toFixed(5)}, ${position[1].toFixed(5)}`);
-
-  function LocationMarker() {
-    useMapEvents({
-      click(e) {
-        const { lat, lng } = e.latlng;
-        setPosition([lat, lng]);
-        setSelectedLocation({ lat, lng });
-
-        // Manzilni yangilash
-        setAddress(`Koordinata: ${lat.toFixed(5)}, ${lng.toFixed(5)}`);
-      },
-    });
-
-    return (
-      <Marker position={position} icon={customIcon}>
-        <Popup>
-          <span className="font-bold text-blue-600">📍 Shu yerdan olib ketaman!</span>
-        </Popup>
-      </Marker>
-    );
-  }
-
+const Delivery_main = () => {
+  const location = useLocation().pathname.split("/")[2];
   return (
-    <div className="relative max-w-[100%] h-[80vh] mx-auto my-6 border border-gray-300 rounded-lg shadow-lg">
-      {/* Xarita container */}
-      <MapContainer
-        center={position}
-        zoom={13}
-        className="w-full h-full rounded-lg overflow-hidden z-0"
-        style={{ height: "100%", width: "100%" }}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        />
-        <LocationMarker />
-      </MapContainer>
-
-      {/* Manzil oynasi - z-index bilan oldinga chiqarildi */}
-      <div className="absolute bottom-6 right-6 bg-white p-4 shadow-lg rounded-lg w-64 z-10 border border-gray-300">
-        <p className="text-gray-800 text-sm">{address}</p>
-        <button className="mt-2 w-full bg-yellow-400 text-black py-2 rounded-lg font-bold">
-          Bu yerdan olaman
-        </button>
+    <div className="w-full h-full flex flex-col mb-[84px]">
+      <div className="sticky w-full h-[80px] fixed top-0 z-50">
+        <div className="bg-[#DCC38B] flex items-center gap-[10px] w-full h-full font-inter font-[600] text-[20px] leading-[22px] text-black flex items-center pl-[50px]">
+          <Link to={`${location === "map" ? "/delivery" : "/formalization"}`} >
+            <ChevronLeft className="w-[35px] h-[35px] mt-[2px] cursor-pointer" />
+          </Link>
+          <p>Olib ketish manzili</p>
+        </div>
+      </div>
+      <div>
+        <Routes>
+          <Route path="/" element={<Addresses />} />
+          <Route path="/map" element={<Map />} />
+        </Routes>
       </div>
     </div>
   );
 };
 
-export default MapPage;
+export default Delivery_main;

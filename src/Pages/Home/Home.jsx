@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import photo from './Images/photo.png';
-import cart_icon from './Images/cart_icon.png';
-import like_icon from './Images/like_icon.png';
-import liked_icon from './Images/liked_icon.png';
+import cart_icon from './Images/cart_icon.svg';
+import like_icon from './Images/like_icon.svg';
+import liked_icon from './Images/liked_icon.svg';
 import Carusel from './Carusel';
 import Download from './Download';
 
@@ -69,10 +69,10 @@ const Home = () => {
                                     <div className='flex justify-between'>
                                         <p className='font-inter font-[500] text-[20px] leading-[22px] text-black'>Narxi : {product.price}</p>
 
-                                        <div className='flex gap-[16.33px]'>
-                                            <img className='hover:scale-[105%] transition-all duration-300 w-[24px] h-[24px]' src={cart_icon} alt="Cart" />
+                                        <div className='flex items-center gap-[16.33px]'>
+                                            <img className='hover:scale-[105%] transition-all duration-300 w-[26px] h-[26px] object-contain' src={cart_icon} alt="Cart" />
                                             <img
-                                                className='hover:scale-[105%] transition-all duration-300 w-[22px] h-[19px] mt-[2px] cursor-pointer'
+                                                className={`hover:scale-[105%] transition-all duration-300 ${product.liked ? 'p-[3px]' : 'p-0'} w-[26px] h-[26px] object-contain cursor-pointer`}
                                                 src={product.liked ? liked_icon : like_icon}
                                                 alt="Like"
                                                 onClick={() => handleLikeToggle(product.id)} // Toggle like on click

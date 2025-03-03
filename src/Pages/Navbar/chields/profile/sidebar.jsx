@@ -20,8 +20,8 @@ const Sidebar = ({ isUserSignIn }) => {
   const location = useLocation();
 
   return (
-    <div className="h-[75vh] w-[350px]">
-      <div className="fixed w-[350px]">
+    <div className="h-auto w-[350px]">
+      <div className="sticky top-0 w-[350px]">
         <div>
           {!isUserSignIn ? (
             <div className="flex h-[70px] items-center w-full gap-3 border-[#D5D5D5] border rounded-[8px] pl-[20px] pr-[30px] py-[12px]">

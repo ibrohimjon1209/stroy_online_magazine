@@ -1,17 +1,17 @@
 import React, { useState, useRef } from "react";
 import logo from "./Images/logo.png";
-import cube from "./Images/orders.png";
-import cube_a from "./Images/orders_a.png";
-import like from "./Images/like.png";
-import like_a from "./Images/like_a.png";
-import basket from "./Images/cart.png";
-import basket_a from "./Images/basket_a.png";
-import profile from "./Images/profile.png";
-import profile_a from "./Images/profile_a.png";
-import search from "./Images/search.png";
+import cube from "./Images/orders.svg";
+import cube_a from "./Images/orders_a.svg";
+import like from "./Images/like.svg";
+import like_a from "./Images/like_a.svg";
+import basket from "./Images/basket.svg";
+import basket_a from "./Images/basket_a.svg";
+import profile from "./Images/profile.svg";
+import profile_a from "./Images/profile_a.svg";
 import vector from "./Images/vector.png";
 import { Link } from "react-router";
 import { useNavigate } from "react-router-dom";
+import { ChevronDown, Search } from "lucide-react";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -82,20 +82,23 @@ const Navbar = () => {
   return (
     <div className="w-full h-[80px] flex justify-between gap-[20px] z-50 items-center px-[4.2%] sticky top-0 bg-[#DCC38B]">
       <div className="w-[247px] h-full flex items-center gap-[5px]">
-        <img src={logo} alt="Logo" className="cursor-pointer" onClick={to_home} />
-        <h1 className="font-inter font-[600] text-[20px] cursor-pointer leading-[22px] text-black" onClick={to_home}>
+        <img
+          src={logo}
+          alt="Logo"
+          className="cursor-pointer"
+          onClick={to_home}
+        />
+        <h1
+          className="font-inter font-[600] text-[20px] cursor-pointer leading-[22px] text-black"
+          onClick={to_home}
+        >
           STROY BAZA №1
         </h1>
       </div>
 
       <div className="w-[653px] flex gap-[20px]">
         <div className="w-[427px] h-[40px] pl-[23.5px] bg-[#FFFFFF] rounded-[5px] flex items-center">
-          <img
-            src={search}
-            alt="Search"
-            className="cursor-pointer"
-            onClick={handleSearchClick}
-          />
+          <Search className="cursor-pointer" onClick={handleSearchClick} />
           <input
             type="text"
             placeholder="Search"
@@ -130,9 +133,8 @@ const Navbar = () => {
             onClick={toggleDropdown}
           >
             <span>{selectedOption.name}</span>
-            <img
-              src={vector}
-              alt="Dropdown"
+
+            <ChevronDown
               className={`transition-transform duration-300 ${
                 isOpen ? "rotate-180" : ""
               }`}
@@ -157,9 +159,11 @@ const Navbar = () => {
       <div className="w-[242px] h-[40px] flex items-center gap-[48px]">
         <Link to="/likes">
           <img
-            className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
+            className={`hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain`}
             src={active == "likes" || is_likes_hovered ? like_a : like}
-            onClick={()=>{set_active("likes")}}
+            onClick={() => {
+              set_active("likes");
+            }}
             onMouseEnter={() => set_is_likes_hovered(true)}
             onMouseLeave={() => set_is_likes_hovered(false)}
           />
@@ -168,7 +172,9 @@ const Navbar = () => {
           <img
             className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
             src={active == "orders" || is_orders_hovered ? cube_a : cube}
-            onClick={()=>{set_active("orders")}}
+            onClick={() => {
+              set_active("orders");
+            }}
             onMouseEnter={() => set_is_orders_hovered(true)}
             onMouseLeave={() => set_is_orders_hovered(false)}
           />
@@ -177,7 +183,9 @@ const Navbar = () => {
           <img
             className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
             src={active == "basket" || is_basket_hovered ? basket_a : basket}
-            onClick={()=>{set_active("basket")}}
+            onClick={() => {
+              set_active("basket");
+            }}
             onMouseEnter={() => set_is_basket_hovered(true)}
             onMouseLeave={() => set_is_basket_hovered(false)}
           />
@@ -185,8 +193,12 @@ const Navbar = () => {
         <Link to="/profile/orders">
           <img
             className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
-            src={active == "profile" || is_profile_hovered ? profile_a : profile}
-            onClick={()=>{set_active("profile")}}
+            src={
+              active == "profile" || is_profile_hovered ? profile_a : profile
+            }
+            onClick={() => {
+              set_active("profile");
+            }}
             onMouseEnter={() => set_is_profile_hovered(true)}
             onMouseLeave={() => set_is_profile_hovered(false)}
           />

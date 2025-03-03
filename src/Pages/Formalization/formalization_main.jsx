@@ -91,7 +91,7 @@ const Formalization_main = ({userSignIn}) => {
         </div>
 
         <div className="border border-[#D5D5D5] rounded-lg mb-4 mt-[35px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300">
-          <button className="flex items-center justify-between w-full p-4 cursor-pointer">
+          <Link to="/delivery" className="flex items-center justify-between w-full p-4 cursor-pointer">
             <div className="flex items-center gap-3">
               <img
                 src={arrive_icon}
@@ -103,7 +103,7 @@ const Formalization_main = ({userSignIn}) => {
               </span>
             </div>
             <ChevronRight className="h-5 w-5 text-gray-400" />
-          </button>
+          </Link>
         </div>
 
         <div className="border border-[#D5D5D5] rounded-lg mb-4 mt-[30px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300">
@@ -255,9 +255,9 @@ const Formalization_main = ({userSignIn}) => {
                     </span>
                   </div>
                 </div>
-                <button className="font-inter font-[600] text-[16px] leading-[22px] text-[#000000BF]">
+                <Link to="/payment-variant" className="cursor-pointer hover:underline font-inter font-[600] text-[16px] leading-[22px] text-[#000000BF]">
                   Taxrirlash
-                </button>
+                </Link>
               </div>
               <hr className="border-[#D5D5D5]" />
               <div className="mt-5 flex flex-col gap-[46px] font-inter font-[600] text-[16px] leading-[22px] text-[#000000BF]">

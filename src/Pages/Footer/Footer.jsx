@@ -1,16 +1,16 @@
 import React from 'react'
 import app_store from './Images/app_store.jpg'
 import google_play from './Images/google_play.png'
-import instagram from './Images/instagram.png'
 import logo from './Images/logo.png'
-import telegram from './Images/telegram.png'
-import youtube from './Images/youtube.png'
+import telegram from './Images/telegram.svg'
+import youtube from './Images/youtube.svg'
 import apple from './Images/apple.png'
 import play from './Images/play.png'
+import instagram from './Images/instagram.svg'
 
 const Footer = () => {
     return (
-        <div className='w-full h-[315px] hidden sm:block bg-[#262928] pt-[40px] pl-[49px] '>
+        <div className='sticky w-full h-[315px] hidden sm:block bg-[#262928] pt-[40px] pl-[49px] '>
 
             <div className='flex'>
 
@@ -56,13 +56,13 @@ const Footer = () => {
                 <div className='ml-[70px] flex flex-col gap-[20px]'>
                     <h1 className='font-inter font-[700] text-[20px] leading-[30px] text-white '>Social Media :</h1>
                     <div className='flex gap-[11px]'>
-                        <div className='cursor-pointer w-[37px] h-[37px] flex justify-center items-center rounded-[3px] bg-[#111111]'>
+                        <div className='cursor-pointer w-[37px] h-[37px] flex justify-center object-contain items-center rounded-[3px] bg-[#111111]'>
                             <img src={instagram} />
                         </div>
-                        <div className='cursor-pointer w-[37px] h-[37px] flex justify-center items-center rounded-[3px] bg-[#111111]'>
+                        <div className='cursor-pointer w-[37px] h-[37px] flex justify-center object-contain items-center rounded-[3px] bg-[#111111]'>
                             <img src={telegram} />
                         </div>
-                        <div className='cursor-pointer w-[37px] h-[37px] flex justify-center items-center rounded-[3px] bg-[#111111]'>
+                        <div className='cursor-pointer w-[37px] h-[37px] flex justify-center object-contain items-center rounded-[3px] bg-[#111111]'>
                             <img src={youtube} />
                         </div>
                     </div>
