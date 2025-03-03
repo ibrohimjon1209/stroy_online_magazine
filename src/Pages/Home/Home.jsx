@@ -6,7 +6,6 @@ import liked_icon from './Images/liked_icon.svg';
 import Carusel from './Carusel';
 import Download from './Download';
 
-// Mock API function to fetch product data
 const fetchProducts = () => {
     return new Promise((resolve) => {
         const products = Array.from({ length: 12 }, (_, index) => ({
@@ -14,7 +13,7 @@ const fetchProducts = () => {
             name: `Product ${index + 1}`,
             price: "9.999 UZS",
             image: photo,
-            liked: false, // Initialize liked state
+            liked: false, 
         }));
         resolve(products);
     });
@@ -31,7 +30,6 @@ const Home = () => {
         getProducts();
     }, []);
 
-    // Function to handle like button click
     const handleLikeToggle = (id) => {
         setProducts((prevProducts) =>
             prevProducts.map((product) =>
@@ -75,7 +73,7 @@ const Home = () => {
                                                 className={`hover:scale-[105%] transition-all duration-300 ${product.liked ? 'p-[3px]' : 'p-0'} w-[26px] h-[26px] object-contain cursor-pointer`}
                                                 src={product.liked ? liked_icon : like_icon}
                                                 alt="Like"
-                                                onClick={() => handleLikeToggle(product.id)} // Toggle like on click
+                                                onClick={() => handleLikeToggle(product.id)} 
                                             />
                                         </div>
                                     </div>
