@@ -12,10 +12,10 @@ import Formalization from "./Pages/Formalization/formalization_main";
 import MapPage from "./Pages/Map/map_main";
 
 const App = () => {
-  const [userSignIn, setUserSignIn] = useState(false);
+  const [userSignIn, setUserSignIn] = useState(true);
   const [is_found, set_is_found] = useState(true);
   const [is_online, set_is_online] = useState(navigator.onLine);
-  const [selectedLocation, setSelectedLocation] = useState(null); // 📌 Tanlangan joy
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
   useEffect(() => {
     const updateOnlineStatus = () => {
