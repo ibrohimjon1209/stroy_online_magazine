@@ -1,5 +1,5 @@
 import Sidebar from "./sidebar";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import Orders from "./chields/orders/orders_main";
 import Cashback from "./chields/cashback/cashback_main";
 import Favorites from "./chields/favorites/favorites";
@@ -8,8 +8,9 @@ import Language from "./chields/language/language_main";
 import Help from "./chields/help/help_main";
 
 const Profile_main = ({isUserSignIn}) => {
+  const navigate = useNavigate();
   return (
-      <div className="flex my-10 w-[93%] mx-auto">
+      <div className="flex my-10 profile_md:w-[93%] w-[90%] mx-auto">
         <Sidebar isUserSignIn={isUserSignIn} />
         <div className="flex-1 ml-[20px] border border-[#D5D5D5] rounded-[8px] flex pt-[50px]">
           <Routes>

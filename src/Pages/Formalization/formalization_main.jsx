@@ -91,7 +91,7 @@ const Formalization_main = ({userSignIn}) => {
         </div>
 
         <div className="border border-[#D5D5D5] rounded-lg mb-4 mt-[35px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300">
-          <Link to="/delivery" className="flex items-center justify-between w-full p-4 cursor-pointer">
+          <Link to="/delivery/address" className="flex items-center justify-between w-full p-4 cursor-pointer">
             <div className="flex items-center gap-3">
               <img
                 src={arrive_icon}

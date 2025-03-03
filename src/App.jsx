@@ -63,7 +63,7 @@ const App = () => {
         <Route path="/orders" element={<Orders />} />
         <Route
           path="/profile/*"
-          element={<Profile userSignIn={userSignIn} />}
+          element={<Profile userSignIn={userSignIn}/>}
         />
         <Route path="*" element={<Not_found set_is_found={set_is_found} />} />
         <Route
@@ -77,7 +77,7 @@ const App = () => {
         <Route path="/terms" element={<Terms />} />
         <Route path="/payment-variant" element={<Payment_variant />} />
       </Routes>
-      <Footer />
+    {is_found && <Footer />}
     </div>
   );
 };
