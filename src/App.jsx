@@ -40,7 +40,11 @@ const App = () => {
     };
   }, []);
   useEffect(() => {
-    if (location == "delivery" || location == "terms" || location == "payment-variant") {
+    if (
+      location == "delivery" ||
+      location == "terms" ||
+      location == "payment-variant"
+    ) {
       set_is_another_nav(true);
     } else {
       set_is_another_nav(false);
@@ -63,21 +67,24 @@ const App = () => {
         <Route path="/orders" element={<Orders />} />
         <Route
           path="/profile/*"
-          element={<Profile userSignIn={userSignIn}/>}
+          element={<Profile userSignIn={userSignIn} />}
         />
         <Route path="*" element={<Not_found set_is_found={set_is_found} />} />
         <Route
           path="/formalization"
-          element={<Formalization userSignIn={userSignIn} />}
-        />
-        <Route
-          path="/delivery/*"
-          element={<Delivery setSelectedLocation={setSelectedLocation} />}
+          element={
+            <Formalization
+              userSignIn={userSignIn}
+              setSelectedLocation={setSelectedLocation}
+              set_is_another_nav={set_is_another_nav}
+              is_another_nav={is_another_nav}
+            />
+          }
         />
         <Route path="/terms" element={<Terms />} />
-        <Route path="/payment-variant" element={<Payment_variant />} />
+        {/* <Route path="/payment-variant" element={<Payment_variant />} /> */}
       </Routes>
-    {is_found && <Footer />}
+      {is_found && <Footer />}
     </div>
   );
 };
