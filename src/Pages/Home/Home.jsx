@@ -5,6 +5,7 @@ import like_icon from './Images/like_icon.svg';
 import liked_icon from './Images/liked_icon.svg';
 import Carusel from './Carusel';
 import Download from './Download';
+import { Link } from 'react-router-dom';
 
 const fetchProducts = () => {
     return new Promise((resolve) => {
@@ -13,7 +14,7 @@ const fetchProducts = () => {
             name: `Product ${index + 1}`,
             price: "9.999 UZS",
             image: photo,
-            liked: false, 
+            liked: false,
         }));
         resolve(products);
     });
@@ -52,20 +53,26 @@ const Home = () => {
                                 key={product.id}
                                 className='w-[283px] h-[403px] cursor-pointer hover:shadow-xs'
                             >
-                                <div className='w-[283px] h-[283px] rounded-[10px] bg-[#F2F2F1] flex justify-center items-center overflow-hidden group'>
-                                    <img
-                                        src={product.image}
-                                        className='transition-transform duration-300 transform group-hover:scale-105 w-full h-full object-fill'
-                                        alt={product.name}
-                                    />
-                                </div>
+                                <Link to={"/product"}>
+                                    <div className='w-[283px] h-[283px] rounded-[10px] bg-[#F2F2F1] flex justify-center items-center overflow-hidden group'>
+                                        <img
+                                            src={product.image}
+                                            className='transition-transform duration-300 transform group-hover:scale-105 w-full h-full object-fill'
+                                            alt={product.name}
+                                        />
+                                    </div>
+                                </Link>
 
                                 <div className='flex flex-col gap-[16px]'>
-                                    <div className='flex flex-col gap-[26px] mt-[30px]'>
-                                        <h1 className='font-inter font-[600] text-[20px] text-black'>{product.name}</h1>
-                                    </div>
+                                    <Link to={"/product"}>
+                                        <div className='flex flex-col gap-[26px] mt-[30px]'>
+                                            <h1 className='font-inter font-[600] text-[20px] text-black'>{product.name}</h1>
+                                        </div>
+                                    </Link>
                                     <div className='flex justify-between'>
-                                        <p className='font-inter font-[500] text-[20px] leading-[22px] text-black'>Narxi : {product.price}</p>
+                                        <Link to={"/product"}>
+                                            <p className='font-inter font-[500] text-[20px] leading-[22px] text-black'>Narxi : {product.price}</p>
+                                        </Link>
 
                                         <div className='flex items-center gap-[16.33px]'>
                                             <img className='hover:scale-[105%] transition-all duration-300 w-[26px] h-[26px] object-contain' src={cart_icon} alt="Cart" />
@@ -73,7 +80,7 @@ const Home = () => {
                                                 className={`hover:scale-[105%] transition-all duration-300 ${product.liked ? 'p-[3px]' : 'p-0'} w-[26px] h-[26px] object-contain cursor-pointer`}
                                                 src={product.liked ? liked_icon : like_icon}
                                                 alt="Like"
-                                                onClick={() => handleLikeToggle(product.id)} 
+                                                onClick={() => handleLikeToggle(product.id)}
                                             />
                                         </div>
                                     </div>

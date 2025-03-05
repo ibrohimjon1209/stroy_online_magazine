@@ -19,6 +19,7 @@ import Footer from "./Pages/Footer/Footer";
 import Terms from "./Pages/Terms/terms_main";
 import Payment_variant from "./Pages/payment_variant/payment_main";
 import Category from "./Pages/Category/Category";
+import Product from "./Pages/Product/Product";
 
 const App = () => {
   const [userSignIn, setUserSignIn] = useState(true);
@@ -53,53 +54,46 @@ const App = () => {
     return <InternetChecker />;
   }
 
-  // Agar ekran kengligi 640px (sm breakpoint) dan kichik bo'lsa, body stillari qo'llanilmasin
-  useEffect(() => {
-    const applyStyles = () => {
-      if (window.innerWidth >= 640) {
-        document.body.style.transform = "scale(0.85)";
-        document.body.style.transformOrigin = "top left";
-        document.body.style.width = "117.33%";
-        document.body.style.overflow = "";
-        document.body.style.height = "100vh";
-      } else {
-        document.body.style.transform = "";
-        document.body.style.transformOrigin = "";
-        document.body.style.width = "";
-        document.body.style.overflow = "";
-        document.body.style.height = "";
-      }
-    };
+  const customScrollbar = {
+    overflowY: "auto",
+    scrollbarWidth: "auto",
+    scrollbarColor: "rgba(255,255,255,1) rgba(255,255,255,1)",
+  };
 
-    applyStyles();
-    window.addEventListener("resize", applyStyles);
-    return () => window.removeEventListener("resize", applyStyles);
+
+  useEffect(() => {
+    document.body.style.transform = "scale(0.85)";
+    document.body.style.transformOrigin = "top left";
+    document.body.style.width = "117.33%";
+    document.body.style.overflow = "hidden";
+    document.body.style.height = "100vh";
   }, []);
 
   return (
-    <div className={`${is_found ? "w-[375px] sm:w-[1440px]" : "w-full"} m-auto`}>
+    <div className={`${is_found ? "w-[375px] sm:w-[1450px]" : "w-full "} m-auto `} >
       {is_found && !is_another_nav && <Navbar userSignIn={userSignIn} />}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/likes" element={<Likes />} />
-        <Route path="/basket" element={<Basket />} />
-        <Route path="/orders" element={<Orders />} />
-<<<<<<< HEAD
-        <Route path="/profile/*" element={<Profile userSignIn={userSignIn} />} />
-=======
-        <Route
-          path="/profile/*"
-          element={<Profile userSignIn={userSignIn}/>}
-        />
->>>>>>> 48fcb8b5a393d65c4abcfde51c6223c87f25da9f
-        <Route path="*" element={<Not_found set_is_found={set_is_found} />} />
-        <Route path="/formalization" element={<Formalization userSignIn={userSignIn} />} />
-        <Route path="/delivery/*" element={<Delivery setSelectedLocation={setSelectedLocation} />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/payment-variant" element={<Payment_variant />} />
-        <Route path="/category" element={<Category />} />
-      </Routes>
-    {is_found && <Footer />}
+      <div className="h-[calc(120.5vh-100px)] w-[100%]" style={{
+        ...customScrollbar,
+        overflowY: "auto",
+        scrollbarWidth: "thin",
+        scrollbarColor: "rgba(244,244,244,1) rgba(255, 255, 255, 1)",
+      }}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/likes" element={<Likes />} />
+          <Route path="/basket" element={<Basket />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/profile/*" element={<Profile userSignIn={userSignIn} />} />
+          <Route path="*" element={<Not_found set_is_found={set_is_found} />} />
+          <Route path="/formalization" element={<Formalization userSignIn={userSignIn} />} />
+          <Route path="/delivery/*" element={<Delivery setSelectedLocation={setSelectedLocation} />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/product/*" element={<Product />} />
+          <Route path="/payment-variant" element={<Payment_variant />} />
+          <Route path="/category" element={<Category />} />
+        </Routes>
+        {is_found && <Footer />}
+      </div>
     </div>
   );
 };
