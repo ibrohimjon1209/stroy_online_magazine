@@ -6,16 +6,16 @@ import solfy from "./imgs/solfy.png";
 import anor from "./imgs/anor.png";
 import uzum from "./imgs/uzum.png";
 
-const Payment_main = () => {
+const Payment_main = ({ set_is_payment_variant, is_payment_variant}) => {
   const [active_tab, set_active_tab] = useState(1);
   const [active_tab2, set_active_tab2] = useState(1);
   return (
-    <div className="w-full h-full flex flex-col mb-[80px]">
+    <div className={`w-full h-full ${is_payment_variant ? "flex" : "hidden"} flex-col mb-[80px]`}>
       <div className="sticky w-full h-[80px] fixed top-0 z-50">
         <div className="bg-[#DCC38B] flex items-center gap-[10px] w-full h-full font-inter font-[600] text-[20px] leading-[22px] text-black flex items-center pl-[50px]">
-          <Link to="/formalization">
+          <div onClick={() => set_is_payment_variant(false)}>
             <ChevronLeft className="w-[35px] h-[35px] mt-[2px] cursor-pointer" />
-          </Link>
+          </div>
           <p>To’lov variantlari</p>
         </div>
       </div>
@@ -167,7 +167,7 @@ const Payment_main = () => {
         </div>
         <div className="font-inter font-[700] text-[36px] leading-[22px] flex items-center justify-between text-[#000000BF] mt-[100px]">
           <h1>Jami:</h1>
-          <h2>1.431.000so’m</h2>
+          <h2>1.431.000 so’m</h2>
         </div>
         <div className="mt-[70px] flex items-center justify-center font-inter font-[600] text-[20px] leading-[22px] rounded-[10px] w-[583px] h-[78px] bg-[#DCC38B] mx-auto cursor-pointer hover:scale-[101%] active:scale-[99%] duration-300 text-black">
         Xaridni rasmiylashtirish

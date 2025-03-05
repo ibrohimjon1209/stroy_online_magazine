@@ -8,7 +8,7 @@ const customIcon = new L.Icon({
   iconSize: [35, 35],
 });
 
-const MapPage = ({ setSelectedLocation }) => {
+const MapPage = ({ setSelectedLocation, set_active, active }) => {
   const [position, setPosition] = useState([40.7836, 72.3501]);
   const [address, setAddress] = useState(`Koordinata: ${position[0].toFixed(5)}, ${position[1].toFixed(5)}`);
 
@@ -33,7 +33,7 @@ const MapPage = ({ setSelectedLocation }) => {
   }
 
   return (
-    <div className="relative max-w-[100%] h-[86vh] mb-2 mx-auto mt-6 border border-gray-300 rounded-lg shadow-lg">
+    <div className={`${active === "map" ? "block" : "hidden"} relative max-w-[100%] h-[86vh] mb-2 mx-auto mt-6 border border-gray-300 rounded-lg shadow-lg`}>
       <MapContainer
         center={position}
         zoom={13}
