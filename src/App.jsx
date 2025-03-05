@@ -16,12 +16,9 @@ import InternetChecker from "./Pages/offline_page/offline_page";
 import Formalization from "./Pages/Formalization/formalization_main";
 import Footer from "./Pages/Footer/Footer";
 import Terms from "./Pages/Terms/terms_main";
-<<<<<<< HEAD
 import Pickup_address from "./Pages/pickup_address/pickup_address_main";
-=======
 import Payment_variant from "./Pages/payment_variant/payment_main";
 import Category from "./Pages/Category/Category";
->>>>>>> c631dd0e9a87eeb171d5c0fe41cca4c84322e029
 
 const App = () => {
   const [userSignIn, setUserSignIn] = useState(true);
@@ -46,18 +43,20 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-<<<<<<< HEAD
     if (
       location == "delivery" ||
       location == "terms" ||
       location == "payment-variant"
     ) {
-=======
-    if (location === "delivery" || location === "terms" || location === "payment-variant") {
->>>>>>> c631dd0e9a87eeb171d5c0fe41cca4c84322e029
-      set_is_another_nav(true);
-    } else {
-      set_is_another_nav(false);
+      if (
+        location === "delivery" ||
+        location === "terms" ||
+        location === "payment-variant"
+      ) {
+        set_is_another_nav(true);
+      } else {
+        set_is_another_nav(false);
+      }
     }
   }, [location]);
 
@@ -89,29 +88,21 @@ const App = () => {
   }, []);
 
   return (
-<<<<<<< HEAD
     <div
-      className={`${is_found ? "w-[1000px] sm:w-[1440px]" : "w-full"} m-auto`}
+      className={`${is_found ? "w-[375px] sm:w-[1440px]" : "w-full"} m-auto`}
     >
-=======
-    <div className={`${is_found ? "w-[375px] sm:w-[1440px]" : "w-full"} m-auto`}>
->>>>>>> c631dd0e9a87eeb171d5c0fe41cca4c84322e029
       {is_found && !is_another_nav && <Navbar userSignIn={userSignIn} />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/likes" element={<Likes />} />
         <Route path="/basket" element={<Basket />} />
         <Route path="/orders" element={<Orders />} />
-<<<<<<< HEAD
-        <Route path="/profile/*" element={<Profile userSignIn={userSignIn} />} />
-=======
         <Route
           path="/profile/*"
           element={<Profile userSignIn={userSignIn} />}
         />
->>>>>>> 48fcb8b5a393d65c4abcfde51c6223c87f25da9f
+
         <Route path="*" element={<Not_found set_is_found={set_is_found} />} />
-<<<<<<< HEAD
         <Route
           path="/formalization"
           element={
@@ -126,13 +117,8 @@ const App = () => {
         />
         <Route path="/terms" element={<Terms />} />
         {/* <Route path="/pickup-address" element={<Pickup_address set_is_footer_visible={set_is_footer_visible} set_is_another_nav={set_is_another_nav} is_another_nav={is_another_nav} />} /> */}
-=======
-        <Route path="/formalization" element={<Formalization userSignIn={userSignIn} />} />
-        <Route path="/delivery/*" element={<Delivery setSelectedLocation={setSelectedLocation} />} />
         <Route path="/terms" element={<Terms />} />
-        <Route path="/payment-variant" element={<Payment_variant />} />
         <Route path="/category" element={<Category />} />
->>>>>>> c631dd0e9a87eeb171d5c0fe41cca4c84322e029
       </Routes>
       {is_found && is_footer_visible && <Footer />}
     </div>

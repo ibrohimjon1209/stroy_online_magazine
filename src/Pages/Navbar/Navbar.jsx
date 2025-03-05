@@ -10,13 +10,8 @@ import profile from "./Images/profile.svg";
 import profile_a from "./Images/profile_a.svg";
 import vector from "./Images/vector.png";
 import { Link } from "react-router";
-<<<<<<< HEAD
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronDown, Search } from "lucide-react";
-=======
-import { useNavigate } from "react-router-dom";
 import { ChevronDown, CirclePlus, History, Menu, Search, X } from "lucide-react";
->>>>>>> c631dd0e9a87eeb171d5c0fe41cca4c84322e029
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -28,9 +23,6 @@ const Navbar = () => {
   const [is_orders_hovered, set_is_orders_hovered] = useState(false);
   const [is_basket_hovered, set_is_basket_hovered] = useState(false);
   const [is_profile_hovered, set_is_profile_hovered] = useState(false);
-<<<<<<< HEAD
-  const location = useLocation().pathname.split("/")[1];
-=======
   const [active, set_active] = useState("");
 
   const [searchText, setSearchText] = useState("");
@@ -40,7 +32,6 @@ const Navbar = () => {
     set_is_search_open(false);
   };
 
->>>>>>> c631dd0e9a87eeb171d5c0fe41cca4c84322e029
   const handleSearchClick = () => {
     set_is_search_open(true);
     set_is_category_open(false);
@@ -225,12 +216,8 @@ const Navbar = () => {
         <Link to="/likes">
           <img
             className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
-<<<<<<< HEAD
-            src={location == "likes" || is_likes_hovered ? like_a : like}
-=======
             src={active === "likes" || is_likes_hovered ? like_a : like}
             onClick={() => set_active("likes")}
->>>>>>> c631dd0e9a87eeb171d5c0fe41cca4c84322e029
             onMouseEnter={() => set_is_likes_hovered(true)}
             onMouseLeave={() => set_is_likes_hovered(false)}
             alt="likes"
@@ -239,12 +226,8 @@ const Navbar = () => {
         <Link to="/orders">
           <img
             className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
-<<<<<<< HEAD
-            src={location == "orders" || is_orders_hovered ? cube_a : cube}
-=======
             src={active === "orders" || is_orders_hovered ? cube_a : cube}
             onClick={() => set_active("orders")}
->>>>>>> c631dd0e9a87eeb171d5c0fe41cca4c84322e029
             onMouseEnter={() => set_is_orders_hovered(true)}
             onMouseLeave={() => set_is_orders_hovered(false)}
             alt="orders"
@@ -253,12 +236,8 @@ const Navbar = () => {
         <Link to="/basket">
           <img
             className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
-<<<<<<< HEAD
-            src={location == "basket" || is_basket_hovered ? basket_a : basket}
-=======
             src={active === "basket" || is_basket_hovered ? basket_a : basket}
             onClick={() => set_active("basket")}
->>>>>>> c631dd0e9a87eeb171d5c0fe41cca4c84322e029
             onMouseEnter={() => set_is_basket_hovered(true)}
             onMouseLeave={() => set_is_basket_hovered(false)}
             alt="basket"
@@ -267,14 +246,8 @@ const Navbar = () => {
         <Link to="/profile/orders">
           <img
             className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
-<<<<<<< HEAD
-            src={
-              location == "profile" || is_profile_hovered ? profile_a : profile
-            }
-=======
             src={active === "profile" || is_profile_hovered ? profile_a : profile}
             onClick={() => set_active("profile")}
->>>>>>> c631dd0e9a87eeb171d5c0fe41cca4c84322e029
             onMouseEnter={() => set_is_profile_hovered(true)}
             onMouseLeave={() => set_is_profile_hovered(false)}
             alt="profile"
