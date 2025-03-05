@@ -1,64 +1,91 @@
-import React, { useState, useRef } from "react";
-import logo from "./Images/logo.png";
-import cube from "./Images/orders.svg";
-import cube_a from "./Images/orders_a.svg";
-import like from "./Images/like.svg";
-import like_a from "./Images/like_a.svg";
-import basket from "./Images/basket.svg";
-import basket_a from "./Images/basket_a.svg";
-import profile from "./Images/profile.svg";
-import profile_a from "./Images/profile_a.svg";
-import vector from "./Images/vector.png";
-import { Link } from "react-router";
-import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronDown, Search } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { ChevronDown, CirclePlus, History, Menu, Search, X } from "lucide-react";
+"use client"
+
+import { useState, useRef } from "react"
+import logo from "./Images/logo.svg"
+import cube from "./Images/orders.svg"
+import cube_a from "./Images/orders_a.svg"
+import like from "./Images/like.svg"
+import like_a from "./Images/like_a.svg"
+import basket from "./Images/basket.svg"
+import basket_a from "./Images/basket_a.svg"
+import profile from "./Images/profile.svg"
+import profile_a from "./Images/profile_a.svg"
+import vector from "./Images/vector.png"
+import { Link } from "react-router"
+import { useNavigate, useLocation } from "react-router-dom"
+import { ChevronDown, CirclePlus, History, Menu, Search, X } from "lucide-react"
 
 const Navbar = () => {
-  const navigate = useNavigate();
-  const inputRef = useRef(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [is_category_open, set_is_category_open] = useState(false);
-  const [is_search_open, set_is_search_open] = useState(false);
-  const [is_likes_hovered, set_is_likes_hovered] = useState(false);
-  const [is_orders_hovered, set_is_orders_hovered] = useState(false);
-  const [is_basket_hovered, set_is_basket_hovered] = useState(false);
-  const [is_profile_hovered, set_is_profile_hovered] = useState(false);
-  const location = useLocation().pathname.split("/")[1];
-  const [active, set_active] = useState("");
+  const navigate = useNavigate()
+  const inputRef = useRef(null)
+  const [isOpen, setIsOpen] = useState(false)
+  const [is_category_open, set_is_category_open] = useState(false)
+  const [is_search_open, set_is_search_open] = useState(false)
+  const [is_likes_hovered, set_is_likes_hovered] = useState(false)
+  const [is_orders_hovered, set_is_orders_hovered] = useState(false)
+  const [is_basket_hovered, set_is_basket_hovered] = useState(false)
+  const [is_profile_hovered, set_is_profile_hovered] = useState(false)
+  const location = useLocation().pathname.split("/")[1]
+  const [active, set_active] = useState("")
+  const [categoryAnimation, setCategoryAnimation] = useState(false)
+  const [searchAnimation, setSearchAnimation] = useState(false)
 
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState("")
 
   const handleCategoryClick = () => {
-    set_is_category_open(true);
-    set_is_search_open(false);
-  };
+    if (is_category_open) {
+      setCategoryAnimation(false)
+      setTimeout(() => {
+        set_is_category_open(false)
+      }, 300) // Match this to the animation duration
+    } else {
+      set_is_category_open(true)
+      setTimeout(() => {
+        setCategoryAnimation(true)
+      }, 10)
+      set_is_search_open(false)
+      setSearchAnimation(false)
+    }
+  }
 
   const handleSearchClick = () => {
-    set_is_search_open(true);
-    set_is_category_open(false);
-    if (inputRef.current) {
-      inputRef.current.focus();
+    if (is_search_open) {
+      setSearchAnimation(false)
+      setTimeout(() => {
+        set_is_search_open(false)
+      }, 300) // Match this to the animation duration
+    } else {
+      set_is_search_open(true)
+      setTimeout(() => {
+        setSearchAnimation(true)
+      }, 10)
+      set_is_category_open(false)
+      setCategoryAnimation(false)
+      if (inputRef.current) {
+        inputRef.current.focus()
+      }
     }
-  };
+  }
 
   const clearInput = () => {
-    setSearchText("");
+    setSearchText("")
     if (inputRef.current) {
-      inputRef.current.focus();
+      inputRef.current.focus()
     }
-  };
+  }
 
   // Qidiruv modali tavsiyalaridan birini tanlash funksiyasi
   const handleSelectTopic = (name) => {
-    setSearchText(name);
-    set_is_search_open(false);
-  };
+    setSearchText(name)
+    setSearchAnimation(false)
+    setTimeout(() => {
+      set_is_search_open(false)
+    }, 300)
+  }
 
   const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
+    setIsOpen(!isOpen)
+  }
 
   const category_topics = [
     { name: "Penopleks" },
@@ -69,44 +96,70 @@ const Navbar = () => {
     { name: "Steklovata" },
     { name: "Kanauf" },
     { name: "Kanauf" },
-  ];
+  ]
 
-  const search_topics = [
-    { name: "Olma" },
-    { name: "Behi" },
-    { name: "Anor" },
-    { name: "Ko'ylak" },
-    { name: "Bazalt" },
-  ];
+  const search_topics = [{ name: "Olma" }, { name: "Behi" }, { name: "Anor" }, { name: "Ko'ylak" }, { name: "Bazalt" }]
 
-  const points = [
-    { name: "Stroy Baza №1" },
-    { name: "Mebel" },
-    { name: "Golden house" },
-  ];
+  const points = [{ name: "Stroy Baza №1" }, { name: "Mebel" }, { name: "Golden house" }]
 
-  const [selectedOption, setSelectedOption] = useState(points[0]);
+  const [selectedOption, setSelectedOption] = useState(points[0])
 
   const handleOptionClick = (option) => {
-    setSelectedOption(option);
-    setIsOpen(false);
-  };
+    setSelectedOption(option)
+    setIsOpen(false)
+  }
 
   const handleClickOutside_category = () => {
-    set_is_category_open(false);
-  };
+    setCategoryAnimation(false)
+    setTimeout(() => {
+      set_is_category_open(false)
+    }, 300) // Match this to the animation duration
+  }
 
   const handleClickOutside_search = () => {
-    set_is_search_open(false);
-  };
+    setSearchAnimation(false)
+    setTimeout(() => {
+      set_is_search_open(false)
+    }, 300) // Match this to the animation duration
+  }
 
-  const to_home = () => navigate("/");
+  const to_home = () => navigate("/")
 
   return (
     <div className="w-full h-[80px] flex justify-between gap-[20px] z-50 items-center px-[4.2%] sticky top-2 rounded-[15px] bg-[#DCC38B]">
+      <style jsx>{`
+        .dropdown-enter {
+          opacity: 0;
+          transform: translateY(-20px);
+          max-height: 0;
+          overflow: hidden;
+        }
+        
+        .dropdown-enter-active {
+          opacity: 1;
+          transform: translateY(0);
+          max-height: 500px;
+          transition: opacity 300ms, transform 300ms, max-height 300ms;
+        }
+        
+        .dropdown-exit {
+          opacity: 1;
+          transform: translateY(0);
+          max-height: 500px;
+        }
+        
+        .dropdown-exit-active {
+          opacity: 0;
+          transform: translateY(-20px);
+          max-height: 0;
+          transition: opacity 300ms, transform 300ms, max-height 300ms;
+          overflow: hidden;
+        }
+      `}</style>
+
       {/* Logo va bosh sahifaga yo'naltirish */}
       <div className="w-[247px] h-full flex items-center gap-[5px]">
-        <img src={logo} alt="Logo" className="cursor-pointer" onClick={to_home} />
+        <img src={logo || "/placeholder.svg"} alt="Logo" className="cursor-pointer" onClick={to_home} />
         <h1 className="font-inter font-[600] text-[20px] cursor-pointer leading-[22px] text-black" onClick={to_home}>
           STROY BAZA №1
         </h1>
@@ -119,7 +172,7 @@ const Navbar = () => {
             onClick={handleCategoryClick}
             className="border-[3px] border-white drop-shadow-xl hover:opacity-75 cursor-pointer w-[100px] h-[40px] bg-transparent flex justify-center items-center rounded-[5px] gap-[5px]"
           >
-            <Menu strokeWidth={1.50} color="white" />
+            <Menu strokeWidth={1.5} color="white" />
             <h1 className="font-inter font-[500] text-[13px] text-white uppercase">Katolog</h1>
           </div>
 
@@ -128,14 +181,14 @@ const Navbar = () => {
               className="absolute top-[100%] left-0 h-[91vh] w-full flex justify-center pr-[50px] pt-[10px]"
               onClick={handleClickOutside_category}
             >
-              <div className="search_modal w-[600px] h-[450px] bg-white border-[1px] overflow-hidden border-[#6D5C5CA6] rounded-[5px] shadow-xl">
+              <div
+                className={`search_modal w-[600px] h-[450px] bg-white border-[1px] overflow-hidden border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${categoryAnimation ? "dropdown-enter-active" : "dropdown-enter"}`}
+              >
                 {category_topics.map((item, index) => (
-                  <Link to={"/category"}>
-                    <div key={index} className="w-full h-[52px] pl-[34px] pr-[43px] flex justify-between items-center bg-transparent hover:bg-gray-100">
-                      <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">
-                        {item.name}
-                      </h1>
-                      <img src={vector} className="rotate-[270deg]" />
+                  <Link to={"/category"} key={index}>
+                    <div className="w-full h-[52px] pl-[34px] pr-[43px] flex justify-between items-center bg-transparent hover:bg-gray-100">
+                      <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">{item.name}</h1>
+                      <img src={vector || "/placeholder.svg"} className="rotate-[270deg]" alt="arrow" />
                     </div>
                   </Link>
                 ))}
@@ -157,11 +210,7 @@ const Navbar = () => {
             onChange={(e) => setSearchText(e.target.value)}
           />
           {searchText && (
-            <CirclePlus
-              className="rotate-[45deg] mr-[15px] cursor-pointer"
-              strokeWidth={1.75}
-              onClick={clearInput}
-            />
+            <CirclePlus className="rotate-[45deg] mr-[15px] cursor-pointer" strokeWidth={1.75} onClick={clearInput} />
           )}
         </div>
 
@@ -171,18 +220,30 @@ const Navbar = () => {
             onClick={handleClickOutside_search}
           >
             <div
-              className="search_modal transition-transform duration-300 w-[520px] h-fit ml-[160px] bg-white border-[1px] overflow-hidden border-[#6D5C5CA6] rounded-[5px] shadow-xl"
+              className={`search_modal w-[520px] h-fit ml-[160px] bg-white border-[1px] overflow-hidden border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${searchAnimation ? "dropdown-enter-active" : "dropdown-enter"}`}
               onClick={(e) => e.stopPropagation()}
             >
               {search_topics.map((item, index) => (
-                <div key={index} onClick={() => handleSelectTopic(item.name)} className="cursor-pointer w-full h-[52px] pl-[24px] pr-[43px] flex justify-between items-center bg-transparent hover:bg-gray-100">
-                  <div className="flex gap-[15px] cursor-pointer" >
+                <div
+                  key={index}
+                  onClick={() => handleSelectTopic(item.name)}
+                  className="cursor-pointer w-full h-[52px] pl-[24px] pr-[43px] flex justify-between items-center bg-transparent hover:bg-gray-100"
+                >
+                  <div className="flex gap-[15px] cursor-pointer">
                     <History strokeWidth={1.75} />
-                    <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">
-                      {item.name}
-                    </h1>
+                    <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">{item.name}</h1>
                   </div>
-                  <X strokeWidth={1.75} className="cursor-pointer" onClick={() => set_is_search_open(false)} />
+                  <X
+                    strokeWidth={1.75}
+                    className="cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      setSearchAnimation(false)
+                      setTimeout(() => {
+                        set_is_search_open(false)
+                      }, 300)
+                    }}
+                  />
                 </div>
               ))}
             </div>
@@ -246,9 +307,7 @@ const Navbar = () => {
         <Link to="/profile/orders">
           <img
             className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
-            src={
-              location == "profile" || is_profile_hovered ? profile_a : profile
-            }
+            src={location == "profile" || is_profile_hovered ? profile_a : profile}
             onMouseEnter={() => set_is_profile_hovered(true)}
             onMouseLeave={() => set_is_profile_hovered(false)}
             alt="profile"
@@ -256,7 +315,8 @@ const Navbar = () => {
         </Link>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar
+
