@@ -20,19 +20,19 @@ const Sidebar = ({ isUserSignIn }) => {
   const location = useLocation();
 
   return (
-    <div className="h-auto w-[350px]">
-      <div className="sticky top-0 w-[350px]">
+    <div className="h-auto sm:mx-0 mx-auto w-[100%] sm:w-[350px]">
+      <div className="sticky top-0 w-[100%] sm:w-[350px]">
         <div>
           {!isUserSignIn ? (
-            <div className="flex h-[70px] items-center w-full gap-3 border-[#D5D5D5] border rounded-[8px] pl-[20px] pr-[30px] py-[12px]">
+            <div className="flex h-[100px] items-center w-full gap-3 border-[#D5D5D5] border rounded-[8px] pl-[13px] sm:pl-[20px] pr-[30px] py-[12px]">
               <div className="bg-gray-200 rounded-full p-2">
                 <User className="h-7 w-7 text-gray-600" />
               </div>
               <div className="flex flex-col">
-                <span className="font-inter font-[600] text-[15px] leading-[22px] text-black">
+                <span className="font-inter font-[600] text-[18px] sm:text-[15px] leading-[30px] sm:leading-[22px] text-black whitespace-nowrap">
                   {user.name}
                 </span>
-                <span className="font-inter font-[500] text-[13px] leading-[22px] text-black">
+                <span className="font-inter font-[500] text-[16px] sm:text-[13px] leading-[30px] sm:leading-[22px] text-black whitespace-nowrap">
                   {user.phone}
                 </span>
               </div>

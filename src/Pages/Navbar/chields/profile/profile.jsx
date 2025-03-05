@@ -12,7 +12,7 @@ const Profile_main = ({isUserSignIn}) => {
   return (
       <div className="flex my-10 profile_md:w-[93%] w-[90%] mx-auto">
         <Sidebar isUserSignIn={isUserSignIn} />
-        <div className="flex-1 ml-[20px] border border-[#D5D5D5] rounded-[8px] flex pt-[50px]">
+        <div className="flex-1 ml-[20px] border border-[#D5D5D5] rounded-[8px] hidden sm:flex pt-[50px]">
           <Routes>
             <Route path="/orders" element={<Orders />} />
             <Route path="/cashback" element={<Cashback />} />

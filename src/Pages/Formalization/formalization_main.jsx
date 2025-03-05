@@ -12,25 +12,30 @@ import Modal from "./modal";
 import { useState } from "react";
 import Delivery from "../Map/map_main";
 import Payment_variant from "../payment_variant/payment_main";
+import Pickup_address from "../pickup_address/pickup_address_main";
 
 const Formalization_main = ({
   userSignIn,
   setSelectedLocation,
   set_is_another_nav,
   is_another_nav,
+  set_is_footer_visible,
 }) => {
   const [deliver_type, set_deliver_type] = useState("bring");
   const [selectedMethod, setSelectedMethod] = useState("installment");
   const [is_modal_open, set_is_modal_open] = useState(false);
   const [is_delivery, set_is_delivery] = useState(false);
+  const [is_pickup, set_is_pickup] = useState(false);
   const [is_payment_variant, set_is_payment_variant] = useState(false);
-  set_is_another_nav(is_delivery || is_payment_variant);
+  set_is_another_nav(is_delivery || is_payment_variant || is_pickup);
+  set_is_footer_visible(!is_pickup)
   return (
     <>
       <div
-        className={`w-[76%] ${
-          is_delivery || is_payment_variant ? "hidden" : "block"
-        } mx-auto bg-white mb-[20px]`}
+        className={`w-[76%] ${is_delivery ? "hidden" : "block"}
+        ${is_payment_variant ? "hidden" : "block"}
+        ${is_pickup ? "hidden" : "block"}
+         mx-auto bg-white mb-[20px]`}
       >
         <div className="p-6 pt-[35px]">
           <h2 className="font-inter font-[600] text-[15px] leading-[22px] text-black">
@@ -107,7 +112,11 @@ const Formalization_main = ({
 
           <div className="border border-[#D5D5D5] rounded-lg mb-4 mt-[35px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300">
             <div
-              onClick={() => set_is_delivery(true)}
+              onClick={() => {
+                deliver_type === "bring"
+                  ? set_is_delivery(true)
+                  : set_is_pickup(true);
+              }}
               className="flex items-center justify-between w-full p-4 cursor-pointer"
             >
               <div className="flex items-center gap-3">
@@ -117,7 +126,9 @@ const Formalization_main = ({
                   className="h-[25px] w-[25px] object-contain"
                 />
                 <span className="font-medium">
-                  Yetkazib berish manzilini tanlang
+                  {`${
+                    deliver_type === "bring" ? "Olib ketish" : "Yetkazib berish"
+                  } manzilini tanlang`}
                 </span>
               </div>
               <ChevronRight className="h-5 w-5 text-gray-400" />
@@ -360,9 +371,12 @@ const Formalization_main = ({
         is_another_nav={is_another_nav}
       />
       <Payment_variant
-        is_another_nav={is_another_nav}
         is_payment_variant={is_payment_variant}
         set_is_payment_variant={set_is_payment_variant}
+      />
+      <Pickup_address
+        is_pickup={is_pickup}
+        set_is_pickup={set_is_pickup}
       />
     </>
   );

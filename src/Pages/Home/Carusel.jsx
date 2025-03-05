@@ -37,7 +37,7 @@ export default function KitchenCarousel() {
   useEffect(() => {
     const interval = setInterval(() => {
       nextSlide();
-    }, 1700);
+    }, 5000);
     return () => clearInterval(interval);
   }, [nextSlide]);
 

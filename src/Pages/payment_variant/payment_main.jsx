@@ -6,7 +6,7 @@ import solfy from "./imgs/solfy.png";
 import anor from "./imgs/anor.png";
 import uzum from "./imgs/uzum.png";
 
-const Payment_main = ({is_another_nav, set_is_payment_variant, is_payment_variant}) => {
+const Payment_main = ({ set_is_payment_variant, is_payment_variant}) => {
   const [active_tab, set_active_tab] = useState(1);
   const [active_tab2, set_active_tab2] = useState(1);
   return (
