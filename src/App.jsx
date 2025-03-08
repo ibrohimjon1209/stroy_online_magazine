@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { lazy, Suspense, useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -18,8 +18,8 @@ import Footer from "./Pages/Footer/Footer";
 import Terms from "./Pages/Terms/terms_main";
 import Pickup_address from "./Pages/pickup_address/pickup_address_main";
 import Payment_variant from "./Pages/payment_variant/payment_main";
-import Category from "./Pages/Category/Category";
-import Product from "./Pages/Product/Product";
+const Product = lazy(() => import("./Pages/Product/Product"));
+const Category = lazy(() => import("./Pages/Category/Category"));
 
 const App = () => {
   const [userSignIn, setUserSignIn] = useState(true);
@@ -92,30 +92,26 @@ const App = () => {
             <Route path="/basket" element={<Basket />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/profile/*" element={<Profile userSignIn={userSignIn} />} />
-            <Route path="/product/*" element={<Product />} />
+
+            {/* Lazy yuklanadigan sahifalar */}
             <Route
-              path="/profile/*"
-              element={<Profile userSignIn={userSignIn} />}
-            />
-            {/* <Route path="*" element={<Not_found set_is_found={set_is_found} />} /> */}
-            <Route
-              path="/formalization"
+              path="/product/*"
               element={
-                <Formalization
-                  userSignIn={userSignIn}
-                  setSelectedLocation={setSelectedLocation}
-                  set_is_another_nav={set_is_another_nav}
-                  is_another_nav={is_another_nav}
-                  set_is_footer_visible={set_is_footer_visible}
-                />  
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Product />
+                </Suspense>
               }
             />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/pickup-address" element={<Pickup_address set_is_footer_visible={set_is_footer_visible} set_is_another_nav={set_is_another_nav} is_another_nav={is_another_nav} />} /> */ }
-            <Route path="/formalization" element={<Formalization userSignIn={userSignIn} />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/category" element={<Category />} />
-          </Routes >
+            <Route
+              path="/category"
+              element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Category />
+                </Suspense>
+              }
+            />
+          </Routes>
+
           {is_found && is_footer_visible && <Footer />}
         </div>
       </div >
