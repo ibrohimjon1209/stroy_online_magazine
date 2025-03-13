@@ -100,9 +100,9 @@ const Navbar = () => {
   const to_home = () => navigate("/");
 
   return (
-    <div className="w-full h-[80px] flex justify-between gap-[20px] z-50 items-center px-[4.2%] sticky top-2 rounded-[15px] bg-[#DCC38B]">
+    <div className="w-full h-[80px] flex justify-between gap-[20px] z-50 items-center px-[4.2%] fixed top-2 rounded-[15px] bg-[#DCC38B]">
       {/* Logo va bosh sahifaga yo'naltirish */}
-      <div className="w-[247px] h-full flex items-center gap-[5px]">
+      <div className="-[247px] h-full flex items-center gap-[5px]">
         <img src={logo} alt="Logo" className="cursor-pointer" onClick={to_home} />
         <h1 className="font-inter font-[600] text-[20px] cursor-pointer leading-[22px] text-black" onClick={to_home}>
           STROY BAZA №1
