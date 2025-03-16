@@ -131,10 +131,9 @@ const Navbar = () => {
   const to_home = () => navigate("/")
 
   return (
-<<<<<<< HEAD
     <>
       <div className="hidden sm:block">
-        <div className="w-full h-auto md:h-[80px] flex flex-col md:flex-row justify-between gap-[20px] z-50 items-center px-[4.2%] sticky top-2 rounded-[15px] bg-[#DCC38B] py-4 md:py-0">
+        <div className="w-full h-auto md:h-[80px] flex flex-col md:flex-row justify-between gap-[20px] z-50 items-center px-[4.2%] sticky mt-[5px] rounded-[15px] bg-[#DCC38B] py-4 md:py-0">
           <style jsx>{`
           .dropdown-enter {
             opacity: 0;
@@ -164,16 +163,6 @@ const Navbar = () => {
             overflow: hidden;
           }
         `}</style>
-=======
-    <div className="w-full h-[80px] flex justify-between gap-[20px] z-50 items-center px-[4.2%] fixed top-2 rounded-[15px] bg-[#DCC38B]">
-      {/* Logo va bosh sahifaga yo'naltirish */}
-      <div className="-[247px] h-full flex items-center gap-[5px]">
-        <img src={logo} alt="Logo" className="cursor-pointer" onClick={to_home} />
-        <h1 className="font-inter font-[600] text-[20px] cursor-pointer leading-[22px] text-black" onClick={to_home}>
-          STROY BAZA №1
-        </h1>
-      </div>
->>>>>>> b111b54eb939218ec55067d0298c575215905abc
 
           {/* Mobile menu button */}
           <div className="flex w-full md:hidden justify-between items-center">
