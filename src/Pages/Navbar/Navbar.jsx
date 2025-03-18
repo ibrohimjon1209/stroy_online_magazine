@@ -396,7 +396,7 @@ const Navbar = () => {
       </div>
 
       {/* Mobile bottom navigation bar */}
-      <div className="md:hidden fixed -bottom-[calc(19vh-10px)] left-0 right-0 bg-[#BEA086] flex justify-around items-center h-[85px] z-50 rounded-t-[15px]">
+      <div className="md:hidden fixed -bottom-[calc(2vh-10px)] left-0 right-0 bg-[#BEA086] flex justify-around items-center h-[85px] z-50 rounded-t-[15px]">
         <Link to="/" className="flex flex-col items-center justify-center">
           <Home size={24} color={location === "" ? "#000000" : "#666666"} />
         </Link>

@@ -18,6 +18,8 @@ import Footer from "./Pages/Footer/Footer";
 import Terms from "./Pages/Terms/terms_main";
 import Pickup_address from "./Pages/pickup_address/pickup_address_main";
 import Payment_variant from "./Pages/payment_variant/payment_main";
+import { Cat } from "lucide-react";
+import Category_mobile from "./Pages/Category/Category_mobile";
 const Product = lazy(() => import("./Pages/Product/Product"));
 const Category = lazy(() => import("./Pages/Category/Category"));
 
@@ -69,18 +71,27 @@ const App = () => {
 
 
   useEffect(() => {
-    document.body.style.transform = "scale(0.85)";
-    document.body.style.transformOrigin = "top left";
-    document.body.style.width = "117.33%";
-    document.body.style.overflow = "hidden";
-    document.body.style.height = "100vh";
+    if (window.innerWidth > 768) {
+      document.body.style.transform = "scale(0.85)";
+      document.body.style.transformOrigin = "top left";
+      document.body.style.width = "117.33%";
+      document.body.style.overflow = "hidden";
+      document.body.style.height = "100vh";
+    } else {
+      document.body.style.transform = "";
+      document.body.style.transformOrigin = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+      document.body.style.height = "";
+    }
   }, []);
+
 
   return (
     <div className={`${is_found ? "w-[]  sm:w-[1450px]" : "w-full "} m-auto `} >
       {is_found && !is_another_nav && <Navbar userSignIn={userSignIn} />}
-      <div className={`${is_found ? "w-[375px]  sm:w-[1450px]" : "w-full"} m-auto`}>
-        <div className="flex flex-col justify-between h-[calc(121vh-100px)] w-[100%]" style={{
+      <div className={`${is_found ? "w-[]  sm:w-[1450px]" : "w-full"} m-auto`}>
+        <div className="flex flex-col justify-between  h-[calc(100vh)] sm:h-[calc(119vh-100px)] w-[100%]" style={{
           ...customScrollbar,
           overflowY: "auto",
           scrollbarWidth: "thin",
@@ -91,6 +102,7 @@ const App = () => {
             <Route path="/likes" element={<Likes />} />
             <Route path="/basket" element={<Basket />} />
             <Route path="/orders" element={<Orders />} />
+            <Route path="/search" element={<Category_mobile />} />
             <Route path="/profile/*" element={<Profile userSignIn={userSignIn} />} />
 
             {/* Lazy yuklanadigan sahifalar */}
