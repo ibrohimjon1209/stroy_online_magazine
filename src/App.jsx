@@ -77,9 +77,9 @@ const App = () => {
   }, []);
 
   return (
-    <div className={`${is_found ? "w-[375px]  sm:w-[1450px]" : "w-full "} m-auto `} >
+    <div className={`${is_found ? "w-[]  sm:w-[1450px]" : "w-full "} m-auto `} >
       {is_found && !is_another_nav && <Navbar userSignIn={userSignIn} />}
-      <div className={`${is_found ? "w-[375px]  sm:w-[1440px]" : "w-full"} m-auto`}>
+      <div className={`${is_found ? "w-[375px]  sm:w-[1450px]" : "w-full"} m-auto`}>
         <div className="flex flex-col justify-between h-[calc(121vh-100px)] w-[100%]" style={{
           ...customScrollbar,
           overflowY: "auto",
