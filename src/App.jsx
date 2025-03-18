@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { lazy, Suspense, useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -18,7 +18,8 @@ import Footer from "./Pages/Footer/Footer";
 import Terms from "./Pages/Terms/terms_main";
 import Pickup_address from "./Pages/pickup_address/pickup_address_main";
 import Payment_variant from "./Pages/payment_variant/payment_main";
-import Category from "./Pages/Category/Category";
+const Product = lazy(() => import("./Pages/Product/Product"));
+const Category = lazy(() => import("./Pages/Category/Category"));
 
 const App = () => {
   const [userSignIn, setUserSignIn] = useState(true);
@@ -48,80 +49,74 @@ const App = () => {
       location == "terms" ||
       location == "payment-variant"
     ) {
-      if (
-        location === "delivery" ||
-        location === "terms" ||
-        location === "payment-variant"
-      ) {
+      if (location === "delivery" || location === "terms" || location === "payment-variant") {
         set_is_another_nav(true);
       } else {
         set_is_another_nav(false);
       }
-    }
-  }, [location]);
+    } [location]
+  })
 
   if (!is_online) {
     return <InternetChecker />;
   }
 
-  // Agar ekran kengligi 640px (sm breakpoint) dan kichik bo'lsa, body stillari qo'llanilmasin
-  useEffect(() => {
-    const applyStyles = () => {
-      if (window.innerWidth >= 640) {
-        document.body.style.transform = "scale(0.85)";
-        document.body.style.transformOrigin = "top left";
-        document.body.style.width = "117.33%";
-        document.body.style.overflow = "";
-        document.body.style.height = "100vh";
-      } else {
-        document.body.style.transform = "";
-        document.body.style.transformOrigin = "";
-        document.body.style.width = "";
-        document.body.style.overflow = "";
-        document.body.style.height = "";
-      }
-    };
+  const customScrollbar = {
+    overflowY: "auto",
+    scrollbarWidth: "auto",
+    scrollbarColor: "rgba(255,255,255,1) rgba(255,255,255,1)",
+  };
 
-    applyStyles();
-    window.addEventListener("resize", applyStyles);
-    return () => window.removeEventListener("resize", applyStyles);
+
+  useEffect(() => {
+    document.body.style.transform = "scale(0.85)";
+    document.body.style.transformOrigin = "top left";
+    document.body.style.width = "117.33%";
+    document.body.style.overflow = "hidden";
+    document.body.style.height = "100vh";
   }, []);
 
   return (
-    <div
-      className={`${is_found ? "w-[375px] sm:w-[1440px]" : "w-full"} m-auto`}
-    >
+    <div className={`${is_found ? "w-[375px]  sm:w-[1450px]" : "w-full "} m-auto `} >
       {is_found && !is_another_nav && <Navbar userSignIn={userSignIn} />}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/likes" element={<Likes />} />
-        <Route path="/basket" element={<Basket />} />
-        <Route path="/orders" element={<Orders />} />
-        <Route
-          path="/profile/*"
-          element={<Profile userSignIn={userSignIn} />}
-        />
+      <div className={`${is_found ? "w-[375px]  sm:w-[1440px]" : "w-full"} m-auto`}>
+        <div className="flex flex-col justify-between h-[calc(121vh-100px)] w-[100%]" style={{
+          ...customScrollbar,
+          overflowY: "auto",
+          scrollbarWidth: "thin",
+          scrollbarColor: "rgba(244,244,244,1) rgba(255, 255, 255, 1)",
+        }}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/likes" element={<Likes />} />
+            <Route path="/basket" element={<Basket />} />
+            <Route path="/orders" element={<Orders />} />
+            <Route path="/profile/*" element={<Profile userSignIn={userSignIn} />} />
 
-        <Route path="*" element={<Not_found set_is_found={set_is_found} />} />
-        <Route
-          path="/formalization"
-          element={
-            <Formalization
-              userSignIn={userSignIn}
-              setSelectedLocation={setSelectedLocation}
-              set_is_another_nav={set_is_another_nav}
-              is_another_nav={is_another_nav}
-              set_is_footer_visible={set_is_footer_visible}
+            {/* Lazy yuklanadigan sahifalar */}
+            <Route
+              path="/product/*"
+              element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Product />
+                </Suspense>
+              }
             />
-          }
-        />
-        <Route path="/terms" element={<Terms />} />
-        {/* <Route path="/pickup-address" element={<Pickup_address set_is_footer_visible={set_is_footer_visible} set_is_another_nav={set_is_another_nav} is_another_nav={is_another_nav} />} /> */}
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/category" element={<Category />} />
-      </Routes>
-      {is_found && is_footer_visible && <Footer />}
+            <Route
+              path="/category"
+              element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Category />
+                </Suspense>
+              }
+            />
+          </Routes>
+
+          {is_found && is_footer_visible && <Footer />}
+        </div>
+      </div >
     </div>
+
   );
 };
 
