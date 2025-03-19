@@ -10,9 +10,12 @@ import cart_icon from "./Images/cart_icon.svg"
 import like_icon from "./Images/like_icon.svg"
 import liked_icon from "./Images/liked_icon.svg"
 
+// {api imports}
+import { products_get } from "../../Services/products_get"
+
 const fetchProducts = () => {
     return new Promise((resolve) => {
-        const products = Array.from({ length: 12 }, (_, index) => ({
+        const products = Array.from({ length: 222 }, (_, index) => ({
             id: index + 1,
             name: `Product ${index + 1}`,
             price: "9.999 UZS",
@@ -23,7 +26,22 @@ const fetchProducts = () => {
     })
 }
 
+
+
+
+
 function Home() {
+
+    useEffect(() => {
+        products_get()
+            .then((response) => {
+                const data = response.data
+                console.log(data)
+            })
+            .catch((err) => console.error("Error: ", err))
+
+
+    })  
     const inputRef = useRef(null)
     const [is_search_open, set_is_search_open] = useState(false)
     const [searchAnimation, setSearchAnimation] = useState(false)
@@ -138,7 +156,7 @@ function Home() {
                     )}
                 </div>
             </div>
-
+            
             <div className="px-[22px] w-full h-[90px] flex block sm:hidden justify-center items-center">
                 <div className="w-full h-[50px] bg-white border-[0.5px] border-[#8879798C] rounded-[10px] flex items-center justify-evenly">
                     <h1 className="font-inter font-[500] text-[15px] leading-[22px] text-[#DA9700]">Stroy Baza №1</h1>

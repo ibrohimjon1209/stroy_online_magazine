@@ -159,7 +159,7 @@ const Product = () => {
     }
 
     return (
-        <div className="w-full h-auto mt-[50px] px-[190px] mb-[111px]">
+        <div className="w-full h-auto mt-[0px] sm:mt-[50px] px-[22px] sm:px-[190px] mb-[111px]">
             {/* CSS for image transitions */}
             <style jsx>{`
                 @keyframes slideLeft {
@@ -227,6 +227,15 @@ const Product = () => {
                 }
             `}</style>
 
+            <div className='mx-[-22px] sticky top-0 z-50 block sm:hidden'>
+                <div className='w-full h-[65px] bg-[#DCC38B]'>
+                    <Link className='w-full h-full flex items-center gap-[10px] pl-[13px]' to={"/"}>
+                        <ChevronLeft className='scale-110' />
+                        <h1 className='font-inter font-[500] text-[15px] leading-[22px] text-black'>Penoplex</h1>
+                    </Link>
+                </div>
+            </div>
+
             {isVisible && notification && (
                 <div className={`absolute z-50 left-1 w-full h-auto flex justify-center items-center notification`}>
                     <div className="bg-[#fefdfd] drop-shadow-lg w-[750px] h-[100px] flex items-center rounded-md transition-opacity duration-500 ease-in-out opacity-100">
@@ -255,11 +264,11 @@ const Product = () => {
                 </div>
             )}
 
-            <h1 className="font-inter font-[600] text-[20px] leading-[22px] text-black">PENOPLESK</h1>
-            <div className="flex gap-[20px]">
+            <h1 className="hidden sm:block font-inter font-[600] text-[20px] leading-[22px] text-black">PENOPLESK</h1>
+            <div className="flex flex-col sm:flex gap-[20px]">
                 <div className="product-div">
                     <div className="mt-[20px] flex gap-[19px]">
-                        <div className="image-selection-div flex flex-col gap-[18px]">
+                        <div className="hidden sm:block image-selection-div flex flex-col gap-[18px]">
                             {productImagesRef.current.map((image, index) => (
                                 <div
                                     key={index}
@@ -270,7 +279,7 @@ const Product = () => {
                                 </div>
                             ))}
                         </div>
-                        <div className="big-selected-image relative w-[504px] h-[504px] overflow-hidden bg-[rgba(242,242,241,1)] rounded-[15px]">
+                        <div className="flex justify-center items-center big-selected-image relative w-full sm:w-[504px] h-[330px] sm:h-[504px] overflow-hidden bg-[rgba(242,242,241,1)] rounded-[15px]">
                             <div className="nav-button nav-button-left" onClick={handlePrevImage}>
                                 <ChevronLeft size={24} />
                             </div>
@@ -281,12 +290,12 @@ const Product = () => {
 
                             <img
                                 src={selectedImage || "/placeholder.svg"}
-                                className={`w-[504px] h-[504px] object-fill ${isTransitioning ? slideDirection : slideDirection ? (slideDirection === "slide-left" ? "slide-in-right" : "slide-in-left") : ""}`}
+                                className={`w-[162px] sm:w-[504px] h-[188px] sm:h-[504px] object-fill ${isTransitioning ? slideDirection : slideDirection ? (slideDirection === "slide-left" ? "slide-in-right" : "slide-in-left") : ""}`}
                             />
                         </div>
                     </div>
 
-                    <div className="mt-[40px] flex flex-col gap-[28px] w-[681px]">
+                    <div className="hidden sm:block mt-[40px] flex flex-col gap-[28px] w-[681px]">
                         <h1 className="font-inter font-[600] text-[28px] leading-[22px] text-black">Tasnif</h1>
                         <p className="font-inter font-[500] text-[16px] leading-[22px] text-black">
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Vero recusandae nihil earum eligendi officiis
@@ -308,7 +317,7 @@ const Product = () => {
                     </div>
                 </div>
 
-                <div className="product-details mt-[20px]">
+                <div className="product-details mt-[0px] sm:mt-[20px]">
                     <div className="flex flex-col gap-[10px]">
                         <h5 className="font-inter font-[600] text-[16px] leading-[22px] text-[rgba(66,206,94,1)]">Mavjud</h5>
                         <h1 className="font-inter font-[600] text-[24px] leading-[22px] text-black">Penoplex Komfort</h1>
