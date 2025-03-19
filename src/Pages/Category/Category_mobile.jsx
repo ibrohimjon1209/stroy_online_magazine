@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useRef } from "react"
 import { Search, CirclePlus, History, X, ChevronRight } from "lucide-react"
 import { Link } from "react-router-dom"

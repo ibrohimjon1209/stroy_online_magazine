@@ -15,13 +15,10 @@ import Not_found from "./Pages/Not_found/not_found";
 import InternetChecker from "./Pages/offline_page/offline_page";
 import Footer from "./Pages/Footer/Footer";
 import Terms from "./Pages/Terms/terms_main";
-<<<<<<< HEAD
 import Pickup_address from "./Pages/pickup_address/pickup_address_main";
 import Payment_variant from "./Pages/payment_variant/payment_main";
 import { Cat } from "lucide-react";
 import Category_mobile from "./Pages/Category/Category_mobile";
-=======
->>>>>>> cb9605e (a)
 const Product = lazy(() => import("./Pages/Product/Product"));
 const Category = lazy(() => import("./Pages/Category/Category"));
 
@@ -53,13 +50,18 @@ const App = () => {
       location == "terms" ||
       location == "payment-variant"
     ) {
-      if (location === "delivery" || location === "terms" || location === "payment-variant") {
+      if (
+        location === "delivery" ||
+        location === "terms" ||
+        location === "payment-variant"
+      ) {
         set_is_another_nav(true);
       } else {
         set_is_another_nav(false);
       }
-    } [location]
-  })
+    }
+    [location];
+  });
 
   if (!is_online) {
     return <InternetChecker />;
@@ -70,7 +72,6 @@ const App = () => {
     scrollbarWidth: "auto",
     scrollbarColor: "rgba(255,255,255,1) rgba(255,255,255,1)",
   };
-
 
   useEffect(() => {
     if (window.innerWidth > 768) {
@@ -88,24 +89,29 @@ const App = () => {
     }
   }, []);
 
-
   return (
-    <div className={`${is_found ? "w-[]  sm:w-[1450px]" : "w-full "} m-auto `} >
+    <div className={`${is_found ? "w-[]  sm:w-[1450px]" : "w-full "} m-auto `}>
       {is_found && !is_another_nav && <Navbar userSignIn={userSignIn} />}
       <div className={`${is_found ? "w-[]  sm:w-[1450px]" : "w-full"} m-auto`}>
-        <div className="flex flex-col justify-between  h-[calc(100vh)] sm:h-[calc(119vh-100px)] w-[100%]" style={{
-          ...customScrollbar,
-          overflowY: "auto",
-          scrollbarWidth: "thin",
-          scrollbarColor: "rgba(244,244,244,1) rgba(255, 255, 255, 1)",
-        }}>
+        <div
+          className="flex flex-col justify-between  h-[calc(100vh)] sm:h-[calc(119vh-100px)] w-[100%]"
+          style={{
+            ...customScrollbar,
+            overflowY: "auto",
+            scrollbarWidth: "thin",
+            scrollbarColor: "rgba(244,244,244,1) rgba(255, 255, 255, 1)",
+          }}
+        >
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/likes" element={<Likes />} />
             <Route path="/basket" element={<Basket />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/search" element={<Category_mobile />} />
-            <Route path="/profile/*" element={<Profile userSignIn={userSignIn} />} />
+            <Route
+              path="/profile/*"
+              element={<Profile userSignIn={userSignIn} />}
+            />
 
             {/* Lazy yuklanadigan sahifalar */}
             <Route
@@ -128,9 +134,8 @@ const App = () => {
 
           {is_found && is_footer_visible && <Footer />}
         </div>
-      </div >
+      </div>
     </div>
-
   );
 };
 

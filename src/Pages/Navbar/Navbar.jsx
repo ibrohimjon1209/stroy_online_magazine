@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-"use client"
-
 import { useState, useRef } from "react"
 import logo from "./Images/logo.svg"
 import cube from "./Images/orders.svg"
@@ -15,33 +12,6 @@ import vector from "./Images/vector.png"
 import { Link } from "react-router"
 import { useNavigate, useLocation } from "react-router-dom"
 import { ChevronDown, CirclePlus, History, Home, Menu, Package, Search, ShoppingCart, User, X } from "lucide-react"
-=======
-import { useState, useRef } from "react";
-import logo from "./Images/logo.svg";
-import cube from "./Images/orders.svg";
-import cube_a from "./Images/orders_a.svg";
-import like from "./Images/like.svg";
-import like_a from "./Images/like_a.svg";
-import basket from "./Images/basket.svg";
-import basket_a from "./Images/basket_a.svg";
-import profile from "./Images/profile.svg";
-import profile_a from "./Images/profile_a.svg";
-import vector from "./Images/vector.png";
-import { Link } from "react-router";
-import { useNavigate, useLocation } from "react-router-dom";
-import {
-  ChevronDown,
-  CirclePlus,
-  History,
-  Home,
-  Menu,
-  Package,
-  Search,
-  ShoppingCart,
-  User,
-  X,
-} from "lucide-react";
->>>>>>> cb9605e (a)
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -169,7 +139,6 @@ const Navbar = () => {
   const to_home = () => navigate("/");
 
   return (
-<<<<<<< HEAD
     <>
       <div className="hidden sm:block">
         <div className="w-full h-auto md:h-[80px] flex flex-col md:flex-row justify-between gap-[20px] z-50 items-center px-[4.2%] sticky mt-[5px] rounded-[15px] bg-[#DCC38B] py-4 md:py-0">
@@ -217,36 +186,6 @@ const Navbar = () => {
             <button onClick={toggleMobileMenu} className="md:hidden text-white p-2">
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-=======
-    <div className="w-full h-[80px] flex justify-between gap-[20px] z-50 items-center px-[4.2%] sticky top-2 rounded-[15px] bg-[#DCC38B]">
-      {/* Logo va bosh sahifaga yo'naltirish */}
-      <div className="-[247px] h-full flex items-center gap-[5px]">
-        <img
-          src={logo}
-          alt="Logo"
-          className="cursor-pointer"
-          onClick={to_home}
-        />
-        <h1
-          className="font-inter font-[600] text-[20px] cursor-pointer leading-[22px] text-black"
-          onClick={to_home}
-        >
-          STROY BAZA №1
-        </h1>
-      </div>
-
-      <div className="w-[653px] flex gap-[20px]">
-        {/* Katalog bo'limi */}
-        <div>
-          <div
-            onClick={handleCategoryClick}
-            className="border-[3px] border-white drop-shadow-xl hover:opacity-75 cursor-pointer w-[100px] h-[40px] bg-transparent flex justify-center items-center rounded-[5px] gap-[5px]"
-          >
-            <Menu strokeWidth={1.5} color="white" />
-            <h1 className="font-inter font-[500] text-[13px] text-white uppercase">
-              Katolog
-            </h1>
->>>>>>> cb9605e (a)
           </div>
 
           {/* Logo va bosh sahifaga yo'naltirish - desktop */}
@@ -510,13 +449,9 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-<<<<<<< HEAD
 
       {/* Mobile bottom navigation bar */}
       <div className="md:hidden fixed -bottom-[calc(2vh-10px)] left-0 right-0 bg-[#BEA086] flex justify-around items-center h-[85px] z-50 rounded-t-[15px]">
-=======
-      <div className="md:hidden fixed -bottom-[calc(19vh-10px)] left-0 right-0 bg-[#BEA086] flex justify-around items-center h-[85px] z-50 rounded-t-[15px]">
->>>>>>> cb9605e (a)
         <Link to="/" className="flex flex-col items-center justify-center">
           <Home size={24} color={location === "" ? "#000000" : "#666666"} />
         </Link>
@@ -558,16 +493,8 @@ const Navbar = () => {
         </Link>
       </div>
       <div className="md:hidden h-[0px]"></div>
-<<<<<<< HEAD
     </>
   )
 }
 
 export default Navbar
-=======
-    </div>
-  );
-};
->>>>>>> cb9605e (a)
-
-export default Navbar;

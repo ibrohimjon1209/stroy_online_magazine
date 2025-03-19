@@ -3,7 +3,7 @@ import photo from '../Home/Images/photo.png';
 import cart_icon from '../Home/Images/cart_icon.svg';
 import like_icon from '../Home/Images/like_icon.svg';
 import liked_icon from '../Home/Images/liked_icon.svg';
-import { ChevronLeft, Infinity, InfinityIcon, X } from 'lucide-react';
+import { ChevronLeft, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import './styles.css';
 
@@ -42,10 +42,10 @@ const Category = () => {
     };
 
     const handleAddToCart = () => {
-        setNotification('Mahsulot savatga qo\'shildi');
-        setIsVisible(true); // Xabarni ko'rsatish
+        setNotification("Mahsulot savatga qo'shildi");
+        setIsVisible(true);
         setTimeout(() => {
-            setIsVisible(false); // Xabarni yopish
+            setIsVisible(false);
         }, 500000);
     };
 
