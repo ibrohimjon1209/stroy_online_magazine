@@ -13,13 +13,15 @@ import Orders from "./Pages/Navbar/chields/orders/orders_main";
 import Profile from "./Pages/Navbar/chields/profile/profile";
 import Not_found from "./Pages/Not_found/not_found";
 import InternetChecker from "./Pages/offline_page/offline_page";
-import Formalization from "./Pages/Formalization/formalization_main";
 import Footer from "./Pages/Footer/Footer";
 import Terms from "./Pages/Terms/terms_main";
+<<<<<<< HEAD
 import Pickup_address from "./Pages/pickup_address/pickup_address_main";
 import Payment_variant from "./Pages/payment_variant/payment_main";
 import { Cat } from "lucide-react";
 import Category_mobile from "./Pages/Category/Category_mobile";
+=======
+>>>>>>> cb9605e (a)
 const Product = lazy(() => import("./Pages/Product/Product"));
 const Category = lazy(() => import("./Pages/Category/Category"));
 
