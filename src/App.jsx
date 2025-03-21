@@ -18,6 +18,8 @@ import Footer from "./Pages/Footer/Footer";
 import Terms from "./Pages/Terms/terms_main";
 import Formalization from "./Pages/Formalization/formalization_main";
 import Category_mobile from "./Pages/Category/Category_mobile";
+import Register from "./Pages/Auth/register/register_main";
+import Log_in from "./Pages/Auth/log_in/log_in_main";
 const Product = lazy(() => import("./Pages/Product/Product"));
 const Category = lazy(() => import("./Pages/Category/Category"));
 
@@ -48,12 +50,16 @@ const App = () => {
     if (
       location == "delivery" ||
       (location == "terms" && formalization_open) ||
-      location == "payment-variant"
+      location == "payment-variant" ||
+      location == "login" ||
+      location == "register"
     ) {
       if (
         location === "delivery" ||
         location === "terms" ||
-        location === "payment-variant"
+        location === "payment-variant" ||
+        location == "login" ||
+        location == "register"
       ) {
         set_is_another_nav(true);
       } else {
@@ -167,6 +173,8 @@ const App = () => {
               }
             />
             <Route path="*" element={<Not_found set_is_found={set_is_found}/>}/>
+            <Route path="/register" element={<Register set_is_found={set_is_found}/>}/>
+            <Route path="/login" element={<Log_in set_is_found={set_is_found}/>}/>
           </Routes>
           </div>
 
