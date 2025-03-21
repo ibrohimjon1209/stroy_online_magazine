@@ -18,9 +18,9 @@ const Addresses = ({ active, set_active }) => {
     <div
       className={`w-[90%] mx-auto h-full ${
         active === "address" ? "flex" : "hidden"
-      } flex-col mt-[35px]`}
+      } flex-col mt-[30px] sm:mt-[35px]`}
     >
-      <div className="w-[85%] mx-auto h-full flex flex-row font-inter font-[600] text-[16px] leading-[22px] text-black gap-[65px]">
+      <div className="sm:w-[85%] mx-auto h-[32px] flex flex-row font-inter font-[600] text-[16px] leading-[22px] text-black gap-[65px]">
         <div className="border-[#DCC38B] border-b-2 pb-[10px] cursor-pointer">
           Ro’yxat
         </div>
@@ -28,7 +28,7 @@ const Addresses = ({ active, set_active }) => {
           Xarita
         </div>
       </div>
-      <div className="flex flex-col gap-[45px] mt-[45px]">
+      <div className="flex flex-col gap-[45px] mt-[40px] sm:mt-[45px]">
         {addresses_list.map((address, index) => (
           <div className="flex flex-col gap-[25px]">
             <div className="flex flex-row gap-[15px]">

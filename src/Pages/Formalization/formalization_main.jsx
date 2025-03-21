@@ -45,7 +45,7 @@ const Formalization_main = ({
         </Link>
       </div>
       <div
-        className={`w-full sm:w-[76%] mt-12 ${is_delivery ? "hidden" : "block"}
+        className={`w-full sm:w-[76%] sm:mt-0 mt-12 ${is_delivery ? "hidden" : "block"}
         ${is_payment_variant ? "hidden" : "block"}
         ${is_pickup ? "hidden" : "block"}
          mx-auto bg-white mb-[20px]`}
@@ -136,7 +136,7 @@ const Formalization_main = ({
                   alt="arrive"
                   className="h-[21px] w-[21px] sm:h-[25px] sm:w-[25px] object-contain"
                 />
-                <span className="text-[13px] sm:font-medium">
+                <span className="text-[13px] sm:text-[18px] sm:font-medium">
                   {`${
                     deliver_type === "bring" ? "Olib ketish" : "Yetkazib berish"
                   } manzilini tanlang`}
@@ -154,10 +154,10 @@ const Formalization_main = ({
                   alt="cash"
                   className="h-[21px] w-[21px] sm:h-[25px] sm:w-[25px] object-contain"
                 />
-                <span className="text-[13px] sm:font-medium">Keshbekni ishlatish</span>
+                <span className="text-[13px] sm:text-[18px] sm:font-medium">Keshbekni ishlatish</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[13px] sm:font-medium">15.000 UZS</span>
+                <span className="text-[13px] sm:text-[18px] sm:font-medium">15.000 UZS</span>
                 <div className="bg-green-500 rounded-full p-1">
                   <Check className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
@@ -356,7 +356,7 @@ const Formalization_main = ({
 
             <button
               onClick={() => set_is_modal_open(true)}
-              className="w-full py-4 sm:py-6 bg-[#DCC38B] font-inter mt-8 sm:mt-0 font-[600] text-[16px] sm:text-[22px] leading-[22px] text-black rounded-[10px] cursor-pointer hover:scale-[101%] active:scale-[99%] duration-300"
+              className="w-full py-4 sm:py-6 bg-[#DCC38B] font-inter mt-8 sm:mt-5 font-[600] text-[16px] sm:text-[22px] leading-[22px] text-black rounded-[10px] cursor-pointer hover:scale-[101%] active:scale-[99%] duration-300"
             >
               Xaridni rasmiylashtirish
             </button>

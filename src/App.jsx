@@ -16,8 +16,6 @@ import Not_found from "./Pages/Not_found/not_found";
 import InternetChecker from "./Pages/offline_page/offline_page";
 import Footer from "./Pages/Footer/Footer";
 import Terms from "./Pages/Terms/terms_main";
-import Pickup_address from "./Pages/pickup_address/pickup_address_main";
-import Payment_variant from "./Pages/payment_variant/payment_main";
 import Formalization from "./Pages/Formalization/formalization_main";
 import Category_mobile from "./Pages/Category/Category_mobile";
 const Product = lazy(() => import("./Pages/Product/Product"));
@@ -99,7 +97,7 @@ const App = () => {
   return (
     <div className={`${is_found ? "w-[] sm:w-[1450px]" : "w-full "} m-auto `}>
       {is_found && !is_another_nav && <Navbar userSignIn={userSignIn} />}
-      <div className={`${is_found ? "w-[] sm:w-[1450px]" : "w-full"} m-auto`}>
+      <div className={`${is_found ? "w-[] sm:w-[1450px]" : "w-full"} m-auto overflow-hidden`}>
         <div
           className={`flex flex-col justify-between ${is_found ? "h-[calc(100vh)] sm:h-[calc(130vh-200px)]" : "h-full"} w-[100%]`}
           style={{

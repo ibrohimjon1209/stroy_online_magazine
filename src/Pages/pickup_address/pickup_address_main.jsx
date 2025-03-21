@@ -1,8 +1,7 @@
-"use client"
+"use client";
 
-import { ChevronLeft, ChevronDown } from "lucide-react"
-import { useState, useEffect, useRef } from "react"
-import { Link } from "react-router-dom"
+import { ChevronLeft, ChevronDown } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 
 const regions = [
   { id: 1, name: "Andijon" },
@@ -10,7 +9,7 @@ const regions = [
   { id: 3, name: "Samarqand" },
   { id: 4, name: "Buxoro" },
   { id: 5, name: "Namangan" },
-]
+];
 
 const cities = {
   1: [
@@ -35,28 +34,30 @@ const cities = {
     { id: 11, name: "Namangan Shahar" },
     { id: 12, name: "Chust" },
   ],
-}
+};
 
 // Custom dropdown component
 const CustomDropdown = ({ options, value, onChange, placeholder }) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const dropdownRef = useRef(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
-  const selectedOption = options.find((option) => option.id.toString() === value)
+  const selectedOption = options.find(
+    (option) => option.id.toString() === value
+  );
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -65,8 +66,14 @@ const CustomDropdown = ({ options, value, onChange, placeholder }) => {
         className="w-full h-[70px] px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm cursor-pointer flex items-center justify-between"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className="text-[18px]">{selectedOption ? selectedOption.name : placeholder}</span>
-        <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <span className="text-[18px]">
+          {selectedOption ? selectedOption.name : placeholder}
+        </span>
+        <ChevronDown
+          className={`w-5 h-5 text-gray-400 transition-transform ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
       </div>
 
       {/* Dropdown options */}
@@ -79,8 +86,8 @@ const CustomDropdown = ({ options, value, onChange, placeholder }) => {
                 option.id.toString() === value ? "bg-gray-100" : ""
               }`}
               onClick={() => {
-                onChange(option.id.toString())
-                setIsOpen(false)
+                onChange(option.id.toString());
+                setIsOpen(false);
               }}
             >
               {option.name}
@@ -89,36 +96,40 @@ const CustomDropdown = ({ options, value, onChange, placeholder }) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 function RegionSelectionForm() {
-  const [selectedRegion, setSelectedRegion] = useState("1")
-  const [selectedCity, setSelectedCity] = useState("1")
+  const [selectedRegion, setSelectedRegion] = useState("1");
+  const [selectedCity, setSelectedCity] = useState("1");
 
   const handleRegionChange = (regionId) => {
-    setSelectedRegion(regionId)
+    setSelectedRegion(regionId);
 
     if (cities[Number.parseInt(regionId)]?.length > 0) {
-      setSelectedCity(cities[Number.parseInt(regionId)][0].id.toString())
+      setSelectedCity(cities[Number.parseInt(regionId)][0].id.toString());
     }
-  }
+  };
 
   const handleCityChange = (cityId) => {
-    setSelectedCity(cityId)
-  }
+    setSelectedCity(cityId);
+  };
 
   const handleContinue = () => {
-    const region = regions.find((r) => r.id.toString() === selectedRegion)
-    const city = cities[Number.parseInt(selectedRegion)]?.find((c) => c.id.toString() === selectedCity)
+    const region = regions.find((r) => r.id.toString() === selectedRegion);
+    const city = cities[Number.parseInt(selectedRegion)]?.find(
+      (c) => c.id.toString() === selectedCity
+    );
 
-    alert(`Selected: ${region?.name}, ${city?.name}`)
-  }
+    alert(`Selected: ${region?.name}, ${city?.name}`);
+  };
 
   return (
     <div className="space-y-[50px] w-[450px]">
-      <div className="space-y-2">
-        <label className="font-inter font-[500] text-[24px] leading-[22px] text-black">Viloyat</label>
+      <div className="space-y-4 flex flex-col">
+        <label className="font-inter font-[500] text-[24px] leading-[22px] text-black">
+          Viloyat
+        </label>
         <CustomDropdown
           options={regions}
           value={selectedRegion}
@@ -127,8 +138,10 @@ function RegionSelectionForm() {
         />
       </div>
 
-      <div className="space-y-2">
-        <label className="font-inter font-[500] text-[24px] leading-[22px] text-black">Shahar / Tuman</label>
+      <div className="space-y-4 flex flex-col">
+        <label className="font-inter font-[500] text-[24px] leading-[22px] text-black">
+          Shahar / Tuman
+        </label>
         <CustomDropdown
           options={cities[Number.parseInt(selectedRegion)] || []}
           value={selectedCity}
@@ -137,40 +150,43 @@ function RegionSelectionForm() {
         />
       </div>
 
-      <div className="pt-2">
-        <div className="w-full h-[70px] px-4 flex items-center bg-gray-100 border border-gray-200 rounded text-[18px]">
-          {cities[Number.parseInt(selectedRegion)]?.find((c) => c.id.toString() === selectedCity)?.name || ""}
-        </div>
+      <div className="space-y-4 flex flex-col">
+        <label className="font-inter font-[500] text-[24px] leading-[22px] text-black">
+          Ko’cha
+        </label>
+        <input placeholder={cities[Number.parseInt(selectedRegion)]?.find((c) => c.id.toString() === selectedCity)?.name || ""} className="w-full h-[70px] px-4 flex items-center bg-gray-100 border border-gray-200 rounded text-[18px]" />
       </div>
 
       <button
-        className="w-full mt-[30px] h-[60px] font-inter font-[500] text-[28px] leading-[22px] text-black cursor-pointer bg-[#FFDF02] rounded hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-opacity-50 transition-colors"
+        className="w-full mt-[30px] h-[65px] sm:h-[60px] font-inter font-[500] text-[25px] sm:text-[28px] leading-[22px] text-black cursor-pointer bg-[#FFDF02] rounded hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-opacity-50 transition-colors"
         onClick={handleContinue}
       >
         Davom etish
       </button>
     </div>
-  )
+  );
 }
 
 const Pickup_address_main = ({ is_pickup, set_is_pickup }) => {
-
   return (
-    <div className={`w-full ${is_pickup ? "flex" : "hidden"} items-center justify-center flex-col mb-[84px]`}>
-      <div className="sticky w-full h-[80px] fixed top-0 z-50">
-        <div className="bg-[#DCC38B] flex items-center gap-[10px] w-full h-full font-inter font-[600] text-[20px] leading-[22px] text-black pl-[50px]">
-          <div onClick={()=>set_is_pickup(false)}>
-            <ChevronLeft className="w-[35px] h-[35px] mt-[2px] cursor-pointer" />
+    <div
+      className={`w-full ${
+        is_pickup ? "flex" : "hidden"
+      } items-center justify-center flex-col sm:mb-[84px]`}
+    >
+      <div className="sticky w-full h-[65px] sm:h-[80px] fixed top-0 z-50">
+        <div className="bg-[#DCC38B] flex items-center gap-[10px] w-full h-full font-inter font-[600] text-[17px] sm:text-[20px] leading-[22px] text-black pl-[13px] sm:pl-[50px]">
+          <div onClick={() => set_is_pickup(false)}>
+            <ChevronLeft className="scale-110 sm:scale-100 sm:w-[35px] sm:h-[35px] mt-0 sm:mt-[2px] cursor-pointer" />
           </div>
           <p>Yetkazib berish manzili</p>
         </div>
       </div>
-      <div className="mt-[130px]">
+      <div className="sm:mt-[130px] scale-[72%] sm:scale-100">
         <RegionSelectionForm />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Pickup_address_main
-
+export default Pickup_address_main;

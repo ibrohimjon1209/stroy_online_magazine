@@ -33,7 +33,7 @@ const MapPage = ({ setSelectedLocation, set_active, active }) => {
   }
 
   return (
-    <div className={`${active === "map" ? "block" : "hidden"} relative max-w-[100%] h-[86vh] mb-2 mx-auto mt-6 border border-gray-300 rounded-lg shadow-lg`}>
+    <div className={`${active === "map" ? "block" : "hidden"} relative max-w-[100%] h-[90vh] sm:h-[86vh] -mb-[200px] sm:mb-2 mx-auto mt-0 sm:mt-6 border border-gray-300 rounded-lg shadow-lg`}>
       <MapContainer
         center={position}
         zoom={13}
