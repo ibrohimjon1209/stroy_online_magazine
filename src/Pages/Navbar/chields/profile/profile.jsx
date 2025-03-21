@@ -1,5 +1,10 @@
 import Sidebar from "./sidebar";
-import { Link, Route, Routes, useNavigate } from "react-router-dom";
+import {
+  Link,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import Orders from "./chields/orders/orders_main";
 import Cashback from "./chields/cashback/cashback_main";
 import Favorites from "./chields/favorites/favorites";
@@ -9,18 +14,23 @@ import Help from "./chields/help/help_main";
 import { ChevronLeft } from "lucide-react";
 
 const Profile_main = ({ isUserSignIn }) => {
-  const navigate = useNavigate();
+  const location = useLocation().pathname;
   return (
     <div className="mb-10 gap-[20px] sm:gap-0 sm:my-[20px] flex flex-col items-center justify-center w-full">
       <div className="sticky top-0 z-50 block sm:hidden w-full">
         <div className="w-full h-[65px] bg-[#DCC38B]">
           <Link
             className="w-full h-full flex items-center gap-[10px] pl-[13px]"
-            to={"/"}
+            to={`${location !== "/profile" ? "/profile" : "/"}`}
           >
             <ChevronLeft className="scale-110" />
             <h1 className="font-inter font-[500] text-[17px] leading-[22px] text-black">
-              Profil
+              {location == "/profile" && "Profil"}
+              {location == "/profile/" && "Profil"}
+              {location == "/profile/cashback" && "Kashback"}
+              {location == "/profile/favorites" && "Sevimlilar"}
+              {location == "/profile/city" && "Shahar tanlash"}
+              {location == "/profile/language" && "Til tanlash"}
             </h1>
           </Link>
         </div>

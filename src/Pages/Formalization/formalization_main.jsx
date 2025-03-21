@@ -1,4 +1,4 @@
-import { Check, ChevronRight, User } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import photo from "./imgs/photo.png";
 import arrive_icon from "./imgs/arrive_icon.png";
@@ -20,6 +20,7 @@ const Formalization_main = ({
   set_is_another_nav,
   is_another_nav,
   set_is_footer_visible,
+  set_formalization_open,
 }) => {
   const [deliver_type, set_deliver_type] = useState("bring");
   const [selectedMethod, setSelectedMethod] = useState("installment");
@@ -28,11 +29,23 @@ const Formalization_main = ({
   const [is_pickup, set_is_pickup] = useState(false);
   const [is_payment_variant, set_is_payment_variant] = useState(false);
   set_is_another_nav(is_delivery || is_payment_variant || is_pickup);
-  set_is_footer_visible(!is_pickup)
+  set_is_footer_visible(!is_pickup);
   return (
-    <>
+    <div className="flex flex-col w-full h-full mb-17 sm:mb-0">
+      <div className="w-full fixed z-50 h-[65px] bg-[#DCC38B] sm:hidden block">
+        <Link
+          onClick={() => set_formalization_open(false)}
+          className="w-full h-full flex items-center gap-[10px] pl-[13px]"
+          to="/basket"
+        >
+          <ChevronLeft className="scale-110" />
+          <h1 className="font-inter font-[500] text-[17px] leading-[22px] text-black">
+            Buyurtma
+          </h1>
+        </Link>
+      </div>
       <div
-        className={`w-[76%] ${is_delivery ? "hidden" : "block"}
+        className={`w-full sm:w-[76%] mt-12 ${is_delivery ? "hidden" : "block"}
         ${is_payment_variant ? "hidden" : "block"}
         ${is_pickup ? "hidden" : "block"}
          mx-auto bg-white mb-[20px]`}
@@ -43,7 +56,7 @@ const Formalization_main = ({
           </h2>
 
           {userSignIn ? (
-            <div className="border border-[#D5D5D5] rounded-lg p-4 mt-[20px] mb-6 w-[40%] h-[70px] flex items-center justify-start">
+            <div className="border border-[#D5D5D5] rounded-lg p-4 mt-[15px] sm:mt-[20px] mb-6 w-full sm:w-[40%] h-[70px] flex items-center justify-start">
               <div className="flex items-center gap-3">
                 <div className="bg-gray-300 rounded-full p-2">
                   <User className="h-[23px] w-[23px] text-gray-600" />
@@ -68,29 +81,27 @@ const Formalization_main = ({
             </Link>
           )}
 
-          <div className="flex gap-[35px] mb-6 mt-[20px]">
-            <div className="bg-gray-100 rounded-lg w-[150px] h-[150px] flex items-center justify-center">
+          <div className="flex gap-[15px] sm:gap-[35px] mb-6 mt-[20px]">
+            <div className="bg-gray-100 rounded-lg w-[100px] h-[100px] sm:w-[150px] sm:h-[150px] flex items-center justify-center">
               <img
                 src={photo}
                 alt="PENOPLEX COMFORT"
-                width={80}
-                height={80}
-                className="object-contain"
+                className="object-contain w-full h-full"
               />
             </div>
-            <div className="flex flex-col gap-[50px] font-inter font-[600] text-[24px] leading-[22px] text-black">
+            <div className="flex flex-col gap-[10px] sm:gap-[50px] font-inter font-[600] text-[15px] sm:text-[24px] leading-[22px] text-black">
               <div>
                 <h3>PENOPLEX COMFORT</h3>
-                <p className="mt-[25px]">125.650 so'm</p>
+                <p className="mt-[15px] sm:mt-[25px]">125.650 so'm</p>
               </div>
               <p>1 dona</p>
             </div>
           </div>
 
-          <div className="relative flex p-1 bg-gray-100 rounded-xl mt-[35px] mb-4 h-[60px] w-[95%] mx-auto font-inter font-[500] text-[18px] leading-[22px] text-black">
+          <div className="relative flex p-1 bg-gray-100 rounded-xl mt-[20px] sm:mt-[35px] mb-4 h-[40px] sm:h-[60px] w-full sm:w-[95%] mx-auto font-inter font-[500] text-[13px] sm:text-[18px] leading-[22px] text-black">
             <button
               onClick={() => set_deliver_type("bring")}
-              className={`flex-1 py-2.5 text-center rounded-lg font-medium cursor-pointer ${
+              className={`flex-1 py-1 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
                 deliver_type === "bring"
                   ? "bg-white shadow-sm duration-500"
                   : "text-gray-500"
@@ -100,7 +111,7 @@ const Formalization_main = ({
             </button>
             <button
               onClick={() => set_deliver_type("deliver")}
-              className={`flex-1 py-2.5 text-center rounded-lg font-medium cursor-pointer ${
+              className={`flex-1 py-1 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
                 deliver_type === "deliver"
                   ? "bg-white shadow-sm duration-500"
                   : "text-gray-500"
@@ -110,22 +121,22 @@ const Formalization_main = ({
             </button>
           </div>
 
-          <div className="border border-[#D5D5D5] rounded-lg mb-4 mt-[35px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300">
+          <div className="border border-[#D5D5D5] rounded-lg mb-4 mt-[25px] sm:mt-[35px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300">
             <div
               onClick={() => {
                 deliver_type === "bring"
                   ? set_is_delivery(true)
                   : set_is_pickup(true);
               }}
-              className="flex items-center justify-between w-full p-4 cursor-pointer"
+              className="flex items-center justify-between w-full p-2 sm:p-4 cursor-pointer"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <img
                   src={arrive_icon}
                   alt="arrive"
-                  className="h-[25px] w-[25px] object-contain"
+                  className="h-[21px] w-[21px] sm:h-[25px] sm:w-[25px] object-contain"
                 />
-                <span className="font-medium">
+                <span className="text-[13px] sm:font-medium">
                   {`${
                     deliver_type === "bring" ? "Olib ketish" : "Yetkazib berish"
                   } manzilini tanlang`}
@@ -135,33 +146,33 @@ const Formalization_main = ({
             </div>
           </div>
 
-          <div className="border border-[#D5D5D5] rounded-lg mb-4 mt-[30px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300">
-            <div className="flex items-center justify-between w-full p-4 cursor-pointer">
-              <div className="flex items-center gap-3">
+          <div className="border border-[#D5D5D5] rounded-lg mb-4 mt-[20px] sm:mt-[30px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300">
+            <div className="flex items-center justify-between w-full p-2 sm:p-4 cursor-pointer">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <img
                   src={cash_icon}
                   alt="cash"
-                  className="h-[25px] w-[25px] object-contain"
+                  className="h-[21px] w-[21px] sm:h-[25px] sm:w-[25px] object-contain"
                 />
-                <span className="font-medium">Keshbekni ishlatish</span>
+                <span className="text-[13px] sm:font-medium">Keshbekni ishlatish</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-medium">15.000 UZS</span>
+                <span className="text-[13px] sm:font-medium">15.000 UZS</span>
                 <div className="bg-green-500 rounded-full p-1">
-                  <Check className="h-4 w-4 text-white" />
+                  <Check className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div className="w-[95%] mx-auto p-4 -mt-[20px]">
+        <div className="w-full sm:w-[95%] mx-auto p-7 sm:p-4 -mt-[20px]">
           <h1 className="font-inter font-[600] text-[15px] leading-[22px] text-black mb-4">
             To'lov usuli
           </h1>
 
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="border border-[#D5D5D5] w-[90%] rounded-lg p-4 bg-white">
-              <div className="space-y-4">
+            <div className="border border-[#D5D5D5] w-full sm:w-[90%] rounded-lg p-4 bg-white">
+              <div className="space-y-3.5 sm:space-y-4">
                 <div
                   className="flex cursor-pointer items-center justify-between p-2"
                   onClick={() => setSelectedMethod("click")}
@@ -170,7 +181,7 @@ const Formalization_main = ({
                     <img
                       src={click}
                       alt="Click"
-                      className="w-8 h-8 object-contain"
+                      className="w-7 h-7 sm:w-8 sm:h-8 object-contain"
                     />
                     <span className="font-inter font-[600] text-[15px] leading-[22px] text-black">
                       Click
@@ -194,7 +205,7 @@ const Formalization_main = ({
                   <div className="flex items-center gap-3">
                     <img
                       src={pay_me}
-                      className="w-8 h-8 object-contain"
+                      className="w-7 h-7 sm:w-8 sm:h-8 object-contain"
                       alt="Payme"
                     />
                     <span className="font-inter font-[600] text-[15px] leading-[22px] text-black">
@@ -221,7 +232,7 @@ const Formalization_main = ({
                     <img
                       src={on_arrive}
                       alt="Qabul qilinganda"
-                      className="w-8 h-8 object-contain"
+                      className="w-7 h-7 sm:w-8 sm:h-8 object-contain"
                     />
                     <span className="font-inter font-[600] text-[15px] leading-[22px] text-black">
                       Qabul qilinganda
@@ -239,7 +250,7 @@ const Formalization_main = ({
                 </div>
 
                 <div
-                  className="flex items-center justify-between p-2 cursor-pointer bg-gray-50 rounded-md"
+                  className="flex items-center justify-between p-2 cursor-pointer rounded-md"
                   onClick={() => setSelectedMethod("installment")}
                 >
                   <div className="flex items-center gap-3">
@@ -266,8 +277,8 @@ const Formalization_main = ({
             </div>
 
             {selectedMethod === "installment" && (
-              <div className="border border-[#D5D5D5] rounded-lg w-[90%] p-[27px] bg-white">
-                <div className="flex justify-between items-center mb-6">
+              <div className="border border-[#D5D5D5] rounded-lg w-full sm:w-[90%] p-[20px] sm:p-[27px] bg-white">
+                <div className="flex justify-between items-center mb-5 sm:mb-6">
                   <div className="flex flex-row gap-3">
                     <img
                       src={alif_icon}
@@ -275,23 +286,23 @@ const Formalization_main = ({
                       alt=""
                     />
                     <div className="flex flex-col h-[30px] -mt-[2px]">
-                      <span className="font-inter font-[500] text-[16px] leading-[22px] text-black">
+                      <span className="font-inter font-[500] text-[14px] sm:text-[16px] leading-[22px] text-black">
                         Muddatli to'lov turi
                       </span>
-                      <span className="font-inter font-[600] text-[16px] leading-[22px] text-black">
+                      <span className="font-inter font-[600] text-[14px] sm:text-[16px] leading-[22px] text-black">
                         Alif
                       </span>
                     </div>
                   </div>
                   <div
                     onClick={() => set_is_payment_variant(true)}
-                    className="cursor-pointer hover:underline font-inter font-[600] text-[16px] leading-[22px] text-[#000000BF]"
+                    className="cursor-pointer hover:underline font-inter font-[600] text-[14px] sm:text-[16px] leading-[22px] text-[#000000BF]"
                   >
                     Taxrirlash
                   </div>
                 </div>
                 <hr className="border-[#D5D5D5]" />
-                <div className="mt-5 flex flex-col gap-[46px] font-inter font-[600] text-[16px] leading-[22px] text-[#000000BF]">
+                <div className="mt-4 sm:mt-5 flex flex-col gap-5 sm:gap-[46px] font-inter font-[600] text-[16px] leading-[22px] text-[#000000BF]">
                   <div className="flex flex-col gap-5">
                     <div className="flex justify-between">
                       <span>Oylik to'lov</span>
@@ -313,13 +324,13 @@ const Formalization_main = ({
             )}
           </div>
         </div>
-        <div className="w-[97%] mx-auto p-6">
-          <div className="space-y-10">
-            <h2 className="font-inter font-[600] text-[24px] leading-[22px] text-black">
+        <div className="w-[97%] mx-auto px-6 sm:p-6">
+          <div className="space-y-5 sm:space-y-10">
+            <h2 className="font-inter font-[600] text-[14px] sm:text-[24px] leading-[22px] text-black">
               Sizning buyurtmangiz
             </h2>
 
-            <div className="space-y-5 w-[100%] text-[#000000BF] font-inter font-[500] text-[20px] leading-[22px]">
+            <div className="space-y-5 w-[100%] text-[#000000BF] font-inter font-[500] text-[14px] sm:text-[20px] leading-[22px]">
               <div className="flex justify-between items-center">
                 <span>1 ta maxsulot narxi</span>
                 <span>1.431.000so'm</span>
@@ -337,7 +348,7 @@ const Formalization_main = ({
 
               <hr className="border-[#D5D5D5] border-[1.5px] my-[23px]" />
 
-              <div className="flex justify-between items-center">
+              <div className="flex sm:text-[20px] font-[700] text-[16px] justify-between items-center">
                 <span>Jami</span>
                 <span>1.431.000so'm</span>
               </div>
@@ -345,12 +356,12 @@ const Formalization_main = ({
 
             <button
               onClick={() => set_is_modal_open(true)}
-              className="w-full py-6 bg-[#DCC38B] font-inter font-[600] text-[22px] leading-[22px] text-black rounded-[10px] cursor-pointer hover:scale-[101%] active:scale-[99%] duration-300"
+              className="w-full py-4 sm:py-6 bg-[#DCC38B] font-inter mt-8 sm:mt-0 font-[600] text-[16px] sm:text-[22px] leading-[22px] text-black rounded-[10px] cursor-pointer hover:scale-[101%] active:scale-[99%] duration-300"
             >
               Xaridni rasmiylashtirish
             </button>
 
-            <div className="text-center font-inter font-[400] text-[18px] leading-[33px]">
+            <div className="text-center font-inter font-[400] text-[13px] sm:text-[18px] leading-[19px] sm:leading-[33px]">
               Buyurtmani tasdiqlash orqali men{" "}
               <Link to="/terms" className="text-purple-600 hover:underline">
                 foydalanuvchi <br /> shartnomasini
@@ -374,11 +385,8 @@ const Formalization_main = ({
         is_payment_variant={is_payment_variant}
         set_is_payment_variant={set_is_payment_variant}
       />
-      <Pickup_address
-        is_pickup={is_pickup}
-        set_is_pickup={set_is_pickup}
-      />
-    </>
+      <Pickup_address is_pickup={is_pickup} set_is_pickup={set_is_pickup} />
+    </div>
   );
 };
 

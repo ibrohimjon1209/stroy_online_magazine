@@ -139,24 +139,53 @@ const Navbar = () => {
   const to_home = () => navigate("/");
 
   return (
-    <div className="w-full h-[80px] flex justify-between gap-[20px] z-50 items-center px-[4.2%] sticky top-2 rounded-[15px] bg-[#DCC38B]">
-      {/* Logo va bosh sahifaga yo'naltirish */}
-      <div className="-[247px] h-full flex items-center gap-[5px]">
-        <img src={logo} alt="Logo" className="cursor-pointer" onClick={to_home} />
-        <h1 className="font-inter font-[600] text-[20px] cursor-pointer leading-[22px] text-black" onClick={to_home}>
-          STROY BAZA №1
-        </h1>
-      </div>
+    <>
+      <div className="hidden sm:block">
+        <div className="w-full h-auto md:h-[80px] flex flex-col md:flex-row justify-between gap-[20px] z-50 items-center px-[4.2%] sticky mt-[5px] rounded-[15px] bg-[#DCC38B] py-4 md:py-0">
+          <style jsx>{`
+          .dropdown-enter {
+            opacity: 0;
+            transform: translateY(-20px);
+            max-height: 0;
+            overflow: hidden;
+          }
+          
+          .dropdown-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+            max-height: 500px;
+            transition: opacity 300ms, transform 300ms, max-height 300ms;
+          }
+          
+          .dropdown-exit {
+            opacity: 1;
+            transform: translateY(0);
+            max-height: 500px;
+          }
+          
+          .dropdown-exit-active {
+            opacity: 0;
+            transform: translateY(-20px);
+            max-height: 0;
+            transition: opacity 300ms, transform 300ms, max-height 300ms;
+            overflow: hidden;
+          }
+        `}</style>
 
-      <div className="w-[653px] flex gap-[20px]">
-        {/* Katalog bo'limi */}
-        <div>
-          <div
-            onClick={handleCategoryClick}
-            className="border-[3px] border-white drop-shadow-xl hover:opacity-75 cursor-pointer w-[100px] h-[40px] bg-transparent flex justify-center items-center rounded-[5px] gap-[5px]"
-          >
-            <Menu strokeWidth={1.5} color="white" />
-            <h1 className="font-inter font-[500] text-[13px] text-white uppercase">Katolog</h1>
+          {/* Mobile menu button */}
+          <div className="flex w-full md:hidden justify-between items-center">
+            <div className="flex items-center gap-[5px]">
+              <img src={logo || "/placeholder.svg"} alt="Logo" className="cursor-pointer w-8 h-8" onClick={to_home} />
+              <h1
+                className="font-inter font-[600] text-[16px] cursor-pointer leading-[22px] text-black"
+                onClick={to_home}
+              >
+                STROY BAZA №1
+              </h1>
+            </div>
+            <button onClick={toggleMobileMenu} className="md:hidden text-white p-2">
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
 
           {/* Logo va bosh sahifaga yo'naltirish - desktop */}
@@ -421,18 +450,17 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile bottom navigation bar */}
       <div className="md:hidden fixed -bottom-[calc(2vh-10px)] left-0 right-0 bg-[#BEA086] flex justify-around items-center h-[85px] z-50 rounded-t-[15px]">
         <Link to="/" className="flex flex-col items-center justify-center">
-          <Home size={24} color={location === "" ? "#000000" : "#666666"} />
+          <Home size={28} strokeWidth={2} color={location === "" ? "#ffffff" : "#DFCFC2"} />
         </Link>
         <Link
           to="/search"
           className="flex flex-col items-center justify-center"
         >
           <Search
-            size={24}
-            color={location === "search" ? "#000000" : "#666666"}
+            size={28} strokeWidth={2}
+            color={location === "search" ? "#ffffff" : "#DFCFC2"}
           />
         </Link>
         <Link
@@ -440,8 +468,8 @@ const Navbar = () => {
           className="flex flex-col items-center justify-center"
         >
           <Package
-            size={24}
-            color={location === "orders" ? "#000000" : "#666666"}
+            size={28} strokeWidth={2}
+            color={location === "orders" ? "#ffffff" : "#DFCFC2"}
           />
         </Link>
         <Link
@@ -449,8 +477,8 @@ const Navbar = () => {
           className="flex flex-col items-center justify-center"
         >
           <ShoppingCart
-            size={24}
-            color={location === "basket" ? "#000000" : "#666666"}
+            size={28} strokeWidth={2}
+            color={location === "basket" ? "#ffffff" : "#DFCFC2"}
           />
         </Link>
         <Link
@@ -458,13 +486,13 @@ const Navbar = () => {
           className="flex flex-col items-center justify-center"
         >
           <User
-            size={24}
-            color={location === "profile" ? "#000000" : "#666666"}
+            size={28} strokeWidth={2}
+            color={location === "profile" ? "#ffffff" : "#DFCFC2"}
           />
         </Link>
       </div>
       <div className="md:hidden h-[0px]"></div>
-    </div>
+    </>
   )
 }
 

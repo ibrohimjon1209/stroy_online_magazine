@@ -2,7 +2,7 @@ import React from "react";
 
 const Cashback_main = () => {
   return (
-    <div className="w-[100%] sm:w-[40%] mt-6 mx-auto bg-white rounded-lg">
+    <div className="w-[100%] sm:w-[40%] mt-6 sm:mt-0 mx-auto bg-white rounded-lg">
       <div className="flex justify-between mb-1 sm:mb-4 font-inter font-[600] text-[18px] sm:text-[20px] leading-[22px] text-black">
         <div>185.000 UZS</div>
         <div>185.000 UZS</div>

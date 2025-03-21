@@ -10,7 +10,7 @@ import instagram from './Images/instagram.svg'
 
 const Footer = () => {
     return (
-        <div className='sticky w-full h-[315px] hidden sm:block bg-[#262928] pt-[40px] pl-[49px] '>
+        <div className='w-full h-[315px] hidden sm:block bg-[#262928] pt-[40px] pl-[49px]'>
 
             <div className='flex'>
 

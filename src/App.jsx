@@ -4,6 +4,7 @@ import {
   Route,
   Routes,
   useLocation,
+  Navigate,
 } from "react-router-dom";
 import Navbar from "./Pages/Navbar/Navbar";
 import Home from "./Pages/Home/Home";
@@ -17,7 +18,7 @@ import Footer from "./Pages/Footer/Footer";
 import Terms from "./Pages/Terms/terms_main";
 import Pickup_address from "./Pages/pickup_address/pickup_address_main";
 import Payment_variant from "./Pages/payment_variant/payment_main";
-import { Cat } from "lucide-react";
+import Formalization from "./Pages/Formalization/formalization_main";
 import Category_mobile from "./Pages/Category/Category_mobile";
 const Product = lazy(() => import("./Pages/Product/Product"));
 const Category = lazy(() => import("./Pages/Category/Category"));
@@ -29,6 +30,7 @@ const App = () => {
   const [is_online, set_is_online] = useState(navigator.onLine);
   const [is_footer_visible, set_is_footer_visible] = useState(true);
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [formalization_open, set_formalization_open] = useState(false);
   const location = useLocation().pathname.split("/")[1];
 
   useEffect(() => {
@@ -47,7 +49,7 @@ const App = () => {
   useEffect(() => {
     if (
       location == "delivery" ||
-      location == "terms" ||
+      (location == "terms" && formalization_open) ||
       location == "payment-variant"
     ) {
       if (
@@ -60,12 +62,14 @@ const App = () => {
         set_is_another_nav(false);
       }
     }
+    if (location == "formalization" || location == "terms") {
+    }
+    else {
+      set_is_another_nav(false);
+    }
     [location];
   });
 
-  if (!is_online) {
-    return <InternetChecker />;
-  }
 
   const customScrollbar = {
     overflowY: "auto",
@@ -88,32 +92,39 @@ const App = () => {
       document.body.style.height = "";
     }
   }, []);
-
+  if (!is_online) {
+    return <InternetChecker />;
+  }
+  else {
   return (
-    <div className={`${is_found ? "w-[]  sm:w-[1450px]" : "w-full "} m-auto `}>
+    <div className={`${is_found ? "w-[] sm:w-[1450px]" : "w-full "} m-auto `}>
       {is_found && !is_another_nav && <Navbar userSignIn={userSignIn} />}
-      <div className={`${is_found ? "w-[]  sm:w-[1450px]" : "w-full"} m-auto`}>
+      <div className={`${is_found ? "w-[] sm:w-[1450px]" : "w-full"} m-auto`}>
         <div
-          className="flex flex-col justify-between  h-[calc(100vh)] sm:h-[calc(119vh-100px)] w-[100%]"
+          className={`flex flex-col justify-between ${is_found ? "h-[calc(100vh)] sm:h-[calc(130vh-200px)]" : "h-full"} w-[100%]`}
           style={{
             ...customScrollbar,
             overflowY: "auto",
             scrollbarWidth: "thin",
-            scrollbarColor: "rgba(244,244,244,1) rgba(255, 255, 255, 1)",
+            scrollbarColor: "rgba(244,244,244,1) rgba(255, 255, 255, 1)"
           }}
         >
+          <div>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/likes" element={<Likes />} />
-            <Route path="/basket" element={<Basket />} />
+            <Route
+              path="/basket"
+              element={
+                <Basket set_formalization_open={set_formalization_open} />
+              }
+            />
             <Route path="/orders" element={<Orders />} />
             <Route path="/search" element={<Category_mobile />} />
             <Route
               path="/profile/*"
               element={<Profile userSignIn={userSignIn} />}
             />
-
-            {/* Lazy yuklanadigan sahifalar */}
             <Route
               path="/product/*"
               element={
@@ -130,13 +141,43 @@ const App = () => {
                 </Suspense>
               }
             />
+            <Route
+              path="/formalization"
+              element={
+                formalization_open ? (
+                  <Formalization
+                    userSignIn={userSignIn}
+                    setSelectedLocation={setSelectedLocation}
+                    set_is_another_nav={set_is_another_nav}
+                    is_another_nav={is_another_nav}
+                    set_is_footer_visible={set_is_footer_visible}
+                    set_formalization_open={set_formalization_open}
+                  />
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
+            />
+            <Route
+              path="/terms"
+              element={
+                formalization_open ? (
+                  <Terms />
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
+            />
+            <Route path="*" element={<Not_found set_is_found={set_is_found}/>}/>
           </Routes>
+          </div>
 
           {is_found && is_footer_visible && <Footer />}
         </div>
       </div>
     </div>
   );
+}
 };
 
 export default App;
