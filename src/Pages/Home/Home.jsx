@@ -41,7 +41,7 @@ function Home() {
             .catch((err) => console.error("Error: ", err))
 
 
-    })  
+    })
     const inputRef = useRef(null)
     const [is_search_open, set_is_search_open] = useState(false)
     const [searchAnimation, setSearchAnimation] = useState(false)
@@ -156,7 +156,7 @@ function Home() {
                     )}
                 </div>
             </div>
-            
+
             <div className="px-[22px] w-full h-[90px] flex block sm:hidden justify-center items-center">
                 <div className="w-full h-[50px] bg-white border-[0.5px] border-[#8879798C] rounded-[10px] flex items-center justify-evenly">
                     <h1 className="font-inter font-[500] text-[15px] leading-[22px] text-[#DA9700]">Stroy Baza №1</h1>
