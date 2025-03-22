@@ -4,7 +4,7 @@ import img from "./404_img.png";
 const Not_found = ({ set_is_found }) => {
   set_is_found(false);
   return (
-    <div className="flex flex-col w-full h-full relative justify-center items-center">
+    <div className="flex flex-col w-full h-[140%] relative justify-center items-center">
       <div className="w-full h-[50vh] bg-[#FEDA73]"></div>
       <img
         src={img}

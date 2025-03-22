@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, Route, Routes, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import {
   ChevronRight,
   LogOut,
@@ -17,15 +17,46 @@ import Favorites from "./chields/favorites/favorites";
 import City from "./chields/city/city_main";
 import Language from "./chields/language/language_main";
 import Help_modal from "./help_modal";
+import { get_user } from "../../../../Services/auth/get_user";
+// import { refresh } from "../../../../Services/auth/refresh_access";
 
 const Sidebar = ({ isUserSignIn, setUserSignIn }) => {
-  const [user] = useState({
-    name: "Foydalanuvchi",
-    phone: localStorage.getItem("phoneNumber") || "Nomalum",
+  const [user, set_user] = useState({
+    name: "...",
+    phone: "...",
   });
   const location = useLocation();
   const isSmallScreen = useMediaQuery({ maxWidth: 640 });
   const [help_modal_open, set_help_modal_open] = useState(false);
+  const navigate = useNavigate()
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const user_data = await get_user(
+          localStorage.getItem("userId"),
+          localStorage.getItem("accessToken"),
+          setUserSignIn
+        );
+
+        if (!user_data) {
+          return;
+        }
+
+        set_user({
+          name: user_data.first_name
+            ? `${user_data.first_name} ${user_data.last_name}`
+            : "Foydalanuvchi",
+          phone: user_data.phone_number || "Nomalum",
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (isUserSignIn) {
+      fetchUserData();
+    }
+  }, [isUserSignIn]);
 
   return (
     <div

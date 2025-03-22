@@ -27,9 +27,9 @@ const Category = lazy(() => import("./Pages/Category/Category"));
 const App = () => {
   const navigate = useNavigate();
   const [userSignIn, setUserSignIn] = useState(false);
-  
+
   useEffect(() => {
-    setUserSignIn(localStorage.getItem("userId") ? true : false)
+    setUserSignIn(localStorage.getItem("userId") ? true : false);
   }, []);
   const [phone_number, set_phone_number] = useState("");
   const [is_found, set_is_found] = useState(true);
@@ -176,6 +176,7 @@ const App = () => {
                         is_another_nav={is_another_nav}
                         set_is_footer_visible={set_is_footer_visible}
                         set_formalization_open={set_formalization_open}
+                        setUserSignIn={setUserSignIn}
                       />
                     ) : (
                       <Navigate to="/" />
@@ -192,11 +193,21 @@ const App = () => {
                 />
                 <Route
                   path="/register"
-                  element={<Register set_is_found={set_is_found} setUserSignIn={setUserSignIn}/>}
+                  element={
+                    <Register
+                      set_is_found={set_is_found}
+                      setUserSignIn={setUserSignIn}
+                    />
+                  }
                 />
                 <Route
                   path="/login"
-                  element={<Log_in set_is_found={set_is_found} setUserSignIn={setUserSignIn}/>}
+                  element={
+                    <Log_in
+                      set_is_found={set_is_found}
+                      setUserSignIn={setUserSignIn}
+                    />
+                  }
                 />
               </Routes>
             </div>

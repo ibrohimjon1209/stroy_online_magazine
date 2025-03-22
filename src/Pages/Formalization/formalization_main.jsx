@@ -9,10 +9,11 @@ import pay_me from "./imgs/pay_me.png";
 import click from "./imgs/click.png";
 import alif_icon from "./imgs/alif.png";
 import Modal from "./modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Delivery from "../Map/map_main";
 import Payment_variant from "../payment_variant/payment_main";
 import Pickup_address from "../pickup_address/pickup_address_main";
+import { get_user } from "../../Services/auth/get_user";
 
 const Formalization_main = ({
   userSignIn,
@@ -21,7 +22,12 @@ const Formalization_main = ({
   is_another_nav,
   set_is_footer_visible,
   set_formalization_open,
+  setUserSignIn
 }) => {
+  const [userData, setUserData] = useState({
+    name: "...",
+    phone: "...",
+  });
   const [deliver_type, set_deliver_type] = useState("bring");
   const [selectedMethod, setSelectedMethod] = useState("installment");
   const [is_modal_open, set_is_modal_open] = useState(false);
@@ -30,6 +36,35 @@ const Formalization_main = ({
   const [is_payment_variant, set_is_payment_variant] = useState(false);
   set_is_another_nav(is_delivery || is_payment_variant || is_pickup);
   set_is_footer_visible(!is_pickup);
+  
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const user_data = await get_user(
+          localStorage.getItem("userId"),
+          localStorage.getItem("accessToken"),
+          setUserSignIn
+        );
+
+        if (!user_data) {
+          return;
+        }
+
+        setUserData({
+          name: user_data.first_name
+            ? `${user_data.first_name} ${user_data.last_name}`
+            : "Foydalanuvchi",
+          phone: user_data.phone_number || "Nomalum",
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (userSignIn) {
+      fetchUserData();
+    }
+  }, [userSignIn]);
   return (
     <div className="flex flex-col w-full h-full mb-17 sm:mb-0">
       <div className="w-full fixed z-50 h-[65px] bg-[#DCC38B] sm:hidden block">
@@ -63,16 +98,16 @@ const Formalization_main = ({
                 </div>
                 <div>
                   <p className="font-inter font-[600] text-[15px] leading-[22px] text-black">
-                    Foydalanuvchi
+                    {userData?.name || "Foydalanuvchi"}
                   </p>
                   <p className="font-inter font-[500] text-[13px] leading-[22px] text-black">
-                    {localStorage.getItem("phoneNumber") || "Nomalum"}
+                    {userData?.phone || "Nomalum"}
                   </p>
                 </div>
               </div>
             </div>
           ) : (
-            <Link to="/enter">
+            <Link to="/login">
               <div className="border bg-[#FFDF02] border-[#D5D5D5] rounded-lg p-4 mt-[20px] mb-6 w-[40%] h-[70px] flex items-center justify-center hover:scale-[101%] active:scale-[99%] duration-300">
                 <p className="font-inter font-[600] text-[24px] leading-[22px] text-black">
                   Kirish

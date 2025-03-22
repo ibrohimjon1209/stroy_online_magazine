@@ -1,20 +1,20 @@
-import { useEffect, useState } from "react"
-import { PhoneInput } from "../components/phone_input"
-import { Link } from "react-router-dom"
-import PhoneVerification from "../components/phone_verification"
-import { login } from "../../../Services/auth/login"
+import { useEffect, useState } from "react";
+import { PhoneInput } from "../components/phone_input";
+import { Link } from "react-router-dom";
+import PhoneVerification from "../components/phone_verification";
+import { login } from "../../../Services/auth/login";
 
 export default function Log_in_main({ set_is_found, setUserSignIn }) {
-  const [phoneNumber, setPhoneNumber] = useState("")
-  const [showVerification, setShowVerification] = useState(false)
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [showVerification, setShowVerification] = useState(false);
 
   useEffect(() => {
-    set_is_found(false)
-  }, [])
+    set_is_found(false);
+  }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    const formattedNumber = `+998${phoneNumber}`
+    e.preventDefault();
+    const formattedNumber = `+998${phoneNumber}`;
     try {
       await login(formattedNumber);
       localStorage.setItem("phoneNumber", formattedNumber);
@@ -22,35 +22,48 @@ export default function Log_in_main({ set_is_found, setUserSignIn }) {
     } catch (error) {
       console.error("Login failed:", error);
     }
-  }
+  };
 
-  const isPhoneComplete = phoneNumber.length === 9
+  const isPhoneComplete = phoneNumber.length === 9;
 
   // If verification screen should be shown, render it
   if (showVerification) {
-    return <PhoneVerification phoneNumber={`+998${phoneNumber}`} method={"login"} set_is_found={set_is_found} setUserSignIn={setUserSignIn} />
+    return (
+      <PhoneVerification
+        phoneNumber={`+998${phoneNumber}`}
+        method={"login"}
+        set_is_found={set_is_found}
+        setUserSignIn={setUserSignIn}
+      />
+    );
   }
 
   // Otherwise show the login form
   return (
-    <div className="flex min-h-screen flex-col items-center sm:justify-center sm:mt-[] mt-[12vh] p-4">
-      <div className="w-full max-w-md space-y-8">
-        <h1 className="text-center text-2xl font-medium">Tizimga kirish</h1>
-        <p className="text-center text-gray-600">Kirish uchun telefon raqamingizni kiriting.</p>
+    <div className="flex h-[calc(100vh-200px)] flex-col items-center sm:justify-center sm:mt-[] mt-[12vh] p-4">
+      <div className="w-full flex flex-col justify-between">
+        <div className=" w-full max-w-md space-y-8">
+          <h1 className="text-center text-2xl font-medium">Tizimga kirish</h1>
+          <p className="text-center text-gray-600">
+            Kirish uchun telefon raqamingizni kiriting.
+          </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <PhoneInput value={phoneNumber} onChange={setPhoneNumber} />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <PhoneInput value={phoneNumber} onChange={setPhoneNumber} />
 
-          <button
-            type="submit"
-            disabled={!isPhoneComplete}
-            className={`w-full py-3 font-medium transition-colors ${
-              isPhoneComplete ? "bg-[#FFDF028C] text-[#0000008C] cursor-pointer" : "bg-gray-300 cursor-not-allowed"
-            }`}
-          >
-            Kirish
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={!isPhoneComplete}
+              className={`w-full py-3 font-medium transition-colors ${
+                isPhoneComplete
+                  ? "bg-[#FFDF028C] text-[#0000008C] cursor-pointer"
+                  : "bg-gray-300 cursor-not-allowed"
+              }`}
+            >
+              Kirish
+            </button>
+          </form>
+        </div>
 
         <div className="mt-[40vh] sm:pt-16 text-center">
           <Link to="/register" className="text-[#4726BCBF] hover:underline">
@@ -59,6 +72,5 @@ export default function Log_in_main({ set_is_found, setUserSignIn }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
