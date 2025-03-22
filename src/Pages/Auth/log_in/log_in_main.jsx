@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 import PhoneVerification from "../components/phone_verification"
 import { login } from "../../../Services/auth/login"
 
-export default function Log_in_main({ set_is_found }) {
+export default function Log_in_main({ set_is_found, setUserSignIn }) {
   const [phoneNumber, setPhoneNumber] = useState("")
   const [showVerification, setShowVerification] = useState(false)
 
@@ -17,6 +17,7 @@ export default function Log_in_main({ set_is_found }) {
     const formattedNumber = `+998${phoneNumber}`
     try {
       await login(formattedNumber);
+      localStorage.setItem("phoneNumber", formattedNumber);
       setShowVerification(true);
     } catch (error) {
       console.error("Login failed:", error);
@@ -27,7 +28,7 @@ export default function Log_in_main({ set_is_found }) {
 
   // If verification screen should be shown, render it
   if (showVerification) {
-    return <PhoneVerification phoneNumber={`+998${phoneNumber}`} method={"login"} set_is_found={set_is_found} />
+    return <PhoneVerification phoneNumber={`+998${phoneNumber}`} method={"login"} set_is_found={set_is_found} setUserSignIn={setUserSignIn} />
   }
 
   // Otherwise show the login form

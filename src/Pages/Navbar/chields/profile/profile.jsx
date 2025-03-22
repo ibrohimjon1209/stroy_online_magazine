@@ -13,7 +13,7 @@ import Language from "./chields/language/language_main";
 import Help from "./chields/help/help_main";
 import { ChevronLeft } from "lucide-react";
 
-const Profile_main = ({ isUserSignIn }) => {
+const Profile_main = ({ isUserSignIn, setUserSignIn }) => {
   const location = useLocation().pathname;
   return (
     <div className="mb-10 gap-[20px] sm:gap-0 sm:my-[20px] flex flex-col items-center justify-center w-full">
@@ -36,7 +36,7 @@ const Profile_main = ({ isUserSignIn }) => {
         </div>
       </div>
       <div className="flex profile_md:w-[93%] w-[90%] mx-auto">
-        <Sidebar isUserSignIn={isUserSignIn} />
+        <Sidebar isUserSignIn={isUserSignIn} setUserSignIn={setUserSignIn} />
         <div className="flex-1 ml-[20px] border border-[#D5D5D5] rounded-[8px] hidden sm:flex pt-[50px]">
           <Routes>
             <Route path="*" element={<Orders />} />

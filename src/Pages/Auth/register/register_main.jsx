@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import PhoneVerification from "../components/phone_verification";
 import { register } from "../../../Services/auth/register";
 
-export default function Register_main({ set_is_found }) {
+export default function Register_main({ set_is_found, setUserSignIn }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showVerification, setShowVerification] = useState(false);
 
@@ -31,7 +31,7 @@ export default function Register_main({ set_is_found }) {
   const isPhoneComplete = phoneNumber.length === 9;
 
   if (showVerification) {
-    return <PhoneVerification phoneNumber={`+998${phoneNumber}`} method={"register"} set_is_found={set_is_found} />;
+    return <PhoneVerification phoneNumber={`+998${phoneNumber}`} method={"register"} set_is_found={set_is_found} setUserSignIn={setUserSignIn} />;
   }
 
   return (

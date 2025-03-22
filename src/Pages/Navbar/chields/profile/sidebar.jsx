@@ -18,7 +18,7 @@ import City from "./chields/city/city_main";
 import Language from "./chields/language/language_main";
 import Help_modal from "./help_modal";
 
-const Sidebar = ({ isUserSignIn }) => {
+const Sidebar = ({ isUserSignIn, setUserSignIn }) => {
   const [user] = useState({
     name: "Foydalanuvchi",
     phone: localStorage.getItem("phoneNumber") || "Nomalum",
@@ -39,7 +39,7 @@ const Sidebar = ({ isUserSignIn }) => {
           element={
             <div className="sticky top-0 w-[100%] sm:w-[350px]">
               <div>
-                {!isUserSignIn ? (
+                {isUserSignIn ? (
                   <div className="flex h-[70px] sm:h-[80px] items-center w-full gap-3 border-[#D5D5D5] border rounded-[8px] pl-[13px] sm:pl-[20px] pr-[30px] py-[12px]">
                     <div className="bg-gray-200 rounded-full p-2">
                       <User className="h-7 w-7 text-gray-600" />
@@ -54,7 +54,7 @@ const Sidebar = ({ isUserSignIn }) => {
                     </div>
                   </div>
                 ) : (
-                  <Link to="/enter">
+                  <Link to="/login">
                     <div className="flex justify-center bg-[#FFDF02] h-[70px] items-center w-full gap-3 border-[#D5D5D5] border rounded-[8px] pl-[20px] pr-[30px] py-[12px] hover:scale-[101%] active:scale-[99%] duration-300">
                       <p className="font-inter font-[600] text-[24px] leading-[22px] text-black">
                         Kirish
@@ -109,7 +109,13 @@ const Sidebar = ({ isUserSignIn }) => {
                   label="Qo'llab-quvvatlash"
                 />
                 <div className="px-4 py-5">
-                  <button className="flex items-center font-inter font-[500] text-[13px] leading-[22px] text-red-500 hover:text-red-700 duration-300 cursor-pointer">
+                  <button onClick={() => {
+                    setUserSignIn(false)
+                    console.log(isUserSignIn)
+                    localStorage.removeItem("refreshToken")
+                    localStorage.removeItem("accessToken")
+                    localStorage.removeItem("userId")
+                  }} className="flex items-center font-inter font-[500] text-[13px] leading-[22px] text-red-500 hover:text-red-700 duration-300 cursor-pointer">
                     <LogOut className="h-5 w-5 mr-3" />
                     Chiqish
                   </button>

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom"; // Import navigation
 import { verify } from "../../../Services/auth/verify";
 
-export default function PhoneVerification({ phoneNumber, method, set_is_found }) {
+export default function PhoneVerification({ phoneNumber, method, set_is_found, setUserSignIn }) {
   const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(59);
   const inputRefs = useRef([]);
@@ -86,6 +86,7 @@ export default function PhoneVerification({ phoneNumber, method, set_is_found })
           localStorage.setItem("accessToken", res.access);
           localStorage.setItem("refreshToken", res.refresh);
           localStorage.setItem("userId", res.id);
+          setUserSignIn(true)
           set_is_found(true);
           navigate("/");
         }
