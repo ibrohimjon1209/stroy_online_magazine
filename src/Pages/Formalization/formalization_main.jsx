@@ -63,10 +63,10 @@ const Formalization_main = ({
                 </div>
                 <div>
                   <p className="font-inter font-[600] text-[15px] leading-[22px] text-black">
-                    Nuraliyev Muhammad Sodiq
+                    Foydalanuvchi
                   </p>
                   <p className="font-inter font-[500] text-[13px] leading-[22px] text-black">
-                    +998 90 762 92 82
+                    {localStorage.getItem("phoneNumber") || "Nomalum"}
                   </p>
                 </div>
               </div>

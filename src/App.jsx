@@ -5,7 +5,9 @@ import {
   Routes,
   useLocation,
   Navigate,
+  useNavigate
 } from "react-router-dom";
+import jwtDecode from "jwt-decode";
 import Navbar from "./Pages/Navbar/Navbar";
 import Home from "./Pages/Home/Home";
 import Likes from "./Pages/Navbar/chields/likes/likes_main";
@@ -24,14 +26,48 @@ const Product = lazy(() => import("./Pages/Product/Product"));
 const Category = lazy(() => import("./Pages/Category/Category"));
 
 const App = () => {
-  const [userSignIn, setUserSignIn] = useState(true);
+  const navigate = useNavigate();
+  const [userSignIn, setUserSignIn] = useState(false);
+  const [phone_number, set_phone_number] = useState("");
+  const [is_online, set_is_online] = useState(navigator.onLine);
   const [is_found, set_is_found] = useState(true);
   const [is_another_nav, set_is_another_nav] = useState(false);
-  const [is_online, set_is_online] = useState(navigator.onLine);
   const [is_footer_visible, set_is_footer_visible] = useState(true);
-  const [selectedLocation, setSelectedLocation] = useState(null);
   const [formalization_open, set_formalization_open] = useState(false);
   const location = useLocation().pathname.split("/")[1];
+
+  useEffect(() => {
+    const checkToken = () => {
+      const token = localStorage.getItem("refresh");
+      if (token) {
+        try {
+          const decodedToken = jwtDecode(token);
+          const currentTime = Date.now() / 1000; // Hozirgi vaqt (sekundlarda)
+          if (decodedToken.exp > currentTime) {
+            setUserSignIn(true);
+            set_phone_number(localStorage.getItem("phoneNumber"));
+          } else {
+            // Token muddati tugagan, login sahifasiga yo'naltirish
+            localStorage.removeItem("refresh");
+            localStorage.removeItem("phoneNumber");
+            setUserSignIn(false);
+            navigate("/login");
+          }
+        } catch (error) {
+          console.error("Token noto‘g‘ri:", error);
+          localStorage.removeItem("refresh");
+          localStorage.removeItem("phoneNumber");
+          setUserSignIn(false);
+          navigate("/login");
+        }
+      } else {
+        setUserSignIn(false);
+        navigate("/login");
+      }
+    };
+
+    checkToken();
+  }, [navigate]);
 
   useEffect(() => {
     const updateOnlineStatus = () => {
@@ -46,89 +82,22 @@ const App = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (
-      location == "delivery" ||
-      (location == "terms" && formalization_open) ||
-      location == "payment-variant" ||
-      location == "login" ||
-      location == "register"
-    ) {
-      if (
-        location === "delivery" ||
-        location === "terms" ||
-        location === "payment-variant" ||
-        location == "login" ||
-        location == "register"
-      ) {
-        set_is_another_nav(true);
-      } else {
-        set_is_another_nav(false);
-      }
-    }
-    if (location == "formalization" || location == "terms") {
-    }
-    else {
-      set_is_another_nav(false);
-    }
-    [location];
-  });
-
-
-  const customScrollbar = {
-    overflowY: "auto",
-    scrollbarWidth: "auto",
-    scrollbarColor: "rgba(255,255,255,1) rgba(255,255,255,1)",
-  };
-
-  useEffect(() => {
-    if (window.innerWidth > 768) {
-      document.body.style.transform = "scale(0.85)";
-      document.body.style.transformOrigin = "top left";
-      document.body.style.width = "117.33%";
-      document.body.style.overflow = "hidden";
-      document.body.style.height = "100vh";
-    } else {
-      document.body.style.transform = "";
-      document.body.style.transformOrigin = "";
-      document.body.style.width = "";
-      document.body.style.overflow = "";
-      document.body.style.height = "";
-    }
-  }, []);
   if (!is_online) {
     return <InternetChecker />;
   }
-  else {
+
   return (
     <div className={`${is_found ? "w-[] sm:w-[1450px]" : "w-full "} m-auto `}>
       {is_found && !is_another_nav && <Navbar userSignIn={userSignIn} />}
       <div className={`${is_found ? "w-[] sm:w-[1450px]" : "w-full"} m-auto overflow-hidden`}>
-        <div
-          className={`flex flex-col justify-between ${is_found ? "h-[calc(100vh)] sm:h-[calc(130vh-200px)]" : "h-full"} w-[100%]`}
-          style={{
-            ...customScrollbar,
-            overflowY: "auto",
-            scrollbarWidth: "thin",
-            scrollbarColor: "rgba(244,244,244,1) rgba(255, 255, 255, 1)"
-          }}
-        >
-          <div>
+        <div className="flex flex-col justify-between h-full w-[100%]">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/likes" element={<Likes />} />
-            <Route
-              path="/basket"
-              element={
-                <Basket set_formalization_open={set_formalization_open} />
-              }
-            />
+            <Route path="/basket" element={<Basket set_formalization_open={set_formalization_open} />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/search" element={<Category_mobile />} />
-            <Route
-              path="/profile/*"
-              element={<Profile userSignIn={userSignIn} />}
-            />
+            <Route path="/profile/*" element={<Profile userSignIn={userSignIn} />} />
             <Route
               path="/product/*"
               element={
@@ -147,43 +116,21 @@ const App = () => {
             />
             <Route
               path="/formalization"
-              element={
-                formalization_open ? (
-                  <Formalization
-                    userSignIn={userSignIn}
-                    setSelectedLocation={setSelectedLocation}
-                    set_is_another_nav={set_is_another_nav}
-                    is_another_nav={is_another_nav}
-                    set_is_footer_visible={set_is_footer_visible}
-                    set_formalization_open={set_formalization_open}
-                  />
-                ) : (
-                  <Navigate to="/" />
-                )
-              }
+              element={formalization_open ? <Formalization /> : <Navigate to="/" />}
             />
             <Route
               path="/terms"
-              element={
-                formalization_open ? (
-                  <Terms />
-                ) : (
-                  <Navigate to="/" />
-                )
-              }
+              element={formalization_open ? <Terms /> : <Navigate to="/" />}
             />
-            <Route path="*" element={<Not_found set_is_found={set_is_found}/>}/>
-            <Route path="/register" element={<Register set_is_found={set_is_found}/>}/>
-            <Route path="/login" element={<Log_in set_is_found={set_is_found}/>}/>
+            <Route path="*" element={<Not_found set_is_found={set_is_found} />} />
+            <Route path="/register" element={<Register set_is_found={set_is_found} />} />
+            <Route path="/login" element={<Log_in set_is_found={set_is_found} />} />
           </Routes>
-          </div>
-
           {is_found && is_footer_visible && <Footer />}
         </div>
       </div>
     </div>
   );
-}
 };
 
 export default App;

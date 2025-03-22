@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { PhoneInput } from "../components/phone_input"
 import { Link } from "react-router-dom"
 import PhoneVerification from "../components/phone_verification"
+import { login } from "../../../Services/auth/login"
 
 export default function Log_in_main({ set_is_found }) {
   const [phoneNumber, setPhoneNumber] = useState("")
@@ -11,24 +12,22 @@ export default function Log_in_main({ set_is_found }) {
     set_is_found(false)
   }, [])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const formattedNumber = `+998${phoneNumber}`
-    // Instead of alert, show verification screen
-    setShowVerification(true)
-  }
-
-  const handleVerificationComplete = (code) => {
-    // Handle verification completion
-    alert(`Verification completed with code: ${code} for phone: +998${phoneNumber}`)
-    // Here you would typically make an API call to verify the code
+    try {
+      await login(formattedNumber);
+      setShowVerification(true);
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
   }
 
   const isPhoneComplete = phoneNumber.length === 9
 
   // If verification screen should be shown, render it
   if (showVerification) {
-    return <PhoneVerification phoneNumber={`+998${phoneNumber}`} onVerificationComplete={handleVerificationComplete} />
+    return <PhoneVerification phoneNumber={`+998${phoneNumber}`} method={"login"} set_is_found={set_is_found} />
   }
 
   // Otherwise show the login form

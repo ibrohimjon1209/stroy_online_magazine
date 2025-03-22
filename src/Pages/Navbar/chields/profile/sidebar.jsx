@@ -20,8 +20,8 @@ import Help_modal from "./help_modal";
 
 const Sidebar = ({ isUserSignIn }) => {
   const [user] = useState({
-    name: "Nuraliyev Muhammad Sodiq",
-    phone: "+998 90 702 92 82",
+    name: "Foydalanuvchi",
+    phone: localStorage.getItem("phoneNumber") || "Nomalum",
   });
   const location = useLocation();
   const isSmallScreen = useMediaQuery({ maxWidth: 640 });

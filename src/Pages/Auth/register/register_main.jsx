@@ -1,39 +1,41 @@
-import { useEffect, useState } from "react"
-import { PhoneInput } from "../components/phone_input"
-import { Link } from "react-router-dom"
-import PhoneVerification from "../components/phone_verification"
+import { useEffect, useState } from "react";
+import { PhoneInput } from "../components/phone_input";
+import { Link } from "react-router-dom";
+import PhoneVerification from "../components/phone_verification";
+import { register } from "../../../Services/auth/register";
 
 export default function Register_main({ set_is_found }) {
-  const [phoneNumber, setPhoneNumber] = useState("")
-  const [showVerification, setShowVerification] = useState(false)
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [showVerification, setShowVerification] = useState(false);
 
   useEffect(() => {
-    set_is_found(false)
-  }, [])
+    set_is_found(false);
+  }, []);
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    const formattedNumber = `+998${phoneNumber}`
-    // Instead of alert, show verification screen
-    setShowVerification(true)
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formattedNumber = `+998${phoneNumber}`;
 
-  const handleVerificationComplete = (code) => {
-    // Handle verification completion
-    alert(`Registration verification completed with code: ${code} for phone: +998${phoneNumber}`)
-    // Here you would typically make an API call to verify the code and register the user
-  }
+    try {
+      await register(formattedNumber);
+      setShowVerification(true);
+    } catch (error) {
+      console.error("Registration failed:", error);
+    }
+  };
 
-  const isPhoneComplete = phoneNumber.length === 9
+  // const handleVerificationComplete = (code) => {
+  //   alert(`Verification completed with code: ${code} for phone: +998${phoneNumber}`);
+  // };
 
-  // If verification screen should be shown, render it
+  const isPhoneComplete = phoneNumber.length === 9;
+
   if (showVerification) {
-    return <PhoneVerification phoneNumber={`+998${phoneNumber}`} onVerificationComplete={handleVerificationComplete} />
+    return <PhoneVerification phoneNumber={`+998${phoneNumber}`} method={"register"} set_is_found={set_is_found} />;
   }
 
-  // Otherwise show the registration form
   return (
-    <div className="flex min-h-screen flex-col items-center sm:justify-center sm:mt-[] mt-[12vh] p-4">
+    <div className="flex min-h-screen flex-col items-center sm:justify-center mt-[12vh] p-4">
       <div className="w-full max-w-md space-y-8">
         <h1 className="text-center text-2xl font-medium">Ro'yxatdan o'tish</h1>
         <p className="text-center text-gray-600">Yangi akkaunt yaratish uchun telefon raqamingizni kiriting.</p>
@@ -59,6 +61,5 @@ export default function Register_main({ set_is_found }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

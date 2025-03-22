@@ -11,7 +11,7 @@ export default defineConfig({
     compression()
   ],
   server: {
-    allowedHosts: ['7c6c-213-230-76-202.ngrok-free.app'],
+    allowedHosts: ['385a-202-79-189-219.ngrok-free.app'],
     host: true,
     port: 5173,
   }
