@@ -4,12 +4,11 @@ const LogOutModal = ({ isOpen, onClose, setUserSignIn }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed h-[121vh] w-[118vw] -mt-2 inset-0 z-[9999] flex items-center justify-center">
+    <div className="fixed w-full -mt-2 inset-0 z-[9999] flex items-center justify-center">
       <div
         className="absolute inset-0 bg-black opacity-50"
         onClick={onClose}
       ></div>
-
       <div className="relative z-10 bg-white text-center w-[300px] p-4 rounded-lg shadow-lg">
         <h2 className="text-[20px] font-semibold mb-2">Chiqishni tasdiqlang</h2>
         <p className="mb-6">Xaqiqatdan ham accauntdan chiqilsinmi ?</p>
