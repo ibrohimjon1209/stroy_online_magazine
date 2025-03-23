@@ -265,7 +265,7 @@ const Product = () => {
             )}
 
             <h1 className="hidden sm:block font-inter font-[600] text-[20px] leading-[22px] text-black">PENOPLESK</h1>
-            <div className="flex flex-col sm:flex gap-[20px]">
+            <div className="flex flex-col sm:flex-row gap-[20px]">
                 <div className="product-div">
                     <div className="mt-[20px] flex gap-[19px]">
                         <div className="hidden sm:block image-selection-div flex flex-col gap-[18px]">
@@ -295,25 +295,27 @@ const Product = () => {
                         </div>
                     </div>
 
-                    <div className="hidden sm:block mt-[40px] flex flex-col gap-[28px] w-[681px]">
-                        <h1 className="font-inter font-[600] text-[28px] leading-[22px] text-black">Tasnif</h1>
-                        <p className="font-inter font-[500] text-[16px] leading-[22px] text-black">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Vero recusandae nihil earum eligendi officiis
-                            quaerat odit magnam? Veniam, vitae dolores! Velit, quo officia sapiente saepe ratione, nemo ea cupiditate
-                            molestias blanditiis sequi qui in reiciendis ab optio officiis veniam delectus eos iure quia nostrum?
-                            Consequatur nulla sequi ea eos quo maxime, commodi atque dolorem asperiores dolores, eaque, delectus
-                            doloremque repellendus sunt quis ab molestiae. Exercitationem explicabo, porro pariatur eveniet, assumenda
-                            quo non atque ipsa molestiae saepe repellat iste eaque cupiditate quisquam aliquid consequatur dicta,
-                            possimus sunt ad blanditiis. Praesentium voluptates fuga reprehenderit? Rem nam est nobis consectetur enim
-                            pariatur reiciendis deserunt vitae nisi odio assumenda, alias quidem, aut impedit, quia labore earum qui
-                            asperiores. Ut in, officia qui modi minus fuga culpa iste consectetur illum, veritatis illo quasi
-                            architecto accusantium. Quae doloremque modi unde vero. Neque tempora numquam reprehenderit mollitia amet
-                            illo, rerum iusto aperiam molestiae ullam porro dolore suscipit itaque ipsa, voluptatum ipsam consequuntur
-                            necessitatibus facilis laborum cupiditate asperiores dolorem, quae exercitationem! Ipsa, obcaecati eum!
-                            Quibusdam nam facere iusto consequatur veritatis corporis perferendis vero eius totam? Beatae iusto
-                            deserunt non hic? Porro eveniet incidunt fugit quia minus, pariatur nihil illum repudiandae quis! Deleniti
-                            ipsam possimus vel reprehenderit! Modi, perferendis.
-                        </p>
+                    <div className="hidden sm:block">
+                        <div className=" mt-[40px] flex flex-col gap-[15px] w-[681px]">
+                            <h1 className="font-inter font-[600] text-[28px] leading-[22px] text-black">Tasnif</h1>
+                            <p className="font-inter font-[500] text-[16px] leading-[22px] text-black">
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Vero recusandae nihil earum eligendi officiis
+                                quaerat odit magnam? Veniam, vitae dolores! Velit, quo officia sapiente saepe ratione, nemo ea cupiditate
+                                molestias blanditiis sequi qui in reiciendis ab optio officiis veniam delectus eos iure quia nostrum?
+                                Consequatur nulla sequi ea eos quo maxime, commodi atque dolorem asperiores dolores, eaque, delectus
+                                doloremque repellendus sunt quis ab molestiae. Exercitationem explicabo, porro pariatur eveniet, assumenda
+                                quo non atque ipsa molestiae saepe repellat iste eaque cupiditate quisquam aliquid consequatur dicta,
+                                possimus sunt ad blanditiis. Praesentium voluptates fuga reprehenderit? Rem nam est nobis consectetur enim
+                                pariatur reiciendis deserunt vitae nisi odio assumenda, alias quidem, aut impedit, quia labore earum qui
+                                asperiores. Ut in, officia qui modi minus fuga culpa iste consectetur illum, veritatis illo quasi
+                                architecto accusantium. Quae doloremque modi unde vero. Neque tempora numquam reprehenderit mollitia amet
+                                illo, rerum iusto aperiam molestiae ullam porro dolore suscipit itaque ipsa, voluptatum ipsam consequuntur
+                                necessitatibus facilis laborum cupiditate asperiores dolorem, quae exercitationem! Ipsa, obcaecati eum!
+                                Quibusdam nam facere iusto consequatur veritatis corporis perferendis vero eius totam? Beatae iusto
+                                deserunt non hic? Porro eveniet incidunt fugit quia minus, pariatur nihil illum repudiandae quis! Deleniti
+                                ipsam possimus vel reprehenderit! Modi, perferendis.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -367,8 +369,8 @@ const Product = () => {
                     </div>
 
                     <div className="term-payment mt-[20px]">
-                        <div className="flex flex-col justify-between w-[358px] py-[10px] px-[12px] h-[87px] rounded-[8px] border-[1px] border-[rgba(213,213,213,1)] bg-[rgba(242,242,241,1)]">
-                            <div className="w-[335px] h-[26px] rounded-[5px] flex justify-between gap-[3.75px] bg-[rgba(213,213,213,1)]">
+                        <div className="flex flex-col justify-between w-full py-[10px] px-[12px] h-[87px] rounded-[8px] border-[1px] border-[rgba(213,213,213,1)] bg-[rgba(242,242,241,1)]">
+                            <div className="w-full  h-[26px] rounded-[5px] flex justify-between gap-[3.75px] bg-[rgba(213,213,213,1)]">
                                 {paymentOptions.map((option, index) => (
                                     <div
                                         key={index}
@@ -392,29 +394,29 @@ const Product = () => {
                             Siz buyurtmani 3 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin.
                         </p>
 
-                        <div className="payment-options p-[20px] mt-[20px] w-[358px] h-[297px] rounded-[10px] border-[1px] border-[rgba(213,213,213,1)]">
+                        <div className="payment-options p-[20px] mt-[20px] w-full h-fit rounded-[10px] border-[1px] border-[rgba(213,213,213,1)]">
                             <h1 className="font-inter font-[500] text-[12px] leading-[22px] text-[rgba(0,0,0,0.75)]">
                                 Yetkazib berish <span className="font-inter font-[800]">1 kun</span> ichida Agar{" "}
                                 <span className="font-inter font-[800]">5mln</span> so'mdan ortiq mahsulotga buyurtma bersangiz yetkazib
                                 berish VODIY bo'ylab be'pul.
                             </h1>
-                            <div className="mt-[20px] w-[318px] h-[1px] bg-[rgba(213,213,213,1)]"></div>
+                            <div className="mt-[20px] w-full h-[1px] bg-[rgba(213,213,213,1)]"></div>
                             <h1 className="mt-[20px] font-inter font-[500] text-[12px] leading-[22px] text-[rgba(0,0,0,0.75)]">
                                 Muddatli to'lovni rasmiylashtirayotganingizda bizdan va hamkorlarimizdan eng ma'qul takliflarga ega
                                 bo'lishingiz mumkin.
                             </h1>
 
                             <div className="flex gap-[15px] mt-[20px]">
-                                <div className="w-[68px] h-[65px] rounded-[10px] bg-green-300">
+                                <div className="w-[68px] h-fit rounded-[10px] bg-green-300">
                                     <img src={payme_icon || "/placeholder.svg"} />
                                 </div>
-                                <div className="w-[68px] h-[65px] rounded-[10px] bg-green-300">
+                                <div className="w-[68px] h-fit rounded-[10px] bg-green-300">
                                     <img src={second_icon || "/placeholder.svg"} />
                                 </div>
-                                <div className="w-[68px] h-[65px] rounded-[10px] bg-green-300">
+                                <div className="w-[68px] h-fit rounded-[10px] bg-green-300">
                                     <img src={anorbank_icon || "/placeholder.svg"} />
                                 </div>
-                                <div className="w-[68px] h-[65px] rounded-[10px] bg-green-300">
+                                <div className="w-[68px] h-fit rounded-[10px] bg-green-300">
                                     <img src={uzum_icon || "/placeholder.svg"} />
                                 </div>
                             </div>
@@ -422,7 +424,7 @@ const Product = () => {
 
                         <div className="relative">
                             <button
-                                className={`mt-[20px] w-[358px] h-[60px] rounded-[10px] bg-[rgba(220,195,139,1)] cursor-pointer hover:bg-[#e9d8b2] transition-all duration-200 font-inter font-[600] text-[15px] leading-[22px] text-[rgba(0,0,0,1)] ${isAnimating ? "animate-circle" : ""}`}
+                                className={`mt-[20px] w-full h-[60px] rounded-[10px] bg-[rgba(220,195,139,1)] cursor-pointer hover:bg-[#e9d8b2] transition-all duration-200 font-inter font-[600] text-[15px] leading-[22px] text-[rgba(0,0,0,1)] ${isAnimating ? "animate-circle" : ""}`}
                                 onClick={handleClick}
                             >
                                 {!isAnimating ? (isAdded ? "Qo'shildi ✅" : "Savatchaga qo'shish") : ""}
