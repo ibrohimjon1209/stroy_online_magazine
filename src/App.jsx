@@ -54,10 +54,12 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    if ((location == "login" || location == "register") && userSignIn)
+    if ((location == "login" || location == "register") && userSignIn) {
       navigate("/");
+    }
     if (localStorage.getItem("refreshToken"))
       if (location == "login" || location == "register") navigate("/");
+
     if (location == "") set_is_found(true);
     if (
       location == "delivery" ||
@@ -119,7 +121,7 @@ const App = () => {
         >
           <div
             className={`flex flex-col justify-between ${
-              is_found ? "h-[calc(100vh)] sm:h-[calc(130vh-200px)]" : "h-full"
+              is_found ? "h-[calc(100vh)] sm:h-[calc(132vh-200px)]" : "h-full"
             } w-[100%]`}
             style={{
               ...customScrollbar,
@@ -145,6 +147,7 @@ const App = () => {
                   element={
                     <Profile
                       isUserSignIn={userSignIn}
+                      set_is_found={set_is_found}
                       setUserSignIn={setUserSignIn}
                     />
                   }

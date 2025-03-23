@@ -13,7 +13,8 @@ import Language from "./chields/language/language_main";
 import Help from "./chields/help/help_main";
 import { ChevronLeft } from "lucide-react";
 
-const Profile_main = ({ isUserSignIn, setUserSignIn }) => {
+const Profile_main = ({ isUserSignIn, setUserSignIn, set_is_found }) => {
+  set_is_found(true)
   const location = useLocation().pathname;
   return (
     <div className="mb-10 gap-[20px] sm:gap-0 sm:my-[20px] flex flex-col items-center justify-center w-full">
