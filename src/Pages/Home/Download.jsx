@@ -1,7 +1,7 @@
 import React from 'react'
 import download from './Images/download.png'
 
-const Download = () => {
+const Download_page = () => {
     return (
         <div className='hidden sm:block w-[1440px] pl-[190px] overflow-hidden mt-[20px] h-[500px] bg-[#F4F4F4]'>
 
@@ -10,4 +10,4 @@ const Download = () => {
     )
 }
 
-export default Download
+export default Download_page

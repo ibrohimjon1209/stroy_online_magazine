@@ -21,6 +21,7 @@ import Formalization from "./Pages/Formalization/formalization_main";
 import Category_mobile from "./Pages/Category/Category_mobile";
 import Register from "./Pages/Auth/register/register_main";
 import Log_in from "./Pages/Auth/log_in/log_in_main";
+import User_offer from "./Pages/User_offer/User_offer";
 const Product = lazy(() => import("./Pages/Product/Product"));
 const Category = lazy(() => import("./Pages/Category/Category"));
 
@@ -113,14 +114,12 @@ const App = () => {
       <div className={`${is_found ? "w-[] sm:w-[1450px]" : "w-full "} m-auto `}>
         {is_found && !is_another_nav && <Navbar userSignIn={userSignIn} />}
         <div
-          className={`${
-            is_found ? "w-[] sm:w-[1450px]" : "w-full"
-          } m-auto overflow-hidden`}
+          className={`${is_found ? "w-[] sm:w-[1450px]" : "w-full"
+            } m-auto overflow-hidden`}
         >
           <div
-            className={`flex flex-col justify-between ${
-              is_found ? "h-[calc(100vh)] sm:h-[calc(130vh-200px)]" : "h-full"
-            } w-[100%]`}
+            className={`flex flex-col justify-between ${is_found ? "h-[calc(100vh)] sm:h-[calc(130vh-200px)]" : "h-full"
+              } w-[100%]`}
             style={{
               ...customScrollbar,
               overflowY: "auto",
@@ -208,6 +207,11 @@ const App = () => {
                       setUserSignIn={setUserSignIn}
                     />
                   }
+                />
+
+                <Route
+                  path="/user_offer"
+                  element={<User_offer />}
                 />
               </Routes>
             </div>
