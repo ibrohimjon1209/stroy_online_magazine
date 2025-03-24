@@ -165,11 +165,11 @@ function Home() {
                 </div>
             </div>
 
-            <div className="flex block sm:hidden justify-center items-center w-full h-[184px] bg-[#F9C527]">
+            {/* <div className="flex block sm:hidden justify-center items-center w-full h-[184px] bg-[#F9C527]">
                 <h1>Carusel</h1>
-            </div>
+            </div> */}
 
-            <div className="hidden sm:block">
+            <div className="block">
                 <Carusel />
             </div>
 

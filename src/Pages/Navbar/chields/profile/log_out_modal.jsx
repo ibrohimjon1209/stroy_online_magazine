@@ -4,7 +4,7 @@ const LogOutModal = ({ isOpen, onClose, setUserSignIn }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed w-full -mt-2 inset-0 z-[9999] flex items-center justify-center">
+    <div className="fixed sm:w-[calc(102%-2rem)] h-[calc(125%-2rem)] sm:h-[calc(122%-2rem)] -mt-2 inset-0 z-[9999] flex items-center justify-center">
       <div
         className="absolute inset-0 bg-black opacity-50"
         onClick={onClose}

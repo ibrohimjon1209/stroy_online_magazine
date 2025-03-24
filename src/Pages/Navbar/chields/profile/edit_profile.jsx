@@ -11,7 +11,7 @@ const Edit_profile = ({ isOpen, onClose, name, surname }) => {
   if (!isOpen) return null; // Hooklar chaqirilgandan keyin return bo‘lishi kerak
 
   return (
-    <div className="fixed w-full -mt-2 inset-0 z-[9999] -mt-2 flex items-center justify-center bg-white">
+    <div className="fixed sm:w-[calc(102%-2rem)] h-[calc(125%-2rem)] sm:h-[calc(122%-2rem)] inset-0 z-[9999] -mt-2 flex items-center justify-center bg-white">
       <div className="space-y-[40px] w-[86%] sm:w-[358px]">
         {/* Ism */}
         <div className="space-y-4 flex flex-col">

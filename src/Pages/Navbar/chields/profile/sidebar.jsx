@@ -18,10 +18,8 @@ import City from "./chields/city/city_main";
 import Language from "./chields/language/language_main";
 import Help_modal from "./help_modal";
 import { get_user } from "../../../../Services/auth/get_user";
-import Logout from "./log_out_modal";
-import Edit_profile from "./edit_profile";
 
-const Sidebar = ({ isUserSignIn, setUserSignIn }) => {
+const Sidebar = ({ isUserSignIn, setUserSignIn, set_user_s, edit_profile_open, set_edit_profile_open, set_is_logout_open }) => {
   const [user, set_user] = useState({
     name: "...",
     surname: "...",
@@ -30,9 +28,7 @@ const Sidebar = ({ isUserSignIn, setUserSignIn }) => {
   const location = useLocation();
   const isSmallScreen = useMediaQuery({ maxWidth: 640 });
   const [help_modal_open, set_help_modal_open] = useState(false);
-  const [is_logout_open, set_is_logout_open] = useState(false);
-  const [edit_profile_open, set_edit_profile_open] = useState(false);
-  const [next, set_next] = useState(false);
+  
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -64,6 +60,10 @@ const Sidebar = ({ isUserSignIn, setUserSignIn }) => {
       fetchUserData();
     }
   }, [isUserSignIn, edit_profile_open]);
+
+  useEffect(() => {
+    set_user_s(user);
+  }, [user]);
 
   return (
     <div
@@ -172,8 +172,6 @@ const Sidebar = ({ isUserSignIn, setUserSignIn }) => {
           </>
         )}
       </Routes>
-      <Logout isOpen={is_logout_open} onClose={() => set_is_logout_open(false)} setUserSignIn={setUserSignIn} />
-      <Edit_profile isOpen={edit_profile_open} onClose={() => set_edit_profile_open(false)} name={user.name} surname={user.surname}/>
     </div>
   );
 };

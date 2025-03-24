@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { verify } from "../../../Services/auth/verify";
+import { login } from "../../../Services/auth/login";
+import { register } from "../../../Services/auth/register";
 
 export default function PhoneVerification({
   phoneNumber,
@@ -8,14 +10,7 @@ export default function PhoneVerification({
   set_is_found,
   setUserSignIn,
 }) {
-  const [verificationCode, setVerificationCode] = useState([
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-  ]);
+  const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(59);
   const inputRefs = useRef([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,7 +28,7 @@ export default function PhoneVerification({
   }, [timer]);
 
   useEffect(() => {
-    if (verificationCode.join("").length == 6) {
+    if (verificationCode.join("").length === 6) {
       handleSubmit();
     }
   }, [verificationCode]);
@@ -66,9 +61,18 @@ export default function PhoneVerification({
     inputRefs.current[newCode.findIndex((c) => !c) || 5]?.focus();
   };
 
-  const resetTimer = () => {
-    setTimer(59);
-    handleSubmit();
+  const resetTimer = async () => {
+    setErrorMessage("");
+
+    try {
+      if (method === "register") await register(phoneNumber);
+      else await login(phoneNumber);  
+      setTimer(59);
+    } catch (error) {
+      setErrorMessage("Kod qayta yuborilmadi. Iltimos, qayta urinib ko‘ring.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -138,7 +142,7 @@ export default function PhoneVerification({
             <input
               key={index}
               ref={(el) => (inputRefs.current[index] = el)}
-              type="text"
+              type="number"
               value={code}
               onChange={(e) => handleInputChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
