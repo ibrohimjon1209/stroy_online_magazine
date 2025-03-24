@@ -9,6 +9,7 @@ function cn(...classes) {
 
 export default function KitchenCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const smallScreen = window.innerWidth < 768;
 
   const slides = [
     {
@@ -19,7 +20,7 @@ export default function KitchenCarousel() {
     },
     {
       image: banner3,
-    }
+    },
   ];
 
   const extendedSlides = [slides[slides.length - 1], ...slides, slides[0]];
@@ -42,32 +43,37 @@ export default function KitchenCarousel() {
   }, [nextSlide]);
 
   return (
-    <div className="relative w-full h-[360px] mx-auto overflow-hidden mt-[30px]">
+    <div className="relative w-full h-auto mx-auto overflow-hidden sm:mt-[20px] sm:h-[360px]">
       <div
         className="flex transition-transform duration-500 ease-in-out"
         style={{
-          transform: `translateX(calc(-${(currentSlide + 1) * 80}% + 10%))`,
+          transform: smallScreen ? `translateX(calc(-${(currentSlide + 1) * 100.5}% + 7%))` : `translateX(calc(-${(currentSlide + 1) * 80}% + 10%))`,
         }}
       >
         {extendedSlides.map((slide, index) => (
           <div
             key={index}
-            className="w-full md:w-4/5 flex-shrink-0 relative px-2"
+            className="w-full sm:w-4/5 flex-shrink-0 relative px-1 sm:px-2"
           >
-            <img src={slide.image} alt="" />
+            <img
+              src={slide.image}
+              className="w-[90%] h-[165px] object-cover sm:w-[100%] rounded-[10px] sm:rounded-[0px] sm:h-full"
+              alt=""
+            />
           </div>
         ))}
       </div>
 
-      {/* Dots */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 hidden sm:flex space-x-1 sm:bottom-4 sm:space-x-2">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
             className={cn(
-              "cursor-pointer w-3 h-3 rounded-full transition-all",
-              currentSlide === index ? "bg-[#DCC38B] w-8" : "bg-[#D5D5D5]"
+              "cursor-pointer w-2 h-2 rounded-full transition-all sm:w-3 sm:h-3",
+              currentSlide === index
+                ? "bg-[#DCC38B] w-6 sm:w-8"
+                : "bg-[#D5D5D5]"
             )}
           />
         ))}

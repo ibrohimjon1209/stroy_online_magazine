@@ -55,10 +55,12 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    if ((location == "login" || location == "register") && userSignIn)
+    if ((location == "login" || location == "register") && userSignIn) {
       navigate("/");
+    }
     if (localStorage.getItem("refreshToken"))
       if (location == "login" || location == "register") navigate("/");
+
     if (location == "") set_is_found(true);
     if (
       location == "delivery" ||
@@ -118,8 +120,14 @@ const App = () => {
             } m-auto overflow-hidden`}
         >
           <div
+<<<<<<< HEAD
             className={`flex flex-col justify-between ${is_found ? "h-[calc(100vh)] sm:h-[calc(130vh-200px)]" : "h-full"
               } w-[100%]`}
+=======
+            className={`flex flex-col justify-between ${
+              is_found ? "h-[calc(100vh)] sm:h-[calc(132vh-200px)]" : "h-full"
+            } w-[100%]`}
+>>>>>>> 8b7b6e17b58ed5b4f8a59aaa465a64e14b8e2575
             style={{
               ...customScrollbar,
               overflowY: "auto",
@@ -144,6 +152,7 @@ const App = () => {
                   element={
                     <Profile
                       isUserSignIn={userSignIn}
+                      set_is_found={set_is_found}
                       setUserSignIn={setUserSignIn}
                     />
                   }

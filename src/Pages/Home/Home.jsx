@@ -101,7 +101,23 @@ function Home() {
                 </div>
             </div>
 
+<<<<<<< HEAD
             <div className="hidden sm:block">
+=======
+            <div className="px-[22px] w-full h-[90px] flex block sm:hidden justify-center items-center">
+                <div className="w-full h-[50px] bg-white border-[0.5px] border-[#8879798C] rounded-[10px] flex items-center justify-evenly">
+                    <h1 className="font-inter font-[500] text-[15px] leading-[22px] text-[#DA9700]">Stroy Baza №1</h1>
+                    <h1 className="font-inter font-[500] text-[15px] leading-[22px] text-black">Mebel</h1>
+                    <h1 className="font-inter font-[500] text-[15px] leading-[22px] text-black">Gold Klinker</h1>
+                </div>
+            </div>
+
+            {/* <div className="flex block sm:hidden justify-center items-center w-full h-[184px] bg-[#F9C527]">
+                <h1>Carusel</h1>
+            </div> */}
+
+            <div className="block">
+>>>>>>> 8b7b6e17b58ed5b4f8a59aaa465a64e14b8e2575
                 <Carusel />
             </div>
 

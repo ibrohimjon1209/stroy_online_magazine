@@ -18,17 +18,17 @@ import City from "./chields/city/city_main";
 import Language from "./chields/language/language_main";
 import Help_modal from "./help_modal";
 import { get_user } from "../../../../Services/auth/get_user";
-// import { refresh } from "../../../../Services/auth/refresh_access";
 
-const Sidebar = ({ isUserSignIn, setUserSignIn }) => {
+const Sidebar = ({ isUserSignIn, setUserSignIn, set_user_s, edit_profile_open, set_edit_profile_open, set_is_logout_open }) => {
   const [user, set_user] = useState({
     name: "...",
+    surname: "...",
     phone: "...",
   });
   const location = useLocation();
   const isSmallScreen = useMediaQuery({ maxWidth: 640 });
   const [help_modal_open, set_help_modal_open] = useState(false);
-  const navigate = useNavigate()
+  
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -44,8 +44,11 @@ const Sidebar = ({ isUserSignIn, setUserSignIn }) => {
 
         set_user({
           name: user_data.first_name
-            ? `${user_data.first_name} ${user_data.last_name}`
+            ? user_data.first_name
             : "Foydalanuvchi",
+          surname: user_data.last_name
+            ? user_data.last_name
+            : "",
           phone: user_data.phone_number || "Nomalum",
         });
       } catch (err) {
@@ -56,7 +59,11 @@ const Sidebar = ({ isUserSignIn, setUserSignIn }) => {
     if (isUserSignIn) {
       fetchUserData();
     }
-  }, [isUserSignIn]);
+  }, [isUserSignIn, edit_profile_open]);
+
+  useEffect(() => {
+    set_user_s(user);
+  }, [user]);
 
   return (
     <div
@@ -75,12 +82,15 @@ const Sidebar = ({ isUserSignIn, setUserSignIn }) => {
                     <div className="bg-gray-200 rounded-full p-2">
                       <User className="h-7 w-7 text-gray-600" />
                     </div>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col items-start">
                       <span className="font-inter font-[600] text-[15px] leading-[22px] text-black whitespace-nowrap">
-                        {user.name}
+                        {user.name} {user.surname}
                       </span>
+                    <span className="flex flex-row gap-6 items-center justify-center">
                       <span className="font-inter font-[500] text-[13px] leading-[22px] text-black whitespace-nowrap">
                         {user.phone}
+                      </span>
+                      <span onClick={() => set_edit_profile_open(true)} className="font-inter font-[400] text-[14px] leading-[22px] text-blue-800 hover:underline cursor-pointer whitespace-nowrap">Tahrirlash</span>
                       </span>
                     </div>
                   </div>
@@ -139,14 +149,8 @@ const Sidebar = ({ isUserSignIn, setUserSignIn }) => {
                   icon={<HelpCircle />}
                   label="Qo'llab-quvvatlash"
                 />
-                <div className="px-4 py-5">
-                  <button onClick={() => {
-                    setUserSignIn(false)
-                    console.log(isUserSignIn)
-                    localStorage.removeItem("refreshToken")
-                    localStorage.removeItem("accessToken")
-                    localStorage.removeItem("userId")
-                  }} className="flex items-center font-inter font-[500] text-[13px] leading-[22px] text-red-500 hover:text-red-700 duration-300 cursor-pointer">
+                <div className={`px-4 py-5 ${isUserSignIn ? "" : "hidden"}`}>
+                  <button onClick={() => set_is_logout_open(true)} className="flex items-center font-inter font-[500] text-[13px] leading-[22px] text-red-500 hover:text-red-700 duration-300 cursor-pointer">
                     <LogOut className="h-5 w-5 mr-3" />
                     Chiqish
                   </button>
