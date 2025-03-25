@@ -120,7 +120,7 @@ const App = () => {
             } m-auto overflow-hidden`}
         >
           <div
-            className={`flex flex-col justify-between ${is_found ? "h-[calc(100vh)] sm:h-[calc(130vh-200px)]" : "h-full"
+            className={`flex flex-col justify-between ${is_found ? "h-[calc(119.9vh-100px)] sm:h-[calc(100)]" : "h-full"
               } w-[100%]`}
             style={{
               ...customScrollbar,

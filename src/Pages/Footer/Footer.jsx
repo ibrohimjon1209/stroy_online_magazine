@@ -84,7 +84,6 @@ const Footer = () => {
                     </div>
                 </div>
 
-
             </div>
 
             <div className='mt-[50px] w-full h-[53px] flex flex-col -ml-[25px] px-[76px]'>
@@ -95,6 +94,7 @@ const Footer = () => {
                     <h1 className='font-inter font-[700] text-[16px] leading-[19.36px] text-[rgba(255,255,255,0.81)]'>© 2024 - 2025 STROY BAZA №1 (Powered by NSD Co.) v1.00.0</h1>
 
                 </div>
+
             </div>
 
 
