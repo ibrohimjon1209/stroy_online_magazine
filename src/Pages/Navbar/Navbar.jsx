@@ -1,4 +1,4 @@
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import logo from "./Images/logo.svg"
 import cube from "./Images/orders.svg"
 import cube_a from "./Images/orders_a.svg"
@@ -28,7 +28,8 @@ const Navbar = () => {
   const [categoryAnimation, setCategoryAnimation] = useState(false);
   const [searchAnimation, setSearchAnimation] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  const [search_topics, set_search_topics] = useState(localStorage.getItem("searchTopics") ? localStorage.getItem("searchTopics") : []);
+  
   const [searchText, setSearchText] = useState("");
 
   const handleCategoryClick = () => {
@@ -48,11 +49,16 @@ const Navbar = () => {
   };
 
   const handleSearchClick = () => {
+    if (searchText) {
+      set_search_topics([...search_topics, searchText]);
+      localStorage.setItem("searchTopics", JSON.stringify([...search_topics, searchText]));
+      setSearchText("");
+    }
     if (is_search_open) {
       setSearchAnimation(false);
       setTimeout(() => {
         set_is_search_open(false);
-      }, 300); // Match this to the animation duration
+      }, 300);
     } else {
       set_is_search_open(true);
       setTimeout(() => {
@@ -99,14 +105,6 @@ const Navbar = () => {
     { name: "Steklovata" },
     { name: "Kanauf" },
     { name: "Kanauf" },
-  ];
-
-  const search_topics = [
-    { name: "Olma" },
-    { name: "Behi" },
-    { name: "Anor" },
-    { name: "Ko'ylak" },
-    { name: "Bazalt" },
   ];
 
   const points = [
@@ -173,9 +171,9 @@ const Navbar = () => {
         `}</style>
 
           {/* Mobile menu button */}
-          <div className="flex w-full md:hidden justify-between items-center">
+          <div className="flex items-center justify-between w-full md:hidden">
             <div className="flex items-center gap-[5px]">
-              <img src={logo || "/placeholder.svg"} alt="Logo" className="cursor-pointer w-8 h-8" onClick={to_home} />
+              <img src={logo || "/placeholder.svg"} alt="Logo" className="w-8 h-8 cursor-pointer" onClick={to_home} />
               <h1
                 className="font-inter font-[600] text-[16px] cursor-pointer leading-[22px] text-black"
                 onClick={to_home}
@@ -183,7 +181,7 @@ const Navbar = () => {
                 STROY BAZA №1
               </h1>
             </div>
-            <button onClick={toggleMobileMenu} className="md:hidden text-white p-2">
+            <button onClick={toggleMobileMenu} className="p-2 text-white md:hidden">
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
@@ -240,7 +238,7 @@ const Navbar = () => {
                     {points.map((option, index) => (
                       <div
                         key={index}
-                        className="py-2 px-4 hover:bg-gray-200 cursor-pointer"
+                        className="px-4 py-2 cursor-pointer hover:bg-gray-200"
                         onClick={() => handleOptionClick(option)}
                       >
                         {option.name}
@@ -302,7 +300,7 @@ const Navbar = () => {
                       <Link to={"/category"} key={index}>
                         <div className="w-full h-[52px] pl-[34px] pr-[43px] flex justify-between items-center bg-transparent hover:bg-gray-100">
                           <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">
-                            {item.name}
+                            {item}
                           </h1>
                           <img
                             src={vector || "/placeholder.svg"}
@@ -349,13 +347,13 @@ const Navbar = () => {
                   {search_topics.map((item, index) => (
                     <div
                       key={index}
-                      onClick={() => handleSelectTopic(item.name)}
+                      onClick={() => handleSelectTopic(item)}
                       className="cursor-pointer w-full h-[52px] pl-[24px] pr-[43px] flex justify-between items-center bg-transparent hover:bg-gray-100"
                     >
                       <div className="flex gap-[15px] cursor-pointer">
                         <History strokeWidth={1.75} />
                         <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">
-                          {item.name}
+                          {item}
                         </h1>
                       </div>
                       <X
@@ -393,7 +391,7 @@ const Navbar = () => {
                   {points.map((option, index) => (
                     <div
                       key={index}
-                      className="py-2 px-4 hover:bg-gray-200 cursor-pointer"
+                      className="px-4 py-2 cursor-pointer hover:bg-gray-200"
                       onClick={() => handleOptionClick(option)}
                     >
                       {option.name}
@@ -406,7 +404,7 @@ const Navbar = () => {
           <div className="icons w-full md:w-[242px] h-[40px] hidden md:flex items-center justify-start gap-[48px]">
             <Link to="/likes">
               <img
-                className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
+                className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
                 src={location == "likes" || is_likes_hovered ? like_a : like}
                 onMouseEnter={() => set_is_likes_hovered(true)}
                 onMouseLeave={() => set_is_likes_hovered(false)}
@@ -415,7 +413,7 @@ const Navbar = () => {
             </Link>
             <Link to="/orders">
               <img
-                className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
+                className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
                 src={location == "orders" || is_orders_hovered ? cube_a : cube}
                 onMouseEnter={() => set_is_orders_hovered(true)}
                 onMouseLeave={() => set_is_orders_hovered(false)}
@@ -424,7 +422,7 @@ const Navbar = () => {
             </Link>
             <Link to="/basket">
               <img
-                className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
+                className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
                 src={
                   location == "basket" || is_basket_hovered ? basket_a : basket
                 }
@@ -435,7 +433,7 @@ const Navbar = () => {
             </Link>
             <Link to="/profile/orders">
               <img
-                className="hover:drop-shadow-md hover:shadow-xl transition-shadow duration-100 object-contain"
+                className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
                 src={
                   location == "profile" || is_profile_hovered
                     ? profile_a

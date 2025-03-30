@@ -15,6 +15,7 @@ function Home() {
   const [searchText, setSearchText] = useState("");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTopics, setSearchTopics] = useState(localStorage.getItem("searchTopics") ? localStorage.getItem("searchTopics") : []);
 
   useEffect(() => {
     const getProducts = async () => {
@@ -77,6 +78,11 @@ function Home() {
   
 
   const handleSearchClick = () => {
+    if (searchText) {
+      setSearchTopics([...searchTopics, searchText]);
+      localStorage.setItem("searchTopics", JSON.stringify([...searchTopics, searchText]));
+      setSearchText("");
+    }
     if (isSearchOpen) {
       setSearchAnimation(false);
       setTimeout(() => setIsSearchOpen(false), 300);
@@ -97,17 +103,10 @@ function Home() {
     setTimeout(() => setIsSearchOpen(false), 300);
   };
 
-  const searchTopics = [
-    { name: "Olma" },
-    { name: "Behi" },
-    { name: "Anor" },
-    { name: "Ko'ylak" },
-    { name: "Bazalt" },
-  ];
 
   return (
     <div>
-      <div className="w-full h-[150px] flex flex-col items-center bg-[#DCC38B] block sm:hidden">
+      <div className="w-full h-[150px] flex flex-col items-center bg-[#DCC38B] sm:hidden">
         <img src={logo} className="w-[77px] h-[71px] mt-[10px]" />
         <div className="w-[90%] h-[40px] pl-[23.5px] bg-[#FFFFFF] rounded-[10px] flex items-center mt-4">
           <Search className="cursor-pointer" onClick={handleSearchClick} />
@@ -153,7 +152,7 @@ function Home() {
                 <div className="flex gap-[15px]">
                   <History strokeWidth={1.75} />
                   <h1 className="font-inter font-[500] text-[20px] text-[#0000008C]">
-                    {item.name}
+                    {item}
                   </h1>
                 </div>
                 <X
@@ -188,7 +187,7 @@ function Home() {
                     <div className="w-full aspect-square rounded-[10px] bg-[#F2F2F1] flex justify-center items-center overflow-hidden group">
                       <img
                         src={`https://back.stroybazan1.uz/${product.image}`}
-                        className="transition-transform duration-300 transform group-hover:scale-105 w-full h-full object-contain"
+                        className="object-contain w-full h-full transition-transform duration-300 transform group-hover:scale-105"
                         alt={product.name_uz}
                       />
                     </div>
@@ -199,7 +198,7 @@ function Home() {
                         {product.name_uz}
                       </h1>
                     </Link>
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                       <Link to={`/product/${product.id}`}>
                         <p className="font-inter font-[500] text-[12px] sm:text-[14px] text-black">
                           {product.variants &&
@@ -232,7 +231,7 @@ function Home() {
                 </div>
               ))
             ) : (
-              <p className="text-center w-full font-inter text-lg text-gray-500">
+              <p className="w-full text-lg text-center text-gray-500 font-inter">
                 Ma'lumot topilmadi.
               </p>
             )}

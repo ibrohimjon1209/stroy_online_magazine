@@ -29,7 +29,6 @@ const App = () => {
   const navigate = useNavigate();
   const [userSignIn, setUserSignIn] = useState(false);
 
-
   useEffect(() => {
     setUserSignIn(localStorage.getItem("userId") ? true : false);
   }, []);
@@ -117,12 +116,14 @@ const App = () => {
       <div className={`${is_found ? "w-[] sm:w-[1450px]" : "w-full "} m-auto `}>
         {is_found && !is_another_nav && <Navbar userSignIn={userSignIn} />}
         <div
-          className={`${is_found ? "w-[] sm:w-[1450px]" : "w-full"
-            } m-auto overflow-hidden`}
+          className={`${
+            is_found ? "w-[] sm:w-[1450px]" : "w-full"
+          } m-auto overflow-hidden`}
         >
           <div
-            className={`flex flex-col justify-between ${is_found ? "h-[calc(119.9vh-100px)] sm:h-[calc(100)]" : "h-full"
-              } w-[100%]`}
+            className={`flex flex-col justify-between ${
+              is_found ? "h-[calc(119.9vh-100px)] sm:h-[calc(100)]" : "h-full"
+            } w-[100%]`}
             style={{
               ...customScrollbar,
               overflowY: "auto",
@@ -213,10 +214,7 @@ const App = () => {
                   }
                 />
 
-                <Route
-                  path="/user_offer"
-                  element={<User_offer />}
-                />
+                <Route path="/user_offer" element={<User_offer />} />
               </Routes>
             </div>
 
