@@ -1,17 +1,36 @@
-import { useState, useRef, useEffect } from "react"
-import logo from "./Images/logo.svg"
-import cube from "./Images/orders.svg"
-import cube_a from "./Images/orders_a.svg"
-import like from "./Images/like.svg"
-import like_a from "./Images/like_a.svg"
-import basket from "./Images/basket.svg"
-import basket_a from "./Images/basket_a.svg"
-import profile from "./Images/profile.svg"
-import profile_a from "./Images/profile_a.svg"
-import vector from "./Images/vector.png"
-import { Link } from "react-router"
-import { useNavigate, useLocation } from "react-router-dom"
-import { ChevronDown, CirclePlus, History, Home, Menu, Package, Search, ShoppingCart, User, X } from "lucide-react"
+import { useState, useRef, useEffect } from "react";
+import logo from "./Images/logo.svg";
+import cube from "./Images/orders.svg";
+import cube_a from "./Images/orders_a.svg";
+import like from "./Images/like.svg";
+import like_a from "./Images/like_a.svg";
+import basket from "./Images/basket.svg";
+import basket_a from "./Images/basket_a.svg";
+import profile from "./Images/profile.svg";
+import profile_a from "./Images/profile_a.svg";
+import vector from "./Images/vector.png";
+import { Link } from "react-router";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  ChevronDown,
+  CirclePlus,
+  History,
+  Home,
+  Menu,
+  Package,
+  Search,
+  ShoppingCart,
+  User,
+  X,
+} from "lucide-react";
+
+const getStoredTopics = () => {
+  try {
+    return JSON.parse(localStorage.getItem("searchTopics")) || [];
+  } catch (error) {
+    return [];
+  }
+};
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -28,16 +47,22 @@ const Navbar = () => {
   const [categoryAnimation, setCategoryAnimation] = useState(false);
   const [searchAnimation, setSearchAnimation] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [search_topics, set_search_topics] = useState(localStorage.getItem("searchTopics") ? localStorage.getItem("searchTopics") : []);
-  
+  const [search_topics, setSearchTopics] = useState(getStoredTopics());
   const [searchText, setSearchText] = useState("");
+
+  const handleDeleteTopic = (index) => {
+    const updatedTopics = [...search_topics];
+    updatedTopics.splice(index, 1);
+    setSearchTopics(updatedTopics);
+    localStorage.setItem("searchTopics", JSON.stringify(updatedTopics));
+  };
 
   const handleCategoryClick = () => {
     if (is_category_open) {
       setCategoryAnimation(false);
       setTimeout(() => {
         set_is_category_open(false);
-      }, 300); // Match this to the animation duration
+      }, 300);
     } else {
       set_is_category_open(true);
       setTimeout(() => {
@@ -49,17 +74,18 @@ const Navbar = () => {
   };
 
   const handleSearchClick = () => {
-    if (searchText) {
-      set_search_topics([...search_topics, searchText]);
-      localStorage.setItem("searchTopics", JSON.stringify([...search_topics, searchText]));
-      setSearchText("");
-    }
+    const includes = search_topics.includes(searchText);
     if (is_search_open) {
       setSearchAnimation(false);
       setTimeout(() => {
         set_is_search_open(false);
       }, 300);
     } else {
+      if (searchText && !includes) {
+        const updatedTopics = [...search_topics, searchText];
+        setSearchTopics(updatedTopics);
+        localStorage.setItem("searchTopics", JSON.stringify(updatedTopics));
+      }
       set_is_search_open(true);
       setTimeout(() => {
         setSearchAnimation(true);
@@ -140,40 +166,45 @@ const Navbar = () => {
     <>
       <div className="hidden sm:block">
         <div className="w-full h-auto md:h-[80px] flex flex-col md:flex-row justify-between gap-[20px] z-50 items-center px-[4.2%] sticky mt-[5px] rounded-[15px] bg-[#DCC38B] py-4 md:py-0">
-          <style jsx>{`
-          .dropdown-enter {
-            opacity: 0;
-            transform: translateY(-20px);
-            max-height: 0;
-            overflow: hidden;
-          }
-          
-          .dropdown-enter-active {
-            opacity: 1;
-            transform: translateY(0);
-            max-height: 500px;
-            transition: opacity 300ms, transform 300ms, max-height 300ms;
-          }
-          
-          .dropdown-exit {
-            opacity: 1;
-            transform: translateY(0);
-            max-height: 500px;
-          }
-          
-          .dropdown-exit-active {
-            opacity: 0;
-            transform: translateY(-20px);
-            max-height: 0;
-            transition: opacity 300ms, transform 300ms, max-height 300ms;
-            overflow: hidden;
-          }
-        `}</style>
+          <style jsx="true" >{`
+            .dropdown-enter {
+              opacity: 0;
+              transform: translateY(-20px);
+              max-height: 0;
+              overflow: hidden;
+            }
+
+            .dropdown-enter-active {
+              opacity: 1;
+              transform: translateY(0);
+              max-height: 500px;
+              transition: opacity 300ms, transform 300ms, max-height 300ms;
+            }
+
+            .dropdown-exit {
+              opacity: 1;
+              transform: translateY(0);
+              max-height: 500px;
+            }
+
+            .dropdown-exit-active {
+              opacity: 0;
+              transform: translateY(-20px);
+              max-height: 0;
+              transition: opacity 300ms, transform 300ms, max-height 300ms;
+              overflow: hidden;
+            }
+          `}</style>
 
           {/* Mobile menu button */}
           <div className="flex items-center justify-between w-full md:hidden">
             <div className="flex items-center gap-[5px]">
-              <img src={logo || "/placeholder.svg"} alt="Logo" className="w-8 h-8 cursor-pointer" onClick={to_home} />
+              <img
+                src={logo || "/placeholder.svg"}
+                alt="Logo"
+                className="w-8 h-8 cursor-pointer"
+                onClick={to_home}
+              />
               <h1
                 className="font-inter font-[600] text-[16px] cursor-pointer leading-[22px] text-black"
                 onClick={to_home}
@@ -181,7 +212,10 @@ const Navbar = () => {
                 STROY BAZA №1
               </h1>
             </div>
-            <button onClick={toggleMobileMenu} className="p-2 text-white md:hidden">
+            <button
+              onClick={toggleMobileMenu}
+              className="p-2 text-white md:hidden"
+            >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
@@ -300,7 +334,7 @@ const Navbar = () => {
                       <Link to={"/category"} key={index}>
                         <div className="w-full h-[52px] pl-[34px] pr-[43px] flex justify-between items-center bg-transparent hover:bg-gray-100">
                           <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">
-                            {item}
+                            {item.name}
                           </h1>
                           <img
                             src={vector || "/placeholder.svg"}
@@ -323,6 +357,11 @@ const Navbar = () => {
                 ref={inputRef}
                 value={searchText}
                 onClick={handleSearchClick}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearchClick();
+                  }
+                }}
                 onChange={(e) => setSearchText(e.target.value)}
               />
               {searchText && (
@@ -344,6 +383,7 @@ const Navbar = () => {
                   }`}
                   onClick={(e) => e.stopPropagation()}
                 >
+                  {console.log(search_topics)}
                   {search_topics.map((item, index) => (
                     <div
                       key={index}
@@ -361,10 +401,7 @@ const Navbar = () => {
                         className="cursor-pointer"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSearchAnimation(false);
-                          setTimeout(() => {
-                            set_is_search_open(false);
-                          }, 300);
+                          handleDeleteTopic(index);
                         }}
                       />
                     </div>
@@ -450,14 +487,19 @@ const Navbar = () => {
 
       <div className="md:hidden fixed -bottom-[calc(2vh-10px)] left-0 right-0 bg-[#BEA086] flex justify-around items-center h-[85px] z-50 rounded-t-[15px]">
         <Link to="/" className="flex flex-col items-center justify-center">
-          <Home size={28} strokeWidth={2} color={location === "" ? "#ffffff" : "#DFCFC2"} />
+          <Home
+            size={28}
+            strokeWidth={2}
+            color={location === "" ? "#ffffff" : "#DFCFC2"}
+          />
         </Link>
         <Link
           to="/search"
           className="flex flex-col items-center justify-center"
         >
           <Search
-            size={28} strokeWidth={2}
+            size={28}
+            strokeWidth={2}
             color={location === "search" ? "#ffffff" : "#DFCFC2"}
           />
         </Link>
@@ -466,7 +508,8 @@ const Navbar = () => {
           className="flex flex-col items-center justify-center"
         >
           <Package
-            size={28} strokeWidth={2}
+            size={28}
+            strokeWidth={2}
             color={location === "orders" ? "#ffffff" : "#DFCFC2"}
           />
         </Link>
@@ -475,7 +518,8 @@ const Navbar = () => {
           className="flex flex-col items-center justify-center"
         >
           <ShoppingCart
-            size={28} strokeWidth={2}
+            size={28}
+            strokeWidth={2}
             color={location === "basket" ? "#ffffff" : "#DFCFC2"}
           />
         </Link>
@@ -484,14 +528,15 @@ const Navbar = () => {
           className="flex flex-col items-center justify-center"
         >
           <User
-            size={28} strokeWidth={2}
+            size={28}
+            strokeWidth={2}
             color={location === "profile" ? "#ffffff" : "#DFCFC2"}
           />
         </Link>
       </div>
       <div className="md:hidden h-[0px]"></div>
     </>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

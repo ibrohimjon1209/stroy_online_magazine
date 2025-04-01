@@ -79,14 +79,14 @@ const Sidebar = ({ isUserSignIn, setUserSignIn, set_user_s, edit_profile_open, s
               <div>
                 {isUserSignIn ? (
                   <div className="flex h-[70px] sm:h-[80px] items-center w-full gap-3 border-[#D5D5D5] border rounded-[8px] pl-[13px] sm:pl-[20px] pr-[30px] py-[12px]">
-                    <div className="bg-gray-200 rounded-full p-2">
-                      <User className="h-7 w-7 text-gray-600" />
+                    <div className="p-2 bg-gray-200 rounded-full">
+                      <User className="text-gray-600 h-7 w-7" />
                     </div>
                     <div className="flex flex-col items-start">
                       <span className="font-inter font-[600] text-[15px] leading-[22px] text-black whitespace-nowrap">
                         {user.name} {user.surname}
                       </span>
-                    <span className="flex flex-row gap-6 items-center justify-center">
+                    <span className="flex flex-row items-center justify-center gap-6">
                       <span className="font-inter font-[500] text-[13px] leading-[22px] text-black whitespace-nowrap">
                         {user.phone}
                       </span>
@@ -96,6 +96,7 @@ const Sidebar = ({ isUserSignIn, setUserSignIn, set_user_s, edit_profile_open, s
                   </div>
                 ) : (
                   <Link to="/login">
+                    {setUserSignIn(false)}
                     <div className="flex justify-center bg-[#FFDF02] h-[70px] items-center w-full gap-3 border-[#D5D5D5] border rounded-[8px] pl-[20px] pr-[30px] py-[12px] hover:scale-[101%] active:scale-[99%] duration-300">
                       <p className="font-inter font-[600] text-[24px] leading-[22px] text-black">
                         Kirish
@@ -151,7 +152,7 @@ const Sidebar = ({ isUserSignIn, setUserSignIn, set_user_s, edit_profile_open, s
                 />
                 <div className={`px-4 py-5 ${isUserSignIn ? "" : "hidden"}`}>
                   <button onClick={() => set_is_logout_open(true)} className="flex items-center font-inter font-[500] text-[13px] leading-[22px] text-red-500 hover:text-red-700 duration-300 cursor-pointer">
-                    <LogOut className="h-5 w-5 mr-3" />
+                    <LogOut className="w-5 h-5 mr-3" />
                     Chiqish
                   </button>
                 </div>
@@ -200,7 +201,7 @@ function NavItem({ href, icon, label, isActive, onClick }) {
           {label}
         </span>
       </div>
-      <ChevronRight className="h-4 w-4 duration-300" color={activeColor} />
+      <ChevronRight className="w-4 h-4 duration-300" color={activeColor} />
     </Link>
   );
 }
