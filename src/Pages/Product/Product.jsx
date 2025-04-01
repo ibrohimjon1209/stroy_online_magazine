@@ -258,7 +258,7 @@ const Product = () => {
                                 <ChevronRight size={24} />
                             </div>
                             <img
-                                src={`back.stroybazan1.uz${productData.image}` || "/placeholder.svg"}
+                                src={`back.stroybazan1.uz/${productData.image}` || "/placeholder.svg"}
                                 className={`w-[162px] sm:w-[504px] h-[188px] sm:h-[504px] object-fill ${isTransitioning ? slideDirection : slideDirection ? (slideDirection === "slide-left" ? "slide-in-right" : "slide-in-left") : ""}`}
                             />
                         </div>
