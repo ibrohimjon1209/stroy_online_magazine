@@ -213,7 +213,7 @@ const Product = () => {
                 <div className={`absolute z-50 left-1 w-full h-auto flex justify-center items-center notification`}>
                     <div className="bg-[#fefdfd] drop-shadow-lg w-[750px] h-[100px] flex items-center rounded-md transition-opacity duration-500 ease-in-out opacity-100">
                         <div className="ml-[20px] rounded-[5px] overflow-hidden border-[1px] w-[120px] h-[80px] flex justify-center items-center">
-                            <img src={`back.stroybazan1.uz${productData.image}` || "/placeholder.svg"} className="w-[80px] h-[80px] object-contain" />
+                            <img src={`https://back.stroybazan1.uz${productData.image}` || "/placeholder.svg"} className="w-[80px] h-[80px] object-contain" />
                         </div>
                         <div className="w-full h-full flex flex-col gap-[5px] mt-[20px] ml-[20px]">
                             <h1 className="font-inter font-[500] text-[16px] leading-[22px] text-black">
@@ -258,7 +258,7 @@ const Product = () => {
                                 <ChevronRight size={24} />
                             </div>
                             <img
-                                src={`back.stroybazan1.uz/${productData.image}` || "/placeholder.svg"}
+                                src={`https://back.stroybazan1.uz/${productData.image}` || "/placeholder.svg"}
                                 className={`w-[162px] sm:w-[504px] h-[188px] sm:h-[504px] object-fill ${isTransitioning ? slideDirection : slideDirection ? (slideDirection === "slide-left" ? "slide-in-right" : "slide-in-left") : ""}`}
                             />
                         </div>
@@ -301,7 +301,7 @@ const Product = () => {
 
                     <div className="size-div mt-[20px]">
                         <h1 className="font-inter font-[400] text-[13px] leading-[22px] text-[rgba(0,0,0,1)]">
-                            O'lchami (Metr²): {selectedSize}
+                            O'lchami: {selectedSize}
                         </h1>
                         <div className="sizes flex gap-[10px] mt-[7px] transition-all duration-300 cursor-pointer">
                             {productData.variants.map((variant, index) => (
