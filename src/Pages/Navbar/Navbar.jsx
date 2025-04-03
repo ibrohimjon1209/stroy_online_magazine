@@ -1,172 +1,179 @@
-import { useState, useRef, useEffect } from "react";
-import logo from "./Images/logo.svg";
-import cube from "./Images/orders.svg";
-import cube_a from "./Images/orders_a.svg";
-import like from "./Images/like.svg";
-import like_a from "./Images/like_a.svg";
-import basket from "./Images/basket.svg";
-import basket_a from "./Images/basket_a.svg";
-import profile from "./Images/profile.svg";
-import profile_a from "./Images/profile_a.svg";
-import vector from "./Images/vector.png";
-import { Link } from "react-router";
-import { useNavigate, useLocation } from "react-router-dom";
-import {
-  ChevronDown,
-  CirclePlus,
-  History,
-  Home,
-  Menu,
-  Package,
-  Search,
-  ShoppingCart,
-  User,
-  X,
-} from "lucide-react";
+"use client"
+
+import { useState, useRef, useEffect } from "react"
+import logo from "./Images/logo.svg"
+import cube from "./Images/orders.svg"
+import cube_a from "./Images/orders_a.svg"
+import like from "./Images/like.svg"
+import like_a from "./Images/like_a.svg"
+import basket from "./Images/basket.svg"
+import basket_a from "./Images/basket_a.svg"
+import profile from "./Images/profile.svg"
+import profile_a from "./Images/profile_a.svg"
+import vector from "./Images/vector.png"
+import { Link } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
+import { ChevronDown, CirclePlus, History, Home, Menu, Package, Search, ShoppingCart, User, X } from "lucide-react"
 
 const getStoredTopics = () => {
   try {
-    return JSON.parse(localStorage.getItem("searchTopics")) || [];
+    return JSON.parse(localStorage.getItem("searchTopics")) || []
   } catch (error) {
-    return [];
+    return []
   }
-};
+}
 
 const Navbar = () => {
-  const navigate = useNavigate();
-  const inputRef = useRef(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [is_category_open, set_is_category_open] = useState(false);
-  const [is_search_open, set_is_search_open] = useState(false);
-  const [is_likes_hovered, set_is_likes_hovered] = useState(false);
-  const [is_orders_hovered, set_is_orders_hovered] = useState(false);
-  const [is_basket_hovered, set_is_basket_hovered] = useState(false);
-  const [is_profile_hovered, set_is_profile_hovered] = useState(false);
-  const location = useLocation().pathname.split("/")[1];
-  const [active, set_active] = useState("");
-  const [categoryAnimation, setCategoryAnimation] = useState(false);
-  const [searchAnimation, setSearchAnimation] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [search_topics, setSearchTopics] = useState(getStoredTopics());
-  const [searchText, setSearchText] = useState("");
+  const navigate = useNavigate()
+  const inputRef = useRef(null)
+  const [isOpen, setIsOpen] = useState(false)
+  const [is_category_open, set_is_category_open] = useState(false)
+  const [is_search_open, set_is_search_open] = useState(false)
+  const [is_likes_hovered, set_is_likes_hovered] = useState(false)
+  const [is_orders_hovered, set_is_orders_hovered] = useState(false)
+  const [is_basket_hovered, set_is_basket_hovered] = useState(false)
+  const [is_profile_hovered, set_is_profile_hovered] = useState(false)
+  const location = useLocation().pathname.split("/")[1]
+  const [active, set_active] = useState("")
+  const [categoryAnimation, setCategoryAnimation] = useState(false)
+  const [searchAnimation, setSearchAnimation] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [search_topics, setSearchTopics] = useState(getStoredTopics())
+  const [searchText, setSearchText] = useState("")
+  const [categories, setCategories] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch("https://back.stroybazan1.uz/api/api/categories/")
+        if (!response.ok) {
+          throw new Error("Failed to fetch categories")
+        }
+        const data = await response.json()
+        setCategories(data)
+      } catch (error) {
+        console.error("Error fetching categories:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchCategories()
+  }, [])
 
   const handleDeleteTopic = (index) => {
-    const updatedTopics = [...search_topics];
-    updatedTopics.splice(index, 1);
-    setSearchTopics(updatedTopics);
-    localStorage.setItem("searchTopics", JSON.stringify(updatedTopics));
-  };
+    const updatedTopics = [...search_topics]
+    updatedTopics.splice(index, 1)
+    setSearchTopics(updatedTopics)
+    localStorage.setItem("searchTopics", JSON.stringify(updatedTopics))
+  }
 
   const handleCategoryClick = () => {
     if (is_category_open) {
-      setCategoryAnimation(false);
+      setCategoryAnimation(false)
       setTimeout(() => {
-        set_is_category_open(false);
-      }, 300);
+        set_is_category_open(false)
+      }, 300)
     } else {
-      set_is_category_open(true);
+      set_is_category_open(true)
       setTimeout(() => {
-        setCategoryAnimation(true);
-      }, 10);
-      set_is_search_open(false);
-      setSearchAnimation(false);
+        setCategoryAnimation(true)
+      }, 10)
+      set_is_search_open(false)
+      setSearchAnimation(false)
     }
-  };
+  }
 
   const handleSearchClick = () => {
-    const includes = search_topics.includes(searchText);
+    const includes = search_topics.includes(searchText)
     if (is_search_open) {
-      setSearchAnimation(false);
+      setSearchAnimation(false)
       setTimeout(() => {
-        set_is_search_open(false);
-      }, 300);
+        set_is_search_open(false)
+      }, 300)
     } else {
       if (searchText && !includes) {
-        const updatedTopics = [...search_topics, searchText];
-        setSearchTopics(updatedTopics);
-        localStorage.setItem("searchTopics", JSON.stringify(updatedTopics));
+        const updatedTopics = [...search_topics, searchText]
+        setSearchTopics(updatedTopics)
+        localStorage.setItem("searchTopics", JSON.stringify(updatedTopics))
       }
-      set_is_search_open(true);
+      set_is_search_open(true)
       setTimeout(() => {
-        setSearchAnimation(true);
-      }, 10);
-      set_is_category_open(false);
-      setCategoryAnimation(false);
+        setSearchAnimation(true)
+      }, 10)
+      set_is_category_open(false)
+      setCategoryAnimation(false)
       if (inputRef.current) {
-        inputRef.current.focus();
+        inputRef.current.focus()
       }
     }
-  };
+  }
 
   const clearInput = () => {
-    setSearchText("");
+    setSearchText("")
     if (inputRef.current) {
-      inputRef.current.focus();
+      inputRef.current.focus()
     }
-  };
+  }
 
   // Qidiruv modali tavsiyalaridan birini tanlash funksiyasi
   const handleSelectTopic = (name) => {
-    setSearchText(name);
-    setSearchAnimation(false);
+    setSearchText(name)
+    setSearchAnimation(false)
     setTimeout(() => {
-      set_is_search_open(false);
-    }, 300);
-  };
+      set_is_search_open(false)
+    }, 300)
+  }
 
   const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
+    setIsOpen(!isOpen)
+  }
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+    setIsMobileMenuOpen(!isMobileMenuOpen)
+  }
 
-  const category_topics = [
-    { name: "Penopleks" },
-    { name: "Teplesk" },
-    { name: "Kley" },
-    { name: "Oboy va kraskalar" },
-    { name: "Bazalt" },
-    { name: "Steklovata" },
-    { name: "Kanauf" },
-    { name: "Kanauf" },
-  ];
+  const points = [{ name: "Stroy Baza №1" }, { name: "Mebel" }, { name: "Golden house" }]
 
-  const points = [
-    { name: "Stroy Baza №1" },
-    { name: "Mebel" },
-    { name: "Golden house" },
-  ];
-
-  const [selectedOption, setSelectedOption] = useState(points[0]);
+  const [selectedOption, setSelectedOption] = useState(points[0])
 
   const handleOptionClick = (option) => {
-    setSelectedOption(option);
-    setIsOpen(false);
-  };
+    setSelectedOption(option)
+    setIsOpen(false)
+  }
 
   const handleClickOutside_category = () => {
-    setCategoryAnimation(false);
+    setCategoryAnimation(false)
     setTimeout(() => {
-      set_is_category_open(false);
-    }, 300); // Match this to the animation duration
-  };
+      set_is_category_open(false)
+    }, 300) // Match this to the animation duration
+  }
 
   const handleClickOutside_search = () => {
-    setSearchAnimation(false);
+    setSearchAnimation(false)
     setTimeout(() => {
-      set_is_search_open(false);
-    }, 300); // Match this to the animation duration
-  };
+      set_is_search_open(false)
+    }, 300) // Match this to the animation duration
+  }
 
-  const to_home = () => navigate("/");
+  const to_home = () => navigate("/")
+
+  const handleCategoryItemClick = (categoryId) => {
+    navigate(`/category/${categoryId}`)
+    setCategoryAnimation(false)
+    setTimeout(() => {
+      set_is_category_open(false)
+    }, 300)
+  }
 
   return (
     <>
       <div className="hidden sm:block">
         <div className="w-full h-auto md:h-[80px] flex flex-col md:flex-row justify-between gap-[20px] z-50 items-center px-[4.2%] sticky mt-[5px] rounded-[15px] bg-[#DCC38B] py-4 md:py-0">
-          <style jsx="true" >{`
+          <style jsx="true">{`
             .dropdown-enter {
               opacity: 0;
               transform: translateY(-20px);
@@ -199,12 +206,7 @@ const Navbar = () => {
           {/* Mobile menu button */}
           <div className="flex items-center justify-between w-full md:hidden">
             <div className="flex items-center gap-[5px]">
-              <img
-                src={logo || "/placeholder.svg"}
-                alt="Logo"
-                className="w-8 h-8 cursor-pointer"
-                onClick={to_home}
-              />
+              <img src={logo || "/placeholder.svg"} alt="Logo" className="w-8 h-8 cursor-pointer" onClick={to_home} />
               <h1
                 className="font-inter font-[600] text-[16px] cursor-pointer leading-[22px] text-black"
                 onClick={to_home}
@@ -212,22 +214,14 @@ const Navbar = () => {
                 STROY BAZA №1
               </h1>
             </div>
-            <button
-              onClick={toggleMobileMenu}
-              className="p-2 text-white md:hidden"
-            >
+            <button onClick={toggleMobileMenu} className="p-2 text-white md:hidden">
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
 
           {/* Logo va bosh sahifaga yo'naltirish - desktop */}
           <div className="w-full md:w-[247px] h-full hidden md:flex items-center gap-[5px]">
-            <img
-              src={logo || "/placeholder.svg"}
-              alt="Logo"
-              className="cursor-pointer"
-              onClick={to_home}
-            />
+            <img src={logo || "/placeholder.svg"} alt="Logo" className="cursor-pointer" onClick={to_home} />
             <h1
               className="font-inter font-[600] text-[20px] cursor-pointer leading-[22px] text-black"
               onClick={to_home}
@@ -237,20 +231,14 @@ const Navbar = () => {
           </div>
 
           {/* Mobile menu content */}
-          <div
-            className={`${
-              isMobileMenuOpen ? "flex" : "hidden"
-            } md:hidden flex-col w-full gap-4 mt-4`}
-          >
+          <div className={`${isMobileMenuOpen ? "flex" : "hidden"} md:hidden flex-col w-full gap-4 mt-4`}>
             <div className="flex items-center justify-between gap-2">
               <div
                 onClick={handleCategoryClick}
                 className="border-[3px] border-white drop-shadow-xl hover:opacity-75 cursor-pointer w-[100px] h-[40px] bg-transparent flex justify-center items-center rounded-[5px] gap-[5px]"
               >
                 <Menu strokeWidth={1.5} color="white" />
-                <h1 className="font-inter font-[500] text-[13px] text-white uppercase">
-                  Katolog
-                </h1>
+                <h1 className="font-inter font-[500] text-[13px] text-white uppercase">Katolog</h1>
               </div>
 
               <div className="relative w-[calc(100%-120px)]">
@@ -261,11 +249,7 @@ const Navbar = () => {
                   onClick={toggleDropdown}
                 >
                   <span className="truncate">{selectedOption.name}</span>
-                  <ChevronDown
-                    className={`transition-transform duration-300 ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
-                  />
+                  <ChevronDown className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
                 </div>
                 {isOpen && (
                   <div className="absolute top-[100%] left-0 w-full bg-white rounded-b-[5px] shadow-lg transition-all duration-500 z-50">
@@ -313,9 +297,7 @@ const Navbar = () => {
                 className="border-[3px] border-white drop-shadow-xl hover:opacity-75 cursor-pointer w-[100px] h-[40px] bg-transparent flex justify-center items-center rounded-[5px] gap-[5px]"
               >
                 <Menu strokeWidth={1.5} color="white" />
-                <h1 className="font-inter font-[500] text-[13px] text-white uppercase">
-                  Katolog
-                </h1>
+                <h1 className="font-inter font-[500] text-[13px] text-white uppercase">Katolog</h1>
               </div>
 
               {is_category_open && (
@@ -324,26 +306,33 @@ const Navbar = () => {
                   onClick={handleClickOutside_category}
                 >
                   <div
-                    className={`search_modal w-[600px] h-[450px] bg-white border-[1px] overflow-hidden border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${
-                      categoryAnimation
-                        ? "dropdown-enter-active"
-                        : "dropdown-enter"
+                    className={`search_modal w-[600px] h-[450px] bg-white border-[1px] overflow-auto border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${
+                      categoryAnimation ? "dropdown-enter-active" : "dropdown-enter"
                     }`}
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    {category_topics.map((item, index) => (
-                      <Link to={"/category"} key={index}>
-                        <div className="w-full h-[52px] pl-[34px] pr-[43px] flex justify-between items-center bg-transparent hover:bg-gray-100">
+                    {isLoading ? (
+                      <div className="w-full h-[100px] flex justify-center items-center">
+                        <div className="w-8 h-8 border-4 border-t-4 border-t-[#DCC38B] border-transparent rounded-full animate-spin"></div>
+                      </div>
+                    ) : categories.length > 0 ? (
+                      categories.map((category) => (
+                        <div
+                          key={category.id}
+                          onClick={() => handleCategoryItemClick(category.id)}
+                          className="w-full h-[52px] pl-[34px] pr-[43px] flex justify-between items-center bg-transparent hover:bg-gray-100 cursor-pointer"
+                        >
                           <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">
-                            {item.name}
+                            {category.name_uz}
                           </h1>
-                          <img
-                            src={vector || "/placeholder.svg"}
-                            className="rotate-[270deg]"
-                            alt="arrow"
-                          />
+                          <img src={vector || "/placeholder.svg"} className="rotate-[270deg]" alt="arrow" />
                         </div>
-                      </Link>
-                    ))}
+                      ))
+                    ) : (
+                      <div className="w-full h-[100px] flex justify-center items-center">
+                        <h1 className="font-inter font-[500] text-[16px] text-gray-500">Kategoriyalar mavjud emas</h1>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -359,7 +348,7 @@ const Navbar = () => {
                 onClick={handleSearchClick}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    handleSearchClick();
+                    handleSearchClick()
                   }
                 }}
                 onChange={(e) => setSearchText(e.target.value)}
@@ -383,29 +372,32 @@ const Navbar = () => {
                   }`}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {console.log(search_topics)}
-                  {search_topics.map((item, index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleSelectTopic(item)}
-                      className="cursor-pointer w-full h-[52px] pl-[24px] pr-[43px] flex justify-between items-center bg-transparent hover:bg-gray-100"
-                    >
-                      <div className="flex gap-[15px] cursor-pointer">
-                        <History strokeWidth={1.75} />
-                        <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">
-                          {item}
-                        </h1>
+                  {search_topics.length > 0 ? (
+                    search_topics.map((item, index) => (
+                      <div
+                        key={index}
+                        onClick={() => handleSelectTopic(item)}
+                        className="cursor-pointer w-full h-[52px] pl-[24px] pr-[43px] flex justify-between items-center bg-transparent hover:bg-gray-100"
+                      >
+                        <div className="flex gap-[15px] cursor-pointer">
+                          <History strokeWidth={1.75} />
+                          <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">{item}</h1>
+                        </div>
+                        <X
+                          strokeWidth={1.75}
+                          className="cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDeleteTopic(index)
+                          }}
+                        />
                       </div>
-                      <X
-                        strokeWidth={1.75}
-                        className="cursor-pointer"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteTopic(index);
-                        }}
-                      />
+                    ))
+                  ) : (
+                    <div className="w-full h-[52px] pl-[24px] flex items-center">
+                      <h1 className="font-inter font-[500] text-[16px] text-gray-500">Qidiruv tarixi bo'm bo'sh</h1>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             )}
@@ -417,11 +409,7 @@ const Navbar = () => {
                 onClick={toggleDropdown}
               >
                 <span>{selectedOption.name}</span>
-                <ChevronDown
-                  className={`transition-transform duration-300 ${
-                    isOpen ? "rotate-180" : ""
-                  }`}
-                />
+                <ChevronDown className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
               </div>
               {isOpen && (
                 <div className="absolute top-[100%] left-0 w-full bg-white rounded-b-[5px] shadow-lg transition-all duration-500 z-50">
@@ -460,9 +448,7 @@ const Navbar = () => {
             <Link to="/basket">
               <img
                 className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
-                src={
-                  location == "basket" || is_basket_hovered ? basket_a : basket
-                }
+                src={location == "basket" || is_basket_hovered ? basket_a : basket}
                 onMouseEnter={() => set_is_basket_hovered(true)}
                 onMouseLeave={() => set_is_basket_hovered(false)}
                 alt="basket"
@@ -471,11 +457,7 @@ const Navbar = () => {
             <Link to="/profile/orders">
               <img
                 className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
-                src={
-                  location == "profile" || is_profile_hovered
-                    ? profile_a
-                    : profile
-                }
+                src={location == "profile" || is_profile_hovered ? profile_a : profile}
                 onMouseEnter={() => set_is_profile_hovered(true)}
                 onMouseLeave={() => set_is_profile_hovered(false)}
                 alt="profile"
@@ -487,56 +469,25 @@ const Navbar = () => {
 
       <div className="md:hidden fixed -bottom-[calc(2vh-10px)] left-0 right-0 bg-[#BEA086] flex justify-around items-center h-[85px] z-50 rounded-t-[15px]">
         <Link to="/" className="flex flex-col items-center justify-center">
-          <Home
-            size={28}
-            strokeWidth={2}
-            color={location === "" ? "#ffffff" : "#DFCFC2"}
-          />
+          <Home size={28} strokeWidth={2} color={location === "" ? "#ffffff" : "#DFCFC2"} />
         </Link>
-        <Link
-          to="/search"
-          className="flex flex-col items-center justify-center"
-        >
-          <Search
-            size={28}
-            strokeWidth={2}
-            color={location === "search" ? "#ffffff" : "#DFCFC2"}
-          />
+        <Link to="/search" className="flex flex-col items-center justify-center">
+          <Search size={28} strokeWidth={2} color={location === "search" ? "#ffffff" : "#DFCFC2"} />
         </Link>
-        <Link
-          to="/orders"
-          className="flex flex-col items-center justify-center"
-        >
-          <Package
-            size={28}
-            strokeWidth={2}
-            color={location === "orders" ? "#ffffff" : "#DFCFC2"}
-          />
+        <Link to="/orders" className="flex flex-col items-center justify-center">
+          <Package size={28} strokeWidth={2} color={location === "orders" ? "#ffffff" : "#DFCFC2"} />
         </Link>
-        <Link
-          to="/basket"
-          className="flex flex-col items-center justify-center"
-        >
-          <ShoppingCart
-            size={28}
-            strokeWidth={2}
-            color={location === "basket" ? "#ffffff" : "#DFCFC2"}
-          />
+        <Link to="/basket" className="flex flex-col items-center justify-center">
+          <ShoppingCart size={28} strokeWidth={2} color={location === "basket" ? "#ffffff" : "#DFCFC2"} />
         </Link>
-        <Link
-          to="/profile"
-          className="flex flex-col items-center justify-center"
-        >
-          <User
-            size={28}
-            strokeWidth={2}
-            color={location === "profile" ? "#ffffff" : "#DFCFC2"}
-          />
+        <Link to="/profile" className="flex flex-col items-center justify-center">
+          <User size={28} strokeWidth={2} color={location === "profile" ? "#ffffff" : "#DFCFC2"} />
         </Link>
       </div>
       <div className="md:hidden h-[0px]"></div>
     </>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar
+
