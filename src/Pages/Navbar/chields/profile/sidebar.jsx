@@ -19,7 +19,7 @@ import Language from "./chields/language/language_main";
 import Help_modal from "./help_modal";
 import { get_user } from "../../../../Services/auth/get_user";
 
-const Sidebar = ({ isUserSignIn, setUserSignIn, set_user_s, edit_profile_open, set_edit_profile_open, set_is_logout_open }) => {
+const Sidebar = ({ lang, isUserSignIn, setUserSignIn, set_user_s, edit_profile_open, set_edit_profile_open, set_is_logout_open }) => {
   const [user, set_user] = useState({
     name: "...",
     surname: "...",
@@ -45,11 +45,11 @@ const Sidebar = ({ isUserSignIn, setUserSignIn, set_user_s, edit_profile_open, s
         set_user({
           name: user_data.first_name
             ? user_data.first_name
-            : "Foydalanuvchi",
+            : lang == "uz" ? "Foydalanuvchi" : lang == "en" ? "User" : lang == "ru" ? "Пользователь" : "Foydalanuvchi",
           surname: user_data.last_name
             ? user_data.last_name
             : "",
-          phone: user_data.phone_number || "Nomalum",
+          phone: user_data.phone_number || lang == "uz" ? "Nomalum" : lang == "en" ? "Undefined" : lang == "ru" ? "Не определено" : "Nomalum",
         });
       } catch (err) {
         console.error(err);
@@ -99,7 +99,7 @@ const Sidebar = ({ isUserSignIn, setUserSignIn, set_user_s, edit_profile_open, s
                     {setUserSignIn(false)}
                     <div className="flex justify-center bg-[#FFDF02] h-[70px] items-center w-full gap-3 border-[#D5D5D5] border rounded-[8px] pl-[20px] pr-[30px] py-[12px] hover:scale-[101%] active:scale-[99%] duration-300">
                       <p className="font-inter font-[600] text-[24px] leading-[22px] text-black">
-                        Kirish
+                        {lang == "uz" ? "Kirish" : lang == "en" ? "Login" : lang == "ru" ? "Входить" : "Kirish"}
                       </p>
                     </div>
                   </Link>
@@ -111,19 +111,19 @@ const Sidebar = ({ isUserSignIn, setUserSignIn, set_user_s, edit_profile_open, s
                   href={isSmallScreen ? "/orders" : "/profile/orders"}
                   isActive={location.pathname === "/profile/orders"}
                   icon={<ShoppingBag />}
-                  label="Buyurtmalar"
+                  label={lang == "uz" ? "Buyurtmalar" : lang == "en" ? "Orders" : lang == "ru" ? "Заказы" : "Buyurtmalar"}
                 />
                 <NavItem
                   href="/profile/cashback"
                   isActive={location.pathname === "/profile/cashback"}
                   icon={<SquarePercent />}
-                  label="Keshbek"
+                  label={lang == "uz" ? "Keshbek" : lang == "en" ? "Cashback" : lang == "ru" ? "Кэшбэк" : "Keshbek"}
                 />
                 <NavItem
                   href="/profile/favorites"
                   isActive={location.pathname === "/profile/favorites"}
                   icon={<Heart />}
-                  label="Sevimlilar"
+                  label={lang == "uz" ? "Sevimlilar" : lang == "en" ? "Favorites" : lang == "ru" ? "Избранное" : "Sevimlilar"}
                 />
               </div>
 
@@ -132,13 +132,13 @@ const Sidebar = ({ isUserSignIn, setUserSignIn, set_user_s, edit_profile_open, s
                   href="/profile/city"
                   isActive={location.pathname === "/profile/city"}
                   icon={<MapPin />}
-                  label="Shahar tanlash"
+                  label={lang == "uz" ? "Shahar tanlash" : lang == "en" ? "City selection" : lang == "ru" ? "Выбор города" : "Shahar tanlash"}
                 />
                 <NavItem
                   href="/profile/language"
                   isActive={location.pathname === "/profile/language"}
                   icon={<Globe />}
-                  label="Til tanlash"
+                  label={lang == "uz" ? "Til tanlash" : lang == "en" ? "Language selection" : lang == "ru" ? "Выбор языка" : "Til tanlash"}
                 />
               </div>
 
@@ -148,16 +148,17 @@ const Sidebar = ({ isUserSignIn, setUserSignIn, set_user_s, edit_profile_open, s
                   href={`${isSmallScreen ? "/profile" : "/profile/help"}`}
                   isActive={isSmallScreen ? false : location.pathname === "/profile/help"}
                   icon={<HelpCircle />}
-                  label="Qo'llab-quvvatlash"
+                  label={lang == "uz" ? "Qo'llab-quvvatlash" : lang == "en" ? "Support" : lang == "ru" ? "Поддержка" : "Qo'llab-quvvatlash"}
                 />
                 <div className={`px-4 py-5 ${isUserSignIn ? "" : "hidden"}`}>
                   <button onClick={() => set_is_logout_open(true)} className="flex items-center font-inter font-[500] text-[13px] leading-[22px] text-red-500 hover:text-red-700 duration-300 cursor-pointer">
                     <LogOut className="w-5 h-5 mr-3" />
-                    Chiqish
+                    {lang == "uz" ? "Chiqish" : lang == "en" ? "Logout" : lang == "ru" ? "Выход" : "Chiqish"}
                   </button>
                 </div>
               </div>
               <Help_modal
+                lang={lang}
                 isOpen={help_modal_open}
                 onClose={() => set_help_modal_open(false)}
               />

@@ -59,7 +59,7 @@ export default function KitchenCarousel() {
         {extendedSlides.map((item, index) => (
           <div
             key={index}
-            className="w-full sm:w-4/5 flex-shrink-0 relative px-1 sm:px-2"
+            className="relative flex-shrink-0 w-full px-1 sm:w-4/5 sm:px-2"
           >
             <img
               src={`https://back.stroybazan1.uz${item.image}`}
@@ -70,7 +70,7 @@ export default function KitchenCarousel() {
         ))}
       </div>
 
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 hidden sm:flex space-x-1 sm:bottom-1 sm:space-x-2">
+      <div className="absolute hidden space-x-1 -translate-x-1/2 bottom-2 left-1/2 sm:flex sm:bottom-1 sm:space-x-2">
         {slides.map((_, index) => (
           <button
             key={index}

@@ -28,10 +28,17 @@ const Category = lazy(() => import("./Pages/Category/Category"));
 const App = () => {
   const navigate = useNavigate();
   const [userSignIn, setUserSignIn] = useState(false);
+  const [lang, set_lang] = useState("uz");
+  const [city, set_city] = useState("andijan city");
 
   useEffect(() => {
     setUserSignIn(localStorage.getItem("userId") ? true : false);
+    !localStorage.getItem("lang") && "uz";
+    !localStorage.getItem("city") && "andijan city";
+    set_lang(localStorage.getItem("lang") || "uz");
+    set_city(localStorage.getItem("city") || "andijan city");
   }, []);
+
   const [phone_number, set_phone_number] = useState("");
   const [is_found, set_is_found] = useState(true);
   const [is_another_nav, set_is_another_nav] = useState(false);
@@ -150,6 +157,10 @@ const App = () => {
                       isUserSignIn={userSignIn}
                       set_is_found={set_is_found}
                       setUserSignIn={setUserSignIn}
+                      lang={lang}
+                      set_lang={set_lang}
+                      city={city}
+                      set_city={set_city}
                     />
                   }
                 />
@@ -199,6 +210,7 @@ const App = () => {
                   path="/register"
                   element={
                     <Register
+                      lang={lang}
                       set_is_found={set_is_found}
                       setUserSignIn={setUserSignIn}
                     />
@@ -208,6 +220,7 @@ const App = () => {
                   path="/login"
                   element={
                     <Log_in
+                      lang={lang}
                       set_is_found={set_is_found}
                       setUserSignIn={setUserSignIn}
                     />

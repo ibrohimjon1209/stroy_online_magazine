@@ -5,7 +5,7 @@ import { Phone } from "lucide-react";
 import { support_get } from "../../../../Services/general/support";
 import { useEffect, useState } from "react";
 
-const BottomModal = ({ isOpen, onClose }) => {
+const BottomModal = ({ isOpen, onClose, lang }) => {
   const [support, set_support] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
@@ -39,7 +39,7 @@ const BottomModal = ({ isOpen, onClose }) => {
       >
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium">Qo'llab-quvvatlash xizmati</h2>
+            <h2 className="text-lg font-medium">{lang == "uz" ? "Qo'llab-quvvatlash xizmati" : lang == "en" ? "Support" : lang == "ru" ? "Поддержка" : "Qo'llab-quvvatlash"}</h2>
             <button onClick={onClose} className="p-1" aria-label="Close">
               <svg
                 width="24"
@@ -57,12 +57,12 @@ const BottomModal = ({ isOpen, onClose }) => {
             </button>
           </div>
 
-          <div className="space-y-4 mb-6">
+          <div className="mb-6 space-y-4">
             {support.map((item) => (
               <div key={item.id} className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">{item.phone_number}</p>
-                  <p className="text-sm text-gray-500">{item.title_uz}</p>
+                  <p className="text-sm text-gray-500">{item[`title_${lang}`]}</p>
                 </div>
                 <Phone className="h-[28px] w-[28px]" />
               </div>
@@ -102,9 +102,9 @@ const BottomModal = ({ isOpen, onClose }) => {
 
             <div className="text-center font-inter font-[500] text-[16px] leading-[22px] text-gray-500">
               Powered by{" "}
-              <span className="text-purple-600 font-[600]">
+              <a href="https://t.me/nsd_corporation" className="text-purple-600 font-[600]">
                 NSD CORPORATION
-              </span>
+              </a>
             </div>
           </div>
         </div>

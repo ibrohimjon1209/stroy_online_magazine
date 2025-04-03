@@ -3,13 +3,12 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { Heart } from "lucide-react";
 
-const Favorites_main = () => {
+const Favorites_main = ({ lang }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [likedProducts, setLikedProducts] = useState([]);
 
   useEffect(() => {
-    // Saqlangan like'larni olish
     const storedLikes = localStorage.getItem("likedProducts");
     const likedIds = storedLikes ? JSON.parse(storedLikes) : [];
 
@@ -27,9 +26,10 @@ const Favorites_main = () => {
             },
           }
         );
-        
-        // Faqat like bosilgan mahsulotlarni olish
-        const likedOnly = response.data.filter(product => likedIds.includes(product.id));
+
+        const likedOnly = response.data.filter((product) =>
+          likedIds.includes(product.id)
+        );
         setProducts(likedOnly);
       } catch (error) {
         console.error("API xatosi:", error);
@@ -67,23 +67,23 @@ const Favorites_main = () => {
               className="w-[150px] h-[235px] sm:h-[280px] cursor-pointer hover:shadow-xs"
             >
               <Link to={`/product/${product.id}`}>
-                <div className="w-full aspect-square rounded-[10px] bg-[#F2F2F1] flex justify-center items-center overflow-hidden group">
+                <div className="w-full h-[150px] sm:h-[150px] aspect-square rounded-[10px] bg-[#F2F2F1] flex justify-center items-center overflow-hidden group">
                   <img
                     src={`https://back.stroybazan1.uz/${product.image}`}
-                    className="transition-transform duration-300 transform group-hover:scale-105 w-full h-full object-contain"
+                    className="object-cover w-full h-full transition-transform duration-300 transform group-hover:scale-105"
                     alt={product.name_uz}
                   />
                 </div>
               </Link>
-              <div className="flex flex-col gap-[8px] sm:gap-[16px] p-2">
+              <div className="flex flex-col gap-[8px] sm:gap-[4px] p-2">
                 <Link to={`/product/${product.id}`}>
-                  <h1 className="font-inter font-[600] text-[12px] sm:text-[16px] text-black truncate">
+                  <h1 className="font-inter font-[600] text-[11px] sm:text-[15px] text-black truncate">
                     {product.name_uz}
                   </h1>
                 </Link>
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between gap-3">
                   <Link to={`/product/${product.id}`}>
-                    <p className="font-inter font-[500] text-[12px] sm:text-[14px] text-black">
+                    <p className="font-inter whitespace-nowrap font-[500] text-[11px] sm:text-[13px] text-black">
                       {product.variants &&
                       product.variants.length > 0 &&
                       product.variants[0].price
@@ -111,8 +111,8 @@ const Favorites_main = () => {
           ))}
         </div>
       ) : (
-        <p className="text-center w-full font-inter text-lg text-gray-500">
-          Sevimlilar yo'q
+        <p className="w-full text-lg text-center text-gray-500 font-inter">
+          {lang == "uz" ? "Sevimlilar yo'q" : lang == "en" ? "Favorites not found" : lang == "ru" ? "Избранное не найдено" : "Sevimlilar yo'q"}
         </p>
       )}
     </div>

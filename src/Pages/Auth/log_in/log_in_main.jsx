@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { PhoneInput } from "../components/phone_input";
 import { Link } from "react-router-dom";
 import PhoneVerification from "../components/phone_verification";
 import { login } from "../../../Services/auth/login";
 
-export default function Log_in_main({ set_is_found, setUserSignIn }) {
+export default function Log_in_main({ set_is_found, setUserSignIn, lang }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showVerification, setShowVerification] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -14,6 +14,30 @@ export default function Log_in_main({ set_is_found, setUserSignIn }) {
   useEffect(() => {
     set_is_found(false);
   }, []);
+
+  const translations = useMemo(() => ({
+    uz: {
+      title: "Tizimga kirish",
+      description: "Kirish uchun telefon raqamingizni kiriting.",
+      error: "Kirishda xatolik yuz berdi",
+      login: "Kirish",
+      register: "Akkountingiz yo'qmi? Ro'yxatdan o'ting"
+    },
+    en: {
+      title: "Login",
+      description: "Enter your phone number to log in.",
+      error: "Error entering",
+      login: "Login",
+      register: "Don't have an account? Sign up"
+    },
+    ru: {
+      title: "Вход в систему",
+      description: "Введите свой номер телефона для входа.",
+      error: "Ввод ошибки",
+      login: "Войти",
+      register: "У вас нет аккаунта? Зарегистрируйтесь"
+    }
+  }), [lang]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,9 +52,8 @@ export default function Log_in_main({ set_is_found, setUserSignIn }) {
         localStorage.setItem("phoneNumber", formattedNumber);
         setShowVerification(true);
       } catch (error) {
-        console.error("Login failed:", error);
         setInputError(true);
-        setErrorMessage("Kirishda xatolik yuz berdi");
+        setErrorMessage(translations[lang]?.error || translations.uz.error);
       } finally {
         setIsLoading(false);
       }
@@ -42,6 +65,7 @@ export default function Log_in_main({ set_is_found, setUserSignIn }) {
   if (showVerification) {
     return (
       <PhoneVerification
+        lang={lang}
         phoneNumber={`+998${phoneNumber}`}
         method={"login"}
         set_is_found={set_is_found}
@@ -52,15 +76,13 @@ export default function Log_in_main({ set_is_found, setUserSignIn }) {
 
   return (
     <div className="flex h-[calc(100vh-100px)] flex-col items-center sm:justify-center mt-[12vh] p-4">
-      <div className="w-full flex flex-col justify-between">
-        <div className="mx-auto w-full max-w-md space-y-8 relative">
-          <h1 className="text-center text-2xl font-medium">Tizimga kirish</h1>
-          <p className="text-center text-gray-600">
-            Kirish uchun telefon raqamingizni kiriting.
-          </p>
+      <div className="flex flex-col justify-between w-full">
+        <div className="relative w-full max-w-md mx-auto space-y-8">
+          <h1 className="text-2xl font-medium text-center">{translations[lang]?.title || translations.uz.title}</h1>
+          <p className="text-center text-gray-600">{translations[lang]?.description || translations.uz.description}</p>
 
           {errorMessage && (
-            <div className="absolute -top-8 left-0 right-0 text-center text-red-500 font-medium">
+            <div className="absolute left-0 right-0 font-medium text-center text-red-500 -top-8">
               {errorMessage}
             </div>
           )}
@@ -86,7 +108,7 @@ export default function Log_in_main({ set_is_found, setUserSignIn }) {
             >
               {isLoading ? (
                 <svg
-                  className="size-7 animate-spin text-black"
+                  className="text-black size-7 animate-spin"
                   fill="none"
                   viewBox="0 0 32 32"
                 >
@@ -96,15 +118,16 @@ export default function Log_in_main({ set_is_found, setUserSignIn }) {
                     d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                   ></path>
                 </svg>
-              ) : "Kirish"}
-              
+              ) : (
+                translations[lang]?.login || translations.uz.login
+              )}
             </button>
           </form>
         </div>
 
         <div className="mt-[40vh] sm:pt-16 text-center">
           <Link to="/register" className="text-[#4726BCBF] hover:underline">
-            Akkountingiz yo'qmi? Ro'yxatdan o'ting
+            {translations[lang]?.register || translations.uz.register}
           </Link>
         </div>
       </div>
