@@ -1,23 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import img from "./404_img.png";
+import { Link } from "react-router-dom";
 
-const Not_found = ({ set_is_found }) => {
-  set_is_found(false);
+const Not_found = ({ abs, set_is_found }) => {
+  useEffect(() => {
+    set_is_found(false)
+    console.log(abs)
+  }, [])
   return (
     <div className="flex flex-col w-full h-[140%] relative justify-center items-center">
-      <div className="w-full h-[50vh] bg-[#FEDA73]"></div>
+      <div className="w-full h-[50vh]"></div>
       <img
         src={img}
-        className="md:w-[500px] w-[300px] h-[370px] md:h-[540px] pb-[66px] md:pb-[95px] absolute"
+        className="md:w-[500px] w-[300px] h-[370px] md:h-[580px] pb-[66px] md:pb-[95px] absolute"
         alt=""
       />
-      <div className="w-full h-[50vh] bg-[#FCC42E] flex items-center justify-center">
-        <a
-            href="/"
-          className="cursor-pointer hover:scale-[101%] active:scale-[99%] duration-200 z-10 mt-[10px] md:mt-[70px] rounded-[10px] text-[13px] whitespace-nowrap md:text-[16px] text-white border-white border-2 flex justify-center items-center p-4 w-[150px] h-[50px] md:w-[200px] md:h-[59px]"
-        >
+      <div className="w-full h-[50vh]  flex items-center justify-center">
+        <Link to="/ " className='scale-[91%] z-50 w-[407px] h-[92px] hover:bg-[#DCC38B] hover:text-white hover:font-[500] transition-all duration-200 active:bg-[#aa9263] active:scale-[91%] hover:scale-[93%] rounded-[10px] border-[1.5px] border-[#DCC38B] bg-[#FFFFFF] font-inter font-500 text-[26px] leading-[22px] text-black text-center flex items-center justify-center'>
           Bosh sahifaga qaytish
-        </a>
+        </Link>
       </div>
     </div>
   );
