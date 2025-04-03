@@ -211,11 +211,6 @@ const Product = () => {
       setIsAdded(true)
       setIsAnimating(false)
       handleAddToCart()
-
-      // Navigate to basket page after a short delay
-      setTimeout(() => {
-        navigate("/basket")
-      }, 800)
     }, 600)
   }
 
@@ -432,7 +427,7 @@ const Product = () => {
                   <img
                     src={`https://back.stroybazan1.uz${variant.image}`}
                     alt={variant.color_uz}
-                    className="w-full h-full object-contain"
+                    className="object-contain w-full h-full"
                   />
                 </div>
               ))}
