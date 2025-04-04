@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useRef, useEffect } from "react"
 import logo from "./Images/logo.svg"
 import cube from "./Images/orders.svg"
@@ -23,7 +21,7 @@ const getStoredTopics = () => {
   }
 }
 
-const Navbar = () => {
+const Navbar = ({lang}) => {
   const navigate = useNavigate()
   const inputRef = useRef(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -271,7 +269,7 @@ const Navbar = () => {
               <Search className="cursor-pointer" onClick={handleSearchClick} />
               <input
                 type="text"
-                placeholder="Search"
+                placeholder={lang == "uz" ? "Qidiruv" : lang == "en" ? "Search" : lang == "ru" ? "Поиск" : "Qidiruv"}
                 className="w-full placeholder:font-inter placeholder:font-[500] placeholder:text-[15px] placeholder:text-[#737373] border-none pl-[15px] pr-[20px] focus:outline-none focus:ring-0 font-inter font-[500] text-[15px]"
                 ref={inputRef}
                 value={searchText}
@@ -341,7 +339,7 @@ const Navbar = () => {
               <Search className="cursor-pointer" onClick={handleSearchClick} />
               <input
                 type="text"
-                placeholder="Search"
+                placeholder={lang == "uz" ? "Qidiruv" : lang == "en" ? "Search" : lang == "ru" ? "Поиск" : "Qidiruv"}
                 className="w-full placeholder:font-inter placeholder:font-[500] placeholder:text-[15px] placeholder:text-[#737373] border-none pl-[15px] pr-[20px] focus:outline-none focus:ring-0 font-inter font-[500] text-[15px]"
                 ref={inputRef}
                 value={searchText}
@@ -395,7 +393,7 @@ const Navbar = () => {
                     ))
                   ) : (
                     <div className="w-full h-[52px] pl-[24px] flex items-center">
-                      <h1 className="font-inter font-[500] text-[16px] text-gray-500">Qidiruv tarixi bo'm bo'sh</h1>
+                      <h1 className="font-inter font-[500] text-[16px] text-gray-500">{lang == "uz" ? "Qidiruv tarixi bo'm bo'sh" : lang == "en" ? "Search history is empty" : lang == "ru" ? "История поиска пуста" : "Qidiruv tarixi bo'm bo'sh"}</h1>
                     </div>
                   )}
                 </div>

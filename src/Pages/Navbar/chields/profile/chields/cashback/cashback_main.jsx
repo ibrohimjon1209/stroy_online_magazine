@@ -112,13 +112,13 @@ const Cashback_main = ({ lang }) => {
             </div>
             <div className="flex justify-between font-inter font-[500] text-[15px] leading-[22px] text-black">
               <div>
-                {lang == "uz"
-                  ? "Rasmiylashtirish sanasi"
+              {lang == "uz"
+                  ? "dona mahsulot"
                   : lang == "en"
-                  ? "Date of registration"
+                  ? "piece of product"
                   : lang == "ru"
-                  ? "Дата оформления"
-                  : "Rasmiylashtirish sanasi"}
+                  ? "штук товара"
+                  : "dona mahsulot"}
               </div>
               <div>{item.delivery_date[lang]}</div>
             </div>
@@ -138,13 +138,7 @@ const Cashback_main = ({ lang }) => {
               </div>
               <div>
                 {item.amount}{" "}
-                {lang == "uz"
-                  ? "so'm"
-                  : lang == "en"
-                  ? "uzs"
-                  : lang == "ru"
-                  ? "сум"
-                  : "so'm"}
+                {uzs_lang}
               </div>
             </div>
             <div className="flex justify-between text-[#12CF38]">

@@ -1,37 +1,32 @@
 import { Minus, Plus, Check, ChevronLeft } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import photo from "./photo.png";
 
-export default function Basket_main({ set_formalization_open }) {
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: "PENOPLEX COMFORT",
-      price: 125650,
-      quantity: 1,
-      selected: true,
-    },
-    {
-      id: 2,
-      name: "PENOPLEX COMFORT",
-      price: 125650,
-      quantity: 1,
-      selected: true,
-    },
-    {
-      id: 3,
-      name: "PENOPLEX COMFORT",
-      price: 125650,
-      quantity: 1,
-      selected: true,
-    },
-  ]);
+export default function Basket_main({ basket, set_formalization_open, lang }) {
+  const [products, setProducts] = useState(basket);
 
   const [paymentType, setPaymentType] = useState("immediate");
   const [contentHeight, setContentHeight] = useState("auto");
   const immediateRef = useRef(null);
   const installmentRef = useRef(null);
+  const uzs_lang =
+    lang == "uz"
+      ? "so'm"
+      : lang == "en"
+      ? "uzs"
+      : lang == "ru"
+      ? "сум"
+      : "so'm";
+
+  useEffect(() => {
+    const savedBasket = localStorage.getItem("basket");
+    if (savedBasket) {
+      setProducts(JSON.parse(savedBasket));
+    }
+  }, []);
+  useEffect(() => {
+    localStorage.setItem("basket", JSON.stringify(products));
+  }, [products]);
 
   const allSelected = products.every((product) => product.selected);
   const toggleSelectAll = () => {
@@ -40,34 +35,50 @@ export default function Basket_main({ set_formalization_open }) {
     );
   };
 
-  const toggleProductSelection = (productId) => {
-    setProducts(
-      products.map((product) =>
-        product.id === productId
+  const toggleProductSelection = (productId, size, color) => {
+    setProducts((prevProducts) => {
+      const updatedProducts = prevProducts.map((product) =>
+        product.id === productId &&
+        product.size[lang] === size &&
+        product.color[lang] === color
           ? { ...product, selected: !product.selected }
           : product
-      )
-    );
+      );
+      return updatedProducts;
+    });
   };
 
-  const increaseQuantity = (productId) => {
-    setProducts(
-      products.map((product) =>
-        product.id === productId
+  const decreaseQuantity = (productId, size, color) => {
+    setProducts((prevProducts) => {
+      return prevProducts
+        .map((product) => {
+          if (
+            product.id === productId &&
+            product.size[lang] === size &&
+            product.color[lang] === color
+          ) {
+            const newQuantity = product.quantity - 1;
+
+            return newQuantity > 0
+              ? { ...product, quantity: newQuantity }
+              : null;
+          }
+          return product;
+        })
+        .filter(Boolean);
+    });
+  };
+  const increaseQuantity = (productId, size, color) => {
+    setProducts((prevProducts) => {
+      const updatedProducts = prevProducts.map((product) =>
+        product.id === productId &&
+        product.size[lang] === size &&
+        product.color[lang] === color
           ? { ...product, quantity: product.quantity + 1 }
           : product
-      )
-    );
-  };
-
-  const decreaseQuantity = (productId) => {
-    setProducts(
-      products.map((product) =>
-        product.id === productId && product.quantity > 1
-          ? { ...product, quantity: product.quantity - 1 }
-          : product
-      )
-    );
+      );
+      return updatedProducts;
+    });
   };
 
   const totalPrice = products
@@ -90,7 +101,13 @@ export default function Basket_main({ set_formalization_open }) {
         >
           <ChevronLeft className="scale-110" />
           <h1 className="font-inter font-[500] text-[17px] leading-[22px] text-black">
-            Savatcha
+            {lang === "uz"
+              ? "Savatcha"
+              : lang === "en"
+              ? "Basket"
+              : lang === "ru"
+              ? "Корзина"
+              : "Savatcha"}
           </h1>
         </Link>
       </div>
@@ -103,27 +120,47 @@ export default function Basket_main({ set_formalization_open }) {
                 className="w-[100%] flex items-center justify-between"
               >
                 <h1 className="font-inter font-[600] text-[15px] whitespace-nowrap sm:text-[24px] leading-[22px] text-black">
-                  Hammasini tanlash{" "}
-                  <span className="sm:inline hidden">
-                    ({products.length} ta maxsulot)
+                  {lang === "uz"
+                    ? "Hammasini tanlash"
+                    : lang === "en"
+                    ? "Select all"
+                    : lang === "ru"
+                    ? "Выбрать все"
+                    : "Hammasini tanlash"}{" "}
+                  <span className="hidden sm:inline">
+                    {products.length}{" "}
+                    {lang == "uz"
+                      ? "ta maxsulot"
+                      : lang === "en"
+                      ? "products"
+                      : lang === "ru"
+                      ? "продукт"
+                      : "ta maxsulot"}
                   </span>
                 </h1>
                 <div
                   className={`w-6 h-6 ${
-                    allSelected ? "bg-[#DCC38B]" : "bg-gray-200"
+                    allSelected && products.length > 0
+                      ? "bg-[#DCC38B]"
+                      : "bg-gray-200"
                   } rounded-md flex items-center justify-center cursor-pointer`}
                 >
-                  {allSelected && <Check className="w-4 h-4 text-white" />}
+                  {allSelected && products.length > 0 && (
+                    <Check className="w-4 h-4 text-white" />
+                  )}
                 </div>
               </button>
             </div>
             {products.map((product) => (
-              <div key={product.id} className="flex items-start py-4 sm:py-8">
+              <div
+                key={`${product.id}-${product.size[lang]}-${product.color[lang]}`}
+                className="flex items-start py-4 sm:py-8"
+              >
                 <div className="rounded-[15px] mr-[1px] sm:mr-15 overflow-hidden p-1">
                   <div className="relative w-[90px] h-[90px] sm:w-[150px] sm:h-[150px] flex items-center justify-center">
                     <img
-                      src={photo}
-                      alt={product.name}
+                      src={product.img}
+                      alt={product.name[lang]}
                       className="object-contain w-full h-full"
                     />
                   </div>
@@ -131,10 +168,16 @@ export default function Basket_main({ set_formalization_open }) {
                 <div className="flex-1">
                   <div className="flex justify-between">
                     <h2 className="font-inter font-[600] text-[15px] leading-[22px] text-black">
-                      {product.name}
+                      {product.name[lang]}
                     </h2>
                     <button
-                      onClick={() => toggleProductSelection(product.id)}
+                      onClick={() =>
+                        toggleProductSelection(
+                          product.id,
+                          product.size[lang],
+                          product.color[lang]
+                        )
+                      }
                       className={`w-6 h-6 ${
                         product.selected ? "bg-[#DCC38B]" : "bg-gray-200"
                       } rounded-md flex items-center justify-center cursor-pointer`}
@@ -145,20 +188,31 @@ export default function Basket_main({ set_formalization_open }) {
                     </button>
                   </div>
                   <p className="font-inter font-[600] text-[15px] leading-[22px] text-black mt-2">
-                    {product.price.toLocaleString()} so'm
+                    {product.price.toLocaleString()} {uzs_lang}
                   </p>
                   <div className="flex items-center mt-11 sm:mt-15">
                     <button
-                      onClick={() => decreaseQuantity(product.id)}
-                      className="w-8 h-8 border rounded-md flex items-center justify-center cursor-pointer"
-                      disabled={product.quantity <= 1}
+                      onClick={() =>
+                        decreaseQuantity(
+                          product.id,
+                          product.size[lang],
+                          product.color[lang]
+                        )
+                      }
+                      className="flex items-center justify-center w-8 h-8 border rounded-md cursor-pointer"
                     >
                       <Minus className="w-4 h-4" />
                     </button>
                     <span className="mx-4">{product.quantity}</span>
                     <button
-                      onClick={() => increaseQuantity(product.id)}
-                      className="w-8 h-8 border rounded-md flex items-center justify-center cursor-pointer"
+                      onClick={() =>
+                        increaseQuantity(
+                          product.id,
+                          product.size[lang],
+                          product.color[lang]
+                        )
+                      }
+                      className="flex items-center justify-center w-8 h-8 border rounded-md cursor-pointer"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
@@ -178,7 +232,13 @@ export default function Basket_main({ set_formalization_open }) {
                       : "text-gray-500"
                   }`}
                 >
-                  Hoziroq to'lash
+                  {lang === "uz"
+                    ? "Hoziroq to'lash"
+                    : lang === "en"
+                    ? "Pay now"
+                    : lang === "ru"
+                    ? "Сразу"
+                    : "Hoziroq to'lash"}
                 </button>
                 <button
                   onClick={() => setPaymentType("installment")}
@@ -188,7 +248,13 @@ export default function Basket_main({ set_formalization_open }) {
                       : "text-gray-500"
                   }`}
                 >
-                  Muddatli to'lov
+                  {lang === "uz"
+                    ? "Muddatli to'lov"
+                    : lang === "en"
+                    ? "Installment"
+                    : lang === "ru"
+                    ? "Рассрочка"
+                    : "Muddatli to'lov"}
                 </button>
               </div>
               <div
@@ -204,8 +270,19 @@ export default function Basket_main({ set_formalization_open }) {
                   }`}
                 >
                   <div className="flex justify-between items-center font-inter font-[700] text-[16px] leading-[22px] text-black">
-                    <span>Umumiy:</span>
-                    <span>{totalPrice.toLocaleString()} so'm</span>
+                    <span>
+                      {lang === "uz"
+                        ? "Umumiy"
+                        : lang === "en"
+                        ? "Total"
+                        : lang === "ru"
+                        ? "Итого"
+                        : "Umumiy"}
+                      :
+                    </span>
+                    <span>
+                      {totalPrice.toLocaleString()} {uzs_lang}
+                    </span>
                   </div>
                 </div>
                 <div
@@ -218,30 +295,64 @@ export default function Basket_main({ set_formalization_open }) {
                 >
                   <div className="flex justify-between">
                     <h1 className="font-inter font-[500] text-[16px] leading-[22px] text-black">
-                      {products.length} ta maxsulot
+                      {products.length}{" "}
+                      {lang == "uz"
+                        ? "ta maxsulot"
+                        : lang === "en"
+                        ? "products"
+                        : lang === "ru"
+                        ? "продукт"
+                        : "ta maxsulot"}
                     </h1>
                     <p className="font-inter font-[500] text-[16px] leading-[22px] text-black">
-                      {totalPrice.toLocaleString()}so'm
+                      {totalPrice.toLocaleString()} {uzs_lang}
                     </p>
                   </div>
                   <p className="font-inter font-[500] text-[14px] leading-[22px] text-[#000000BF] mt-[15px]">
-                    Siz buyurtmani 3 oydan 24 oygacha muddatli to'lov evaziga
-                    xarid qilishingiz mumkin.
+                    {lang == "uz"
+                      ? "Siz buyurtmani 3 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."
+                      : lang == "en"
+                      ? "You can purchase an order for a period of 3 to 24 months for a fixed fee."
+                      : lang == "ru"
+                      ? "Вы можете приобрести заказ на срок от 3 до 24 месяцев за фиксированную плату."
+                      : "Siz buyurtmani 3 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."}
                   </p>
-                  <div className="flex justify-between items-center font-inter font-[700] text-[16px] leading-[22px] text-black mt-[30%] sm:mt-[50%]">
-                    <span>Muddatli to'lov</span>
-                    <span>{monthlyPayment.toLocaleString()} so'mdan × 24</span>
+                  <div className="flex justify-between items-center font-inter font-[700] text-[16px] leading-[22px] text-black mt-[20%] sm:mt-[50%]">
+                    <span>
+                      {lang === "uz"
+                        ? "Muddatli to'lov"
+                        : lang === "en"
+                        ? "Installment"
+                        : lang === "ru"
+                        ? "Рассрочка"
+                        : "Muddatli to'lov"}
+                    </span>
+                    <span>
+                      {lang === "uz"
+                        ? `${monthlyPayment.toLocaleString()} so'mdan × 24`
+                        : lang === "en"
+                        ? `${monthlyPayment.toLocaleString()} × 24`
+                        : lang === "ru"
+                        ? `От ${monthlyPayment.toLocaleString()} Сум × 24`
+                        : `${monthlyPayment.toLocaleString()} so'mdan × 24`}
+                    </span>
                   </div>
                 </div>
               </div>
+              <Link
+                to="/formalization"
+                onClick={() => set_formalization_open(true)}
+                className="sm:w-[87%] w-[90%] absolute flex items-center justify-center py-4 sm:mt-[8%] mt-[5%] bg-[#E6D1A7] rounded-xl font-inter font-[600] text-[15px] leading-[22px] text-black hover:bg-[#dac59b] transition-colors cursor-pointer duration-300"
+              >
+                {lang === "uz"
+                  ? "Rasmiylashtirish"
+                  : lang === "en"
+                  ? "Formalization"
+                  : lang === "ru"
+                  ? "Формализация"
+                  : "Rasmiylashtirish"}
+              </Link>
             </div>
-            <Link
-              to="/formalization"
-              onClick={() => set_formalization_open(true)}
-              className="sm:w-[87%] w-[90%] absolute flex items-center justify-center py-4 sm:mt-[100%] mt-[85%] bg-[#E6D1A7] rounded-xl font-inter font-[600] text-[15px] leading-[22px] text-black hover:bg-[#dac59b] transition-colors cursor-pointer duration-300"
-            >
-              Rasmiylashtirish
-            </Link>
           </div>
         </div>
       </div>

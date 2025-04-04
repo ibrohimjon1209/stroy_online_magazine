@@ -7,12 +7,20 @@ import Carusel from "./Carusel";
 import { Search, CirclePlus, History, X, Heart } from "lucide-react";
 import Download_page from "./Download";
 
-function Home() {
+function Home({ lang }) {
   const inputRef = useRef(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const uzs_lang =
+    lang == "uz"
+      ? "so'm"
+      : lang == "en"
+      ? "uzs"
+      : lang == "ru"
+      ? "сум"
+      : "so'm";
   const [searchTopics, setSearchTopics] = useState(() => {
     return localStorage.getItem("searchTopics") || [];
   });
@@ -28,7 +36,8 @@ function Home() {
           {
             headers: {
               accept: "application/json",
-              "X-CSRFTOKEN": "B8UmaQE4P3RrkjHA8QHRPrl0hvSU4yProbsYerUqficnXhefiWFxkqRVvGVL7Ws5",
+              "X-CSRFTOKEN":
+                "B8UmaQE4P3RrkjHA8QHRPrl0hvSU4yProbsYerUqficnXhefiWFxkqRVvGVL7Ws5",
             },
           }
         );
@@ -89,20 +98,29 @@ function Home() {
       {isSearchOpen && (
         <div className="absolute top-[150px] left-0 h-[91vh] w-full flex justify-center pt-[10px] z-50">
           {searchTopics.map((item, index) => (
-            <div key={index} className="cursor-pointer w-full h-[52px] flex justify-between items-center bg-transparent hover:bg-gray-100">
+            <div
+              key={index}
+              className="cursor-pointer w-full h-[52px] flex justify-between items-center bg-transparent hover:bg-gray-100"
+            >
               <div className="flex gap-[15px]">
                 <History strokeWidth={1.75} />
                 <h1 className="text-black opacity-80">{item}</h1>
               </div>
-              <X strokeWidth={1.75} className="cursor-pointer" onClick={() => setIsSearchOpen(false)} />
+              <X
+                strokeWidth={1.75}
+                className="cursor-pointer"
+                onClick={() => setIsSearchOpen(false)}
+              />
             </div>
           ))}
         </div>
       )}
 
       <div className="popular w-full px-[15px] sm:px-[77px] mb-[100px]">
-        <h1 className="text-[17px] sm:text-[22px] font-semibold mt-6">Ommabop tavarlar</h1>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-[10px] gap-y-[15px]">
+        <h1 className="text-[17px] sm:text-[22px] font-semibold mt-3">
+          {lang == "uz" ? "Ommabop tavarlar" : lang == "en" ? "Popular products" : lang == "ru" ? "Популярные товары" : "Ommabop tavarlar"}
+        </h1>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-[10px] gap-y-[20px] mt-3">
           {loading ? (
             <div className="flex justify-center items-center w-full h-[200px]">
               <div className="loader"></div>
@@ -111,30 +129,48 @@ function Home() {
             products.map((product, index) => (
               <div key={index} className="cursor-pointer">
                 <Link to={`/product/${product.id}`}>
-                  <div className="rounded-[10px] bg-[#F2F2F1] overflow-hidden group">
+                  <div className="rounded-[10px] w-[160px] h-[160px] sm:w-[245px] sm:h-[245px] bg-[#F2F2F1] overflow-hidden group">
                     <img
                       src={`https://back.stroybazan1.uz/${product.image}`}
                       className="object-cover w-full h-full transition-transform group-hover:scale-105"
-                      alt={product.name_uz}
+                      alt={product[`name_${lang}`]}
                     />
                   </div>
-                  <h1 className="text-black truncate font-semibold text-[14px] sm:text-[16px]">{product.name_uz}</h1>
+                  <div className="flex flex-row items-end w-[165px] sm:w-[245px] justify-between mt-1.5 px-3">
+                  <div className="flex flex-col sm:gap-1">
+                  <h1 className="text-black truncate font-semibold text-[14px] sm:text-[16px]">
+                    {product[`name_${lang}`]}
+                  </h1>
                   <p className="text-black text-[12px] sm:text-[14px]">
-                    {product.variants?.[0]?.price ? `Narxi: ${parseFloat(product.variants[0].price).toFixed(2)} UZS` : "Narxi mavjud emas"}
+                    {product.variants?.[0]?.price
+                      ? `${lang == "uz" ? "Narxi" : lang == "en" ? "Price" : lang == "ru" ? "Цена" : "Narxi"}: ${parseFloat(product.variants[0].price).toFixed(
+                          2
+                        )} ${uzs_lang}`
+                      : lang == "uz" ? "Narxi mavjud emas" : lang == "en" ? "Price not available" : lang == "ru" ? "Цена не доступна" : "Narxi mavjud emas"}
                   </p>
-                </Link>
+                  </div>
                 <Heart
-                  className="w-[16px] sm:w-[25px] text-[#FF0000] cursor-pointer"
+                  className="w-[19px] h-[19px] sm:w-[28px] sm:h-[28px] text-[#FF0000] cursor-pointer mb-0.5"
                   fill={likedProducts.includes(product.id) ? "#FF0000" : "none"}
                   onClick={(e) => {
                     e.preventDefault();
                     handleLikeToggle(product.id);
                   }}
                 />
+                  </div>
+                </Link>
               </div>
             ))
           ) : (
-            <p className="text-center text-gray-500">Ma'lumot topilmadi.</p>
+            <p className="text-center text-gray-500">
+              {lang == "uz"
+                ? "Ma'lumot topilmadi."
+                : lang == "en"
+                ? "No data found."
+                : lang == "ru"
+                ? "Данные не найдены."
+                : "Ma'lumot topilmadi."}
+            </p>
           )}
         </div>
       </div>

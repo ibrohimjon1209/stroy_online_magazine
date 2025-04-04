@@ -2,14 +2,26 @@ import { Link } from "react-router-dom";
 import image from "./photo.png";
 import { ChevronLeft } from "lucide-react";
 
-const Orders_main = () => {
+const Orders_main = ({ lang }) => {
   const orders = [
     {
       id: "63224636",
-      status: "Xaridorga Berilgan",
+      status: {
+        uz: "Xaridorga Berilgan",
+        en: "Delivered",
+        ru: "Доставлен",
+      },
       statusColor: "green",
-      deliveryDate: "Juma 10 yanvar",
-      processDate: "Juma 10 yanvar",
+      deliveryDate: {
+        uz: "Juma 10 yanvar",
+        en: "Wednesday 10 January",
+        ru: "Четверг 10 января",
+      },
+      processDate: {
+        uz: "Juma 10 yanvar",
+        en: "Wednesday 10 January",
+        ru: "Четверг 10 января",
+      },
       quantity: 1,
       totalPrice: "126.650",
       product: {
@@ -20,26 +32,23 @@ const Orders_main = () => {
       },
     },
     {
-      id: "63224637",
-      status: "Jarayonda",
+      id: "63224636",
+      status: {
+        uz: "Jarayonda",
+        en: "In progress",
+        ru: "В процессе",
+      },
       statusColor: "yellow",
-      deliveryDate: "Shanba 11 yanvar",
-      processDate: "Juma 10 yanvar",
-      quantity: 2,
-      totalPrice: "253.300",
-      product: {
-        name: "PENOPLEX COMFORT",
-        price: "125.650",
-        seller: "1,599 sotuvchi / 12oy",
-        image: image,
+      deliveryDate: {
+        uz: "Juma 10 yanvar",
+        en: "Wednesday 10 January",
+        ru: "Четверг 10 января",
       },
-    },
-    {
-      id: "63224638",
-      status: "Yetkazilmoqda",
-      statusColor: "blue",
-      deliveryDate: "Yakshanba 12 yanvar",
-      processDate: "Shanba 11 yanvar",
+      processDate: {
+        uz: "Juma 10 yanvar",
+        en: "Wednesday 10 January",
+        ru: "Четверг 10 января",
+      },
       quantity: 1,
       totalPrice: "126.650",
       product: {
@@ -50,58 +59,25 @@ const Orders_main = () => {
       },
     },
     {
-      id: "63224639",
-      status: "Bekor qilindi",
-      statusColor: "red",
-      deliveryDate: "Dushanba 13 yanvar",
-      processDate: "Yakshanba 12 yanvar",
-      quantity: 3,
-      totalPrice: "379.950",
-      product: {
-        name: "PENOPLEX COMFORT",
-        price: "125.650",
-        seller: "1,599 sotuvchi / 12oy",
-        image: image,
+      id: "63224636",
+      status: {
+        uz: "Bekor qilingan",
+        en: "Canceled",
+        ru: "Отменен",
       },
-    },
-    {
-      id: "63224639",
-      status: "Bekor qilindi",
       statusColor: "red",
-      deliveryDate: "Dushanba 13 yanvar",
-      processDate: "Yakshanba 12 yanvar",
-      quantity: 3,
-      totalPrice: "379.950",
-      product: {
-        name: "PENOPLEX COMFORT",
-        price: "125.650",
-        seller: "1,599 sotuvchi / 12oy",
-        image: image,
+      deliveryDate: {
+        uz: "Juma 10 yanvar",
+        en: "Wednesday 10 January",
+        ru: "Четверг 10 января",
       },
-    },
-    {
-      id: "63224639",
-      status: "Bekor qilindi",
-      statusColor: "red",
-      deliveryDate: "Dushanba 13 yanvar",
-      processDate: "Yakshanba 12 yanvar",
-      quantity: 3,
-      totalPrice: "379.950",
-      product: {
-        name: "PENOPLEX COMFORT",
-        price: "125.650",
-        seller: "1,599 sotuvchi / 12oy",
-        image: image,
+      processDate: {
+        uz: "Juma 10 yanvar",
+        en: "Wednesday 10 January",
+        ru: "Четверг 10 января",
       },
-    },
-    {
-      id: "63224639",
-      status: "Bekor qilindi",
-      statusColor: "red",
-      deliveryDate: "Dushanba 13 yanvar",
-      processDate: "Yakshanba 12 yanvar",
-      quantity: 3,
-      totalPrice: "379.950",
+      quantity: 1,
+      totalPrice: "126.650",
       product: {
         name: "PENOPLEX COMFORT",
         price: "125.650",
@@ -110,6 +86,14 @@ const Orders_main = () => {
       },
     },
   ];
+  const uzs_lang =
+    lang == "uz"
+      ? "so'm"
+      : lang == "en"
+      ? "uzs"
+      : lang == "ru"
+      ? "сум"
+      : "so'm";
   return (
     <div className="flex flex-col w-full h-full">
       <div className="w-full fixed z-50 h-[65px] bg-[#DCC38B] sm:hidden block">
@@ -119,21 +103,31 @@ const Orders_main = () => {
         >
           <ChevronLeft className="scale-110" />
           <h1 className="font-inter font-[500] text-[17px] leading-[22px] text-black">
-            Buyurtmalar
+            {lang === "uz"
+              ? "Buyurtmalar"
+              : lang === "ru"
+              ? "Заказы"
+              : "Orders"}
           </h1>
         </Link>
       </div>
-      <div className="container mx-auto p-4 my-4 mt-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="container p-4 mx-auto my-4 mt-16">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {orders.map((order) => (
             <div
               key={order.id}
-              className="border rounded-lg p-6 space-y-4 shadow-md"
+              className="p-6 space-y-4 border rounded-lg shadow-md"
               style={{ borderStyle: "dashed" }}
             >
-              <div className="flex justify-between items-start">
-                <div className="sm:text-xl text-lg font-bold text-gray-900"> 
-                  {order.id}-sonli buyurtma
+              <div className="flex items-start justify-between">
+                <div className="text-lg font-bold text-gray-900 sm:text-xl">
+                  {lang == "uz"
+                    ? `${order.id}-sonli buyurtma`
+                    : lang == "en"
+                    ? `Order № ${order.id}`
+                    : lang == "ru"
+                    ? `Заказ № ${order.id}`
+                    : `${order.id}-sonli buyurtma`}
                 </div>
                 <div
                   className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium
@@ -157,29 +151,52 @@ const Orders_main = () => {
                   }
   `}
                 >
-                  {order.status}
+                  {order.status[lang]}
                 </div>
               </div>
 
               <div className="space-y-3">
                 <div className="flex justify-between text-base">
-                  <span className="text-gray-600">Yetkazish sanasi</span>
-                  <span className="text-gray-900 font-medium">
-                    {order.deliveryDate}
+                  <span className="text-gray-600">
+                    {lang == "uz"
+                      ? "Yetkazish sanasi"
+                      : lang == "en"
+                      ? "Delivery date"
+                      : lang == "ru"
+                      ? "Дата доставки"
+                      : "Yetkazish sanasi"}
                   </span>
-                </div>
-                <div className="flex justify-between text-base">
-                  <span className="text-gray-600">Rasmiylashtirish sanasi</span>
-                  <span className="text-gray-900 font-medium">
-                    {order.processDate}
+                  <span className="font-medium text-gray-900">
+                    {order.deliveryDate[lang]}
                   </span>
                 </div>
                 <div className="flex justify-between text-base">
                   <span className="text-gray-600">
-                    {order.quantity} dona maxsulot
+                    {lang == "uz"
+                      ? "dona mahsulot"
+                      : lang == "en"
+                      ? "piece of product"
+                      : lang == "ru"
+                      ? "штук товара"
+                      : "dona mahsulot"}
                   </span>
-                  <span className="text-gray-900 font-medium">
-                    {order.totalPrice} so'm
+                  <span className="font-medium text-gray-900">
+                    {order.processDate[lang]}
+                  </span>
+                </div>
+                <div className="flex justify-between text-base">
+                  <span className="text-gray-600">
+                    {order.quantity}{" "}
+                    {lang == "uz"
+                      ? "dona mahsulot"
+                      : lang == "en"
+                      ? "piece of product"
+                      : lang == "ru"
+                      ? "штук товара"
+                      : "dona mahsulot"}
+                  </span>
+                  <span className="font-medium text-gray-900">
+                    {order.totalPrice} {uzs_lang}
                   </span>
                 </div>
               </div>
@@ -193,15 +210,20 @@ const Orders_main = () => {
                   className="object-contain rounded"
                 />
                 <div>
-                  <div className="font-bold text-lg">{order.product.name}</div>
-                  <div className="text-gray-900 font-medium">
-                    {order.product.price} so'm
+                  <div className="text-lg font-bold">{order.product.name}</div>
+                  <div className="font-medium text-gray-900">
+                    {order.product.price} {uzs_lang}
                   </div>
                 </div>
               </div>
-
-              <button className="text-orange-500 text-base font-medium hover:underline cursor-pointer">
-                Maxsulotni ko'rsatish
+              <button className="text-base font-medium text-orange-500 cursor-pointer hover:underline">
+                {lang == "uz"
+                  ? "Maxsulotni ko'rsatish"
+                  : lang == "en"
+                  ? "View product"
+                  : lang == "ru"
+                  ? "Просмотр товара"
+                  : "Maxsulotni ko'rsatish"}
               </button>
             </div>
           ))}
