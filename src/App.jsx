@@ -131,7 +131,7 @@ const App = () => {
         >
           <div
             className={`flex flex-col justify-between ${
-              is_found ? "h-[calc(106.9vh-100px)] sm:h-[calc(100)]" : "h-full"
+              is_found ? "h-[calc(119.9vh-100px)] sm:h-[calc(100)]" : "h-full"
             } w-[100%]`}
             style={{
               ...customScrollbar,
