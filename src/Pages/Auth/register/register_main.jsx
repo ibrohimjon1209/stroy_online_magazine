@@ -4,12 +4,39 @@ import { Link } from "react-router-dom";
 import PhoneVerification from "../components/phone_verification";
 import { register } from "../../../Services/auth/register";
 
-export default function Register_main({ set_is_found, setUserSignIn }) {
+export default function Register_main({ set_is_found, setUserSignIn, lang }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [showVerification, setShowVerification] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [inputError, setInputError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const translations = {
+    uz: {
+      title: "Ro'yxatdan o'tish",
+      description:
+        "Yangi akkaunt yaratish uchun telefon raqamingizni kiriting.",
+      error: "Ro'yxatdan o'tishda xatolik yuz berdi",
+      submit: "Ro'yxatdan o'tish",
+      loginLink: "Akkountingiz bormi? Kirish",
+    },
+    en: {
+      title: "Sign Up",
+      description: "Enter your phone number to create a new account.",
+      error: "Error during registration",
+      submit: "Sign Up",
+      loginLink: "Already have an account? Log in",
+    },
+    ru: {
+      title: "Регистрация",
+      description: "Введите свой номер телефона, чтобы создать новый аккаунт.",
+      error: "Ошибка при регистрации",
+      submit: "Регистрация",
+      loginLink: "У вас уже есть аккаунт? Войти",
+    },
+  };
+
+  const t = translations[lang] || translations.uz;
 
   useEffect(() => {
     set_is_found(false);
@@ -29,7 +56,7 @@ export default function Register_main({ set_is_found, setUserSignIn }) {
       } catch (error) {
         console.error("Registration failed:", error);
         setInputError(true);
-        setErrorMessage("Ro'yxatdan o'tishda xatolik yuz berdi");
+        setErrorMessage(t.error);
       } finally {
         setIsLoading(false);
       }
@@ -39,21 +66,26 @@ export default function Register_main({ set_is_found, setUserSignIn }) {
   const isPhoneComplete = phoneNumber.length === 9;
 
   if (showVerification) {
-    return <PhoneVerification phoneNumber={`+998${phoneNumber}`} method={"register"} set_is_found={set_is_found} setUserSignIn={setUserSignIn} />;
+    return (
+      <PhoneVerification
+        lang={lang}
+        phoneNumber={`+998${phoneNumber}`}
+        method={"register"}
+        set_is_found={set_is_found}
+        setUserSignIn={setUserSignIn}
+      />
+    );
   }
 
   return (
     <div className="flex h-[calc(100vh-100px)] flex-col items-center sm:justify-center mt-[12vh] p-4">
-      <div className="w-full flex flex-col justify-between">
-        <div className="mx-auto w-full max-w-md space-y-8 relative">
-          <h1 className="text-center text-2xl font-medium">Ro'yxatdan o'tish</h1>
-          <p className="text-center text-gray-600">
-            Yangi akkaunt yaratish uchun telefon raqamingizni kiriting.
-          </p>
+      <div className="flex flex-col justify-between w-full">
+        <div className="relative w-full max-w-md mx-auto space-y-8">
+          <h1 className="text-2xl font-medium text-center">{t.title}</h1>
+          <p className="text-center text-gray-600">{t.description}</p>
 
-          {/* Xatolik bo‘lsa, error xabarini chiqarish */}
           {errorMessage && (
-            <div className="absolute -top-8 left-0 right-0 text-center text-red-500 font-medium">
+            <div className="absolute left-0 right-0 font-medium text-center text-red-500 -top-8">
               {errorMessage}
             </div>
           )}
@@ -78,7 +110,7 @@ export default function Register_main({ set_is_found, setUserSignIn }) {
             >
               {isLoading ? (
                 <svg
-                  className="size-7 animate-spin text-black"
+                  className="text-black size-7 animate-spin"
                   fill="none"
                   viewBox="0 0 32 32"
                 >
@@ -88,14 +120,16 @@ export default function Register_main({ set_is_found, setUserSignIn }) {
                     d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
                   ></path>
                 </svg>
-              ) : "Ro'yxatdan o'tish"}
+              ) : (
+                t.submit
+              )}
             </button>
           </form>
         </div>
 
         <div className="mt-[40vh] sm:pt-16 text-center">
           <Link to="/login" className="text-[#4726BCBF] hover:underline">
-            Akkountingiz bormi? Kirish
+            {t.loginLink}
           </Link>
         </div>
       </div>

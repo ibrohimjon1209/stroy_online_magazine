@@ -211,10 +211,13 @@ const Product = () => {
       setIsAdded(true)
       setIsAnimating(false)
       handleAddToCart()
+<<<<<<< HEAD
 
       // Navigate to basket page after a short delay
       setTimeout(() => {
       }, 800)
+=======
+>>>>>>> cb0b21270ef708f804415cd32ecc219c4b5d492c
     }, 600)
   }
 
@@ -431,7 +434,7 @@ const Product = () => {
                   <img
                     src={`https://back.stroybazan1.uz${variant.image}`}
                     alt={variant.color_uz}
-                    className="w-full h-full object-contain"
+                    className="object-contain w-full h-full"
                   />
                 </div>
               ))}

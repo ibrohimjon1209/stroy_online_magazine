@@ -3,14 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { verify } from "../../../Services/auth/verify";
 import { login } from "../../../Services/auth/login";
 import { register } from "../../../Services/auth/register";
+import "./style.css";
 
 export default function PhoneVerification({
   phoneNumber,
   method,
   set_is_found,
   setUserSignIn,
+  lang,
 }) {
-  const [verificationCode, setVerificationCode] = useState(["", "", "", "", "", ""]);
+  const [verificationCode, setVerificationCode] = useState([
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+  ]);
   const [timer, setTimer] = useState(59);
   const inputRefs = useRef([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -66,10 +75,18 @@ export default function PhoneVerification({
 
     try {
       if (method === "register") await register(phoneNumber);
-      else await login(phoneNumber);  
+      else await login(phoneNumber);
       setTimer(59);
     } catch (error) {
-      setErrorMessage("Kod qayta yuborilmadi. Iltimos, qayta urinib ko‘ring.");
+      setErrorMessage(
+        lang == "uz"
+          ? "Kod qayta yuborilmadi. Iltimos, qayta urinib ko‘ring."
+          : lang == "en"
+          ? "The code was not sent again. Please try again."
+          : lang == "ru"
+          ? "Код не был отправлен повторно. Пожалуйста, попробуйте еще раз."
+          : "Kod qayta yuborilmadi. Iltimos, qayta urinib ko‘ring."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -93,7 +110,15 @@ export default function PhoneVerification({
         navigate("/");
       }
     } catch (error) {
-      setErrorMessage("Noto‘g‘ri kod! Qayta urining.");
+      setErrorMessage(
+        lang == "uz"
+          ? "Noto‘g‘ri kod! Qayta urining."
+          : lang == "en"
+          ? "Wrong code! Beat again."
+          : lang == "ru"
+          ? "Неправильный код! Попробуйте еще раз."
+          : "Noto‘g‘ri kod! Qayta urining."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -122,10 +147,16 @@ export default function PhoneVerification({
       >
         <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
           {errorMessage && (
-            <div className="text-red-500 font-medium mb-2">{errorMessage}</div>
+            <div className="mb-2 font-medium text-red-500">{errorMessage}</div>
           )}
           <p style={{ color: "#4B5563", marginBottom: "0.25rem" }}>
-            Biz quyidagi telefon raqamiga sms yubordik:
+            {lang == "uz"
+              ? "Biz quyidagi telefon raqamiga sms yubordik:"
+              : lang == "en"
+              ? "We sent an sms to the following phone number:"
+              : lang == "ru"
+              ? "Мы отправили sms на следующий номер телефона:"
+              : "Biz quyidagi telefon raqamiga sms yubordik:"}
           </p>
           <p style={{ fontWeight: "500" }}>{phoneNumber}</p>
         </div>
@@ -166,7 +197,16 @@ export default function PhoneVerification({
           }}
         >
           {timer > 0 ? (
-            <p>Kodni qayta yuborish: 00:{timer < 10 ? `0${timer}` : timer}</p>
+            <p>
+              {lang == "uz"
+                ? "Kodni qayta yuborish:"
+                : lang == "en"
+                ? "Resend code:"
+                : lang == "ru"
+                ? "Повторная отправка кода:"
+                : "Kodni qayta yuborish:"}{" "}
+              00:{timer < 10 ? `0${timer}` : timer}
+            </p>
           ) : (
             <button
               onClick={resetTimer}
@@ -177,7 +217,13 @@ export default function PhoneVerification({
                 cursor: "pointer",
               }}
             >
-              Kodni qayta yuborish
+              {lang == "uz"
+                ? "Kodni qayta yuborish"
+                : lang == "en"
+                ? "Resend code"
+                : lang == "ru"
+                ? "Повторная отправка кода"
+                : "Kodni qayta yuborish"}
             </button>
           )}
         </div>
@@ -193,7 +239,7 @@ export default function PhoneVerification({
         >
           {isLoading ? (
             <svg
-              className="size-7 animate-spin text-black"
+              className="text-black size-7 animate-spin"
               fill="none"
               viewBox="0 0 32 32"
             >
@@ -203,6 +249,12 @@ export default function PhoneVerification({
                 d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
               ></path>
             </svg>
+          ) : lang == "uz" ? (
+            "Kirish"
+          ) : lang == "en" ? (
+            "Login"
+          ) : lang == "ru" ? (
+            "Входить"
           ) : (
             "Kirish"
           )}

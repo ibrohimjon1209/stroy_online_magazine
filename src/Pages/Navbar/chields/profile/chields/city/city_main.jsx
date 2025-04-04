@@ -1,40 +1,38 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import city_get from "../../../../../../Services/cities/city";
 
-const City = [
-  {
-    name: "Toshkent shahri"
-  },
-  {
-    name: "Andijon shahri"
-  },
-  {
-    name: "Farg'ona shahri"
-  },
-  {
-    name: "Namangan shahri"
-  },
-];
-
-const City_main = () => {
-  const [selected, setSelected] = useState(null);
-
+const City_main = ({ lang, city, set_city }) => {
+  const [cities, set_cities] = useState([]);
+  useEffect(() => {
+    const get_cities = async () => {
+      try {
+        const response = await city_get();
+        set_cities(response);
+      } catch (err) {
+        console.error("Error:", err);
+        throw err;
+      }
+    };
+    get_cities();
+  }, []);
   return (
-    <div className='w-full mt-[-50px]'>
-      <div className='w-full h-auto flex flex-col'>
-        {City.map((city, index) => (
-          <div
-            key={index}
-            className={`w-full h-[122px] flex items-center pl-[50px] bg-transparent transition-all duration-150 cursor-pointer hover:bg-gray-100 ${
-              selected === index ? "text-[#DCC38B]" : "text-black"
-            }`}
-            onClick={() => setSelected(index)}
-          >
-            <h1 className='font-inter font-[600] text-[24px] leading-[22px]'>
-              {city.name}
-            </h1>
-          </div>
-        ))}
-      </div>
+    <div className="ml-[1px] sm:ml-[50px] mt-4 sm:mt-0 flex flex-col gap-[50px] sm:gap-[80px] font-inter font-[600] text-[20px] leading-[22px] text-black">
+      {cities.map((item, index) => (
+        <div
+          onClick={() => {
+            localStorage.setItem("city", item.name_en?.toLowerCase());
+            set_city(item.name_en)
+          }}
+          key={index}
+          className={`${
+            item.name_en?.toLowerCase() === city?.toLowerCase()
+              ? "text-[#DCC38B]"
+              : ""
+          } cursor-pointer`}
+        >
+          {item[`name_${lang}`]}
+        </div>
+      ))}
     </div>
   );
 };
