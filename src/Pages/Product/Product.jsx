@@ -214,7 +214,6 @@ const Product = () => {
 
       // Navigate to basket page after a short delay
       setTimeout(() => {
-        navigate("/basket")
       }, 800)
     }, 600)
   }
