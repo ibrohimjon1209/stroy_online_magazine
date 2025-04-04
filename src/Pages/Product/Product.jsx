@@ -211,13 +211,10 @@ const Product = () => {
       setIsAdded(true)
       setIsAnimating(false)
       handleAddToCart()
-<<<<<<< HEAD
 
       // Navigate to basket page after a short delay
       setTimeout(() => {
       }, 800)
-=======
->>>>>>> cb0b21270ef708f804415cd32ecc219c4b5d492c
     }, 600)
   }
 
