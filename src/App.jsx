@@ -30,16 +30,19 @@ const App = () => {
   const [userSignIn, setUserSignIn] = useState(false);
   const [lang, set_lang] = useState("uz");
   const [city, set_city] = useState("andijan city");
+  const [basket, set_basket] = useState([]);
 
   useEffect(() => {
     setUserSignIn(localStorage.getItem("userId") ? true : false);
-    !localStorage.getItem("lang") && "uz";
-    !localStorage.getItem("city") && "andijan city";
+    !localStorage.getItem("lang") && localStorage.setItem("lang", "uz");
+    !localStorage.getItem("city") &&
+      localStorage.setItem("city", "andijan city");
+    const basketFromStorage = JSON.parse(localStorage.getItem("basket")) || [];
     set_lang(localStorage.getItem("lang") || "uz");
     set_city(localStorage.getItem("city") || "andijan city");
+    set_basket(basketFromStorage || []);
   }, []);
 
-  const [phone_number, set_phone_number] = useState("");
   const [is_found, set_is_found] = useState(true);
   const [is_another_nav, set_is_another_nav] = useState(false);
   const [is_online, set_is_online] = useState(navigator.onLine);
@@ -92,8 +95,7 @@ const App = () => {
     } else {
       set_is_another_nav(false);
     }
-    [location];
-  });
+  }, [location]);
 
   const customScrollbar = {
     overflowY: "auto",
@@ -117,11 +119,11 @@ const App = () => {
     }
   }, []);
   if (!is_online) {
-    return <InternetChecker />;
+    return <InternetChecker lang={lang} />;
   } else {
     return (
       <div className={`${is_found ? "w-[] sm:w-[1450px]" : "w-full "} m-auto `}>
-        {is_found && !is_another_nav && <Navbar userSignIn={userSignIn} />}
+        {is_found && !is_another_nav && <Navbar lang={lang} />}
         <div
           className={`${
             is_found ? "w-[] sm:w-[1450px]" : "w-full"
@@ -129,26 +131,31 @@ const App = () => {
         >
           <div
             className={`flex flex-col justify-between ${
-              is_found ? "h-[calc(119.9vh-100px)] sm:h-[calc(100)]" : "h-full"
+              is_found ? "h-[calc(106.9vh-100px)] sm:h-[calc(100)]" : "h-full"
             } w-[100%]`}
             style={{
               ...customScrollbar,
               overflowY: "auto",
-              scrollbarWidth: "thin",
+              scrollbarWidth: "none",
               scrollbarColor: "rgba(244,244,244,1) rgba(255, 255, 255, 1)",
             }}
           >
             <div>
               <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/likes" element={<Likes />} />
+                <Route path="/" element={<Home lang={lang} />} />
+                <Route path="/likes" element={<Likes lang={lang} />} />
                 <Route
                   path="/basket"
                   element={
-                    <Basket set_formalization_open={set_formalization_open} />
+                    <Basket
+                    set_basket={set_basket}
+                      basket={basket}
+                      set_formalization_open={set_formalization_open}
+                      lang={lang}
+                    />
                   }
                 />
-                <Route path="/orders" element={<Orders />} />
+                <Route path="/orders" element={<Orders lang={lang} />} />
                 <Route path="/search" element={<Category_mobile />} />
                 <Route
                   path="/profile/*"
@@ -168,7 +175,11 @@ const App = () => {
                   path="/product/*"
                   element={
                     <Suspense fallback={<div>Loading...</div>}>
-                      <Product />
+                      <Product
+                        set_basket={set_basket}
+                        basket={basket}
+                        lang={lang}
+                      />
                     </Suspense>
                   }
                 />
@@ -204,7 +215,7 @@ const App = () => {
                 />
                 <Route
                   path="*"
-                  element={<Not_found set_is_found={set_is_found} />}
+                  element={<Not_found lang={lang} set_is_found={set_is_found} />}
                 />
                 <Route
                   path="/register"
@@ -231,11 +242,11 @@ const App = () => {
               </Routes>
             </div>
 
-            {is_found && is_footer_visible && <Footer />}
+            {is_found && is_footer_visible && <Footer lang={lang} />}
           </div>
         </div>
       </div>
-    );
+      );
   }
 };
 

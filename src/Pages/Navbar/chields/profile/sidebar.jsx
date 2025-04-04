@@ -19,7 +19,7 @@ import Language from "./chields/language/language_main";
 import Help_modal from "./help_modal";
 import { get_user } from "../../../../Services/auth/get_user";
 
-const Sidebar = ({ lang, isUserSignIn, setUserSignIn, set_user_s, edit_profile_open, set_edit_profile_open, set_is_logout_open }) => {
+const Sidebar = ({ city, set_city, lang, set_lang, isUserSignIn, setUserSignIn, set_user_s, edit_profile_open, set_edit_profile_open, set_is_logout_open }) => {
   const [user, set_user] = useState({
     name: "...",
     surname: "...",
@@ -167,10 +167,10 @@ const Sidebar = ({ lang, isUserSignIn, setUserSignIn, set_user_s, edit_profile_o
         />
         {isSmallScreen && (
           <>
-            <Route path="/cashback" element={<Cashback />} />
-            <Route path="/favorites" element={<Favorites />} />
-            <Route path="/city" element={<City />} />
-            <Route path="/language" element={<Language />} />
+            <Route path="/cashback" element={<Cashback lang={lang} />} />
+            <Route path="/favorites" element={<Favorites lang={lang} />} />
+            <Route path="/city" element={<City lang={lang} city={city} set_city={set_city} />} />
+            <Route path="/language" element={<Language lang={lang} set_lang={set_lang} />} />
           </>
         )}
       </Routes>

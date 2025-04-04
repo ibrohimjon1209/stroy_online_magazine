@@ -3,7 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
 
-const Likes_main = () => {
+const Likes_main = ({ lang }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [likedProducts, setLikedProducts] = useState(
@@ -23,12 +23,13 @@ const Likes_main = () => {
             },
           }
         );
-  
-        const storedLikes = JSON.parse(localStorage.getItem("likedProducts")) || [];
-        const filteredProducts = (response.data || []).filter(product =>
+
+        const storedLikes =
+          JSON.parse(localStorage.getItem("likedProducts")) || [];
+        const filteredProducts = (response.data || []).filter((product) =>
           storedLikes.includes(product.id)
         );
-  
+
         setProducts(filteredProducts);
         setLikedProducts(storedLikes); // LocalStorage bilan sinxronlash
       } catch (error) {
@@ -37,26 +38,25 @@ const Likes_main = () => {
         setLoading(false);
       }
     };
-  
+
     getProducts();
   }, []);
-  
-  
+
   const handleLikeToggle = (id) => {
     const updatedLikes = likedProducts.includes(id)
       ? likedProducts.filter((item) => item !== id)
       : [...likedProducts, id];
-  
+
     setLikedProducts(updatedLikes);
     localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
-  
+
     // Unlike qilinganda mahsulot ro'yxatdan o'chishi uchun
-    setProducts(prevProducts =>
-      updatedLikes.includes(id) ? prevProducts : prevProducts.filter(p => p.id !== id)
+    setProducts((prevProducts) =>
+      updatedLikes.includes(id)
+        ? prevProducts
+        : prevProducts.filter((p) => p.id !== id)
     );
   };
-  
-
 
   return (
     <div className="w-full mx-3">
@@ -76,7 +76,7 @@ const Likes_main = () => {
                   <div className="w-full aspect-square rounded-[10px] bg-[#F2F2F1] flex justify-center items-center overflow-hidden group">
                     <img
                       src={`https://back.stroybazan1.uz/${product.image}`}
-                      className="transition-transform duration-300 transform group-hover:scale-105 w-full h-full object-contain"
+                      className="object-contain w-full h-full transition-transform duration-300 transform group-hover:scale-105"
                       alt={product.name_uz}
                     />
                   </div>
@@ -87,7 +87,7 @@ const Likes_main = () => {
                       {product.name_uz}
                     </h1>
                   </Link>
-                  <div className="flex justify-between items-center">
+                  <div className="flex items-center justify-between">
                     <Link to={`/product/${product.id}`}>
                       <p className="font-inter font-[500] text-[12px] sm:text-[14px] text-black">
                         {product.variants &&
@@ -119,8 +119,14 @@ const Likes_main = () => {
               </div>
             ))
           ) : (
-            <p className="text-center w-full font-inter text-lg text-gray-500">
-              Sevimli mahsulotlar yo'q.
+            <p className="w-full text-lg text-center text-gray-500 font-inter">
+              {lang == "uz"
+                ? "Sevimlilar yo'q"
+                : lang == "en"
+                ? "Favorites not found"
+                : lang == "ru"
+                ? "Избранное не найдено"
+                : "Sevimlilar yo'q"}
             </p>
           )}
         </div>
