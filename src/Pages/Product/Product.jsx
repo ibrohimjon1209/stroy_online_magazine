@@ -276,11 +276,15 @@ const Product = ({ lang, basket, set_basket }) => {
   const handleClick = () => {
     setIsAnimating(true);
     setTimeout(() => {
-      setIsAdded(true);
-      setIsAnimating(false);
-      handleAddToCart();
-    }, 600);
-  };
+      setIsAdded(true)
+      setIsAnimating(false)
+      handleAddToCart()
+
+      // Navigate to basket page after a short delay
+      setTimeout(() => {
+      }, 800)
+    }, 600)
+  }
 
   const handleAddToCart = () => {
     // Here you would typically add the product to the cart in your state management or localStorage
