@@ -134,9 +134,10 @@ const Navbar = ({lang}) => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
   }
 
-  const points = [{ name: "Stroy Baza №1" }, { name: "Mebel" }, { name: "Golden house" }]
+  const points = [{ name: "Story Baza №1" }, { name: "Mebel" }, { name: "Gold Klinker" }]
 
-  const [selectedOption, setSelectedOption] = useState(points[0])
+  const sl_option = localStorage.getItem("sl_option_nav")
+  const [selectedOption, setSelectedOption] = useState({name: sl_option} || points[0])
 
   const handleOptionClick = (option) => {
     setSelectedOption(option)
@@ -157,7 +158,7 @@ const Navbar = ({lang}) => {
     }, 300) // Match this to the animation duration
   }
 
-  const to_home = () => navigate("/")
+  const to_home = () => window.location.href = "/"
 
   const handleCategoryItemClick = (categoryId) => {
     navigate(`/category/${categoryId}`)
