@@ -122,16 +122,16 @@ const App = () => {
     return <InternetChecker lang={lang} />;
   } else {
     return (
-      <div className={`${is_found ? "w-[] sm:w-[1450px]" : "w-full "} m-auto `}>
+      <div className={`${is_found ? "sm:w-[1450px]" : "w-full "} m-auto `}>
         {is_found && !is_another_nav && <Navbar lang={lang} />}
         <div
           className={`${
-            is_found ? "w-[] sm:w-[1450px]" : "w-full"
+            is_found ? "sm:w-[1450px]" : "w-full"
           } m-auto overflow-hidden`}
         >
           <div
             className={`flex flex-col justify-between ${
-              is_found ? "h-[calc(106.9vh-100px)] sm:h-[calc(100)]" : "h-full"
+              is_found ? "h-[calc(106.9vh-100px)] sm:h-[calc(119.5vh-100px)]" : "h-full"
             } w-[100%]`}
             style={{
               ...customScrollbar,
