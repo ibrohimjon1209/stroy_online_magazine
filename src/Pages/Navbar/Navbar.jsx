@@ -4,7 +4,7 @@ import cube from "./Images/orders.svg"
 import cube_a from "./Images/orders_a.svg"
 import like from "./Images/like.svg"
 import like_a from "./Images/like_a.svg"
-import basket from "./Images/basket.svg"
+import basket_i from "./Images/basket.svg"
 import basket_a from "./Images/basket_a.svg"
 import profile from "./Images/profile.svg"
 import profile_a from "./Images/profile_a.svg"
@@ -447,7 +447,7 @@ const Navbar = ({lang, set_basket, basket}) => {
             <Link to="/basket">
               <img
                 className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
-                src={location == "basket" || is_basket_hovered ? basket_a : basket}
+                src={location == "basket" || is_basket_hovered ? basket_a : basket_i}
                 onMouseEnter={() => set_is_basket_hovered(true)}
                 onMouseLeave={() => set_is_basket_hovered(false)}
                 alt="basket"

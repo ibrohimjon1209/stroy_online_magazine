@@ -98,6 +98,7 @@ export default function Basket_main({
   const totalPrice = products
     .filter((product) => product.selected)
     .reduce((sum, product) => sum + product.price * product.quantity, 0);
+
   const monthlyPayment = Math.round(totalPrice / 24);
 
   useEffect(() => {
@@ -355,7 +356,9 @@ export default function Basket_main({
               </div>
               <Link
                 to={products.length > 0 ? "/formalization" : ""}
-                onClick={() => products.length > 0 && setFormalization(true)}
+                onClick={() =>
+                  products.length > 0 && set_formalization_open(true)
+                }
                 className={`sm:w-[87%] w-[90%] absolute flex items-center justify-center py-4 sm:mt-[8%] mt-[5%] ${
                   products.length > 0
                     ? "bg-[#E6D1A7] hover:bg-[#dac59b] cursor-pointer"

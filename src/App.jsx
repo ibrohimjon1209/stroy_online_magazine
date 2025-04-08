@@ -138,7 +138,7 @@ const App = () => {
   } else {
     return (
       <div className={`${is_found ? "sm:w-[1450px]" : "w-full "} m-auto `}>
-        {is_found && !is_another_nav && <Navbar lang={lang}/>}
+        {is_found && !is_another_nav && <Navbar lang={lang} />}
         <div
           className={`${
             is_found ? "sm:w-[1450px]" : "w-full"
@@ -260,8 +260,9 @@ const App = () => {
                 <Route
                   path="/formalization"
                   element={
-                    formalization_open ? (
+                    formalization_open && basket.length ? (
                       <Formalization
+                      lang={lang}
                         userSignIn={userSignIn}
                         setSelectedLocation={setSelectedLocation}
                         set_is_another_nav={set_is_another_nav}
@@ -277,7 +278,13 @@ const App = () => {
                 />
                 <Route
                   path="/terms"
-                  element={formalization_open ? <Terms /> : <Navigate to="/" />}
+                  element={
+                    formalization_open && basket.length ? (
+                      <Terms lang={lang} />
+                    ) : (
+                      <Navigate to="/" />
+                    )
+                  }
                 />
                 <Route
                   path="*"
