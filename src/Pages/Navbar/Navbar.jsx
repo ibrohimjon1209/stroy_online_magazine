@@ -21,7 +21,7 @@ const getStoredTopics = () => {
   }
 }
 
-const Navbar = ({lang}) => {
+const Navbar = ({lang, set_basket, basket}) => {
   const navigate = useNavigate()
   const inputRef = useRef(null)
   const [isOpen, setIsOpen] = useState(false)

@@ -138,7 +138,7 @@ const App = () => {
   } else {
     return (
       <div className={`${is_found ? "sm:w-[1450px]" : "w-full "} m-auto `}>
-        {is_found && !is_another_nav && <Navbar lang={lang} />}
+        {is_found && !is_another_nav && <Navbar lang={lang}/>}
         <div
           className={`${
             is_found ? "sm:w-[1450px]" : "w-full"

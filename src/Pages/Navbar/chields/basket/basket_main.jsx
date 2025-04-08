@@ -2,7 +2,12 @@ import { Minus, Plus, Check, ChevronLeft } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
-export default function Basket_main({ basket, set_formalization_open, lang }) {
+export default function Basket_main({
+  basket,
+  set_formalization_open,
+  lang,
+  set_basket,
+}) {
   const [products, setProducts] = useState(basket);
 
   const [paymentType, setPaymentType] = useState("immediate");
@@ -27,11 +32,10 @@ export default function Basket_main({ basket, set_formalization_open, lang }) {
   useEffect(() => {
     localStorage.setItem("basket", JSON.stringify(products));
   }, [products]);
-  
+
   useEffect(() => {
     setProducts(basket);
   }, [basket]);
-  
 
   const allSelected = products.every((product) => product.selected);
   const toggleSelectAll = () => {
@@ -63,9 +67,6 @@ export default function Basket_main({ basket, set_formalization_open, lang }) {
             product.color[lang] === color
           ) {
             const newQuantity = product.quantity - 1;
-            if (newQuantity === 0) {
-              window.location.reload();
-            }
             return newQuantity > 0
               ? { ...product, quantity: newQuantity }
               : null;
@@ -73,6 +74,8 @@ export default function Basket_main({ basket, set_formalization_open, lang }) {
           return product;
         })
         .filter(Boolean);
+      set_basket(updatedProducts);
+      localStorage.setItem("basket", JSON.stringify(updatedProducts));
       return updatedProducts;
     });
   };
@@ -86,6 +89,8 @@ export default function Basket_main({ basket, set_formalization_open, lang }) {
           ? { ...product, quantity: product.quantity + 1 }
           : product
       );
+      set_basket(updatedProducts);
+      localStorage.setItem("basket", JSON.stringify(updatedProducts));
       return updatedProducts;
     });
   };

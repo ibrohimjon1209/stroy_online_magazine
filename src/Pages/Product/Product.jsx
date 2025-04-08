@@ -287,19 +287,6 @@ const Product = ({ lang, basket, set_basket }) => {
   }
 
   const handleAddToCart = () => {
-    // Here you would typically add the product to the cart in your state management or localStorage
-    // For example:
-    // const cartItem = {
-    //     id: productData.id,
-    //     name: productData.name_uz,
-    //     size: selectedSize,
-    //     color: productData.variants[selectedColorIndex].color_uz,
-    //     price: productData.variants[selectedColorIndex].price,
-    //     image: productData.variants[selectedColorIndex].image,
-    //     quantity: 1
-    // };
-    // Add to cart logic here...
-
     setNotification("Mahsulot savatga qo'shildi");
 
     setIsVisible(true);
