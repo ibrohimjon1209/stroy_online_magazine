@@ -42,6 +42,9 @@ export default function Basket_main({
     setProducts(
       products.map((product) => ({ ...product, selected: !allSelected }))
     );
+    set_basket(
+      products.map((product) => ({ ...product, selected: !allSelected }))
+    );
   };
 
   const toggleProductSelection = (productId, size, color) => {
@@ -55,6 +58,15 @@ export default function Basket_main({
       );
       return updatedProducts;
     });
+    set_basket(
+      products.map((product) =>
+        product.id === productId &&
+        product.size[lang] === size &&
+        product.color[lang] === color
+          ? { ...product, selected: !product.selected }
+          : product
+      )
+    )
   };
 
   const decreaseQuantity = (productId, size, color) => {

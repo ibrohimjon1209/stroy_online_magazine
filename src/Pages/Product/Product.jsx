@@ -276,15 +276,14 @@ const Product = ({ lang, basket, set_basket }) => {
   const handleClick = () => {
     setIsAnimating(true);
     setTimeout(() => {
-      setIsAdded(true)
-      setIsAnimating(false)
-      handleAddToCart()
+      setIsAdded(true);
+      setIsAnimating(false);
+      handleAddToCart();
 
       // Navigate to basket page after a short delay
-      setTimeout(() => {
-      }, 800)
-    }, 600)
-  }
+      setTimeout(() => {}, 800);
+    }, 600);
+  };
 
   const handleAddToCart = () => {
     setNotification("Mahsulot savatga qo'shildi");
@@ -299,7 +298,9 @@ const Product = ({ lang, basket, set_basket }) => {
     if (!productData || !productData.variants || !productData.variants[index])
       return false;
 
-    const currentSize = productData.variants[selectedColorIndex]?.[`size_${lang}`]
+    const currentSize = productData.variants[selectedColorIndex]?.[
+      `size_${lang}`
+    ]
       ?.toLowerCase()
       ?.trim();
     const variantSize = productData.variants[index]?.[`size_${lang}`]
@@ -668,17 +669,17 @@ const Product = ({ lang, basket, set_basket }) => {
                 : "O'lchami"}
               : {selectedSize}
             </h1>
-            <div className="sizes flex gap-[10px] mt-[7px] transition-all duration-300 cursor-pointer">
+            <div className="sizes flex gap-[10px] mt-[7px] transition-all duration-300 cursor-pointer flex-wrap">
               {uniqueSizes.map((sizeObj, index) => (
                 <div
                   key={index}
-                  className={`active:scale-[99%] transition-all duration-200 flex justify-center items-center w-[62px] h-[62px] rounded-[5px] 
-                                    ${
-                                      selectedIndex === index
-                                        ? "border-[rgba(190,160,134,1)] border-[1.5px]"
-                                        : "border-transparent"
-                                    } 
-                                    bg-[rgba(247,247,246,1)]`}
+                  className={`active:scale-[99%] transition-all duration-200 flex justify-center items-center px-2 min-w-[62px] h-[62px] rounded-[5px] 
+                  ${
+                    selectedIndex === index
+                      ? "border-[rgba(190,160,134,1)] border-[1.5px]"
+                      : "border-transparent"
+                  } 
+                  bg-[rgba(247,247,246,1)]`}
                   onClick={() => handleSizeClick(sizeObj.size, index)}
                 >
                   <span className="font-inter whitespace-nowrap max-w-full font-[400] text-[16px] leading-[22px] text-black">
@@ -759,8 +760,20 @@ const Product = ({ lang, basket, set_basket }) => {
               >
                 {!isAnimating
                   ? isAdded
-                    ? (lang == "uz" ? "Qo'shildi ✅" : lang == "en" ? "Added ✅" : lang == "ru" ? "Добавлено ✅" : "Qo'shildi ✅")
-                    : (lang == "uz" ? "Savatchaga qo'shish" : lang == "en" ? "Add to cart" : lang == "ru" ? "Добавить в корзину" : "Savatchaga qo'shish")
+                    ? lang == "uz"
+                      ? "Qo'shildi ✅"
+                      : lang == "en"
+                      ? "Added ✅"
+                      : lang == "ru"
+                      ? "Добавлено ✅"
+                      : "Qo'shildi ✅"
+                    : lang == "uz"
+                    ? "Savatchaga qo'shish"
+                    : lang == "en"
+                    ? "Add to cart"
+                    : lang == "ru"
+                    ? "Добавить в корзину"
+                    : "Savatchaga qo'shish"
                   : ""}
               </button>
               {isAnimating && (

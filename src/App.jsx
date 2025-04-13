@@ -262,7 +262,8 @@ const App = () => {
                   element={
                     formalization_open && basket.length ? (
                       <Formalization
-                      lang={lang}
+                        basket={basket}
+                        lang={lang}
                         userSignIn={userSignIn}
                         setSelectedLocation={setSelectedLocation}
                         set_is_another_nav={set_is_another_nav}

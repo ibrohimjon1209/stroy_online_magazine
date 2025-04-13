@@ -16,6 +16,7 @@ import Pickup_address from "../pickup_address/pickup_address_main";
 import { get_user } from "../../Services/auth/get_user";
 
 const Formalization_main = ({
+  basket,
   lang,
   userSignIn,
   setSelectedLocation,
@@ -177,23 +178,41 @@ const Formalization_main = ({
             </Link>
           )}
 
-          <div className="flex gap-[15px] sm:gap-[35px] mb-6 mt-[20px]">
-            <div className="bg-gray-100 rounded-lg w-[100px] h-[100px] sm:w-[150px] sm:h-[150px] flex items-center justify-center">
-              <img
-                src={photo}
-                alt="PENOPLEX COMFORT"
-                className="object-contain w-full h-full"
-              />
-            </div>
-            <div className="flex flex-col gap-[10px] sm:gap-[50px] font-inter font-[600] text-[15px] sm:text-[24px] leading-[22px] text-black">
-              <div>
-                <h3>PENOPLEX COMFORT</h3>
-                <p className="mt-[15px] sm:mt-[25px]">
-                  125.650 {` `} {uzs_lang}
-                </p>
-              </div>
-              <p>1 dona</p>
-            </div>
+          <div className="flex flex-col gap-8 mx-5 my-20">
+            {console.log(basket)}
+            {basket.map((item) => {
+              if (item.selected) {
+                return (
+                  <div className="flex gap-[15px] sm:gap-[35px] mb-6 mt-[20px]">
+                    <div className="bg-gray-100 rounded-lg w-[100px] h-[100px] sm:w-[150px] sm:h-[150px] flex items-center justify-center">
+                      <img
+                        src={item.img}
+                        alt={item.name[lang]}
+                        className="object-contain w-full h-full"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-[10px] sm:gap-[50px] font-inter font-[600] text-[15px] sm:text-[24px] leading-[22px] text-black">
+                      <div>
+                        <h3>{item.name[lang]}</h3>
+                        <p className="mt-[15px] sm:mt-[25px]">
+                          {item.price} {` `} {uzs_lang}
+                        </p>
+                      </div>
+                      <p>
+                        {item.quantity} {` `}{" "}
+                        {lang == "uz"
+                          ? "dona"
+                          : lang == "en"
+                          ? "piece"
+                          : lang == "ru"
+                          ? "шт"
+                          : "dona"}
+                      </p>
+                    </div>
+                  </div>
+                );
+              }
+            })}
           </div>
 
           <div className="relative flex p-1 bg-gray-100 rounded-xl mt-[20px] sm:mt-[35px] mb-4 h-[40px] sm:h-[60px] w-full sm:w-[95%] mx-auto font-inter font-[500] text-[13px] sm:text-[18px] leading-[22px] text-black">
