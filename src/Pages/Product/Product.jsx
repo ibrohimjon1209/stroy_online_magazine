@@ -276,30 +276,16 @@ const Product = ({ lang, basket, set_basket }) => {
   const handleClick = () => {
     setIsAnimating(true);
     setTimeout(() => {
-      setIsAdded(true)
-      setIsAnimating(false)
-      handleAddToCart()
+      setIsAdded(true);
+      setIsAnimating(false);
+      handleAddToCart();
 
       // Navigate to basket page after a short delay
-      setTimeout(() => {
-      }, 800)
-    }, 600)
-  }
+      setTimeout(() => {}, 800);
+    }, 600);
+  };
 
   const handleAddToCart = () => {
-    // Here you would typically add the product to the cart in your state management or localStorage
-    // For example:
-    // const cartItem = {
-    //     id: productData.id,
-    //     name: productData.name_uz,
-    //     size: selectedSize,
-    //     color: productData.variants[selectedColorIndex].color_uz,
-    //     price: productData.variants[selectedColorIndex].price,
-    //     image: productData.variants[selectedColorIndex].image,
-    //     quantity: 1
-    // };
-    // Add to cart logic here...
-
     setNotification("Mahsulot savatga qo'shildi");
 
     setIsVisible(true);
@@ -312,7 +298,9 @@ const Product = ({ lang, basket, set_basket }) => {
     if (!productData || !productData.variants || !productData.variants[index])
       return false;
 
-    const currentSize = productData.variants[selectedColorIndex]?.[`size_${lang}`]
+    const currentSize = productData.variants[selectedColorIndex]?.[
+      `size_${lang}`
+    ]
       ?.toLowerCase()
       ?.trim();
     const variantSize = productData.variants[index]?.[`size_${lang}`]
@@ -372,7 +360,7 @@ const Product = ({ lang, basket, set_basket }) => {
 
   return (
     <div className="w-full h-auto mt-[0px] sm:mt-[50px] px-[22px] sm:px-[190px] mb-[111px]">
-      <style jsx={true}>{`
+      <style jsx="true">{`
         @keyframes slideLeft {
           from {
             transform: translateX(0);
@@ -476,10 +464,10 @@ const Product = ({ lang, basket, set_basket }) => {
 
       {isVisible && notification && (
         <div
-          className={`absolute z-50 left-1 w-full h-auto flex justify-center items-center notification`}
+          className={`absolute z-50 left-1 scale-70 w-full h-auto flex justify-center items-center notification`}
         >
-          <div className="bg-[#fefdfd] drop-shadow-lg w-[750px] h-[100px] flex items-center rounded-md transition-opacity duration-500 ease-in-out opacity-100">
-            <div className="ml-[20px] rounded-[5px] overflow-hidden border-[1px] w-[120px] h-[80px] flex justify-center items-center">
+          <div className="bg-[#fefdfd] relative drop-shadow-lg w-[450px] sm:w-[750px] h-[100px] flex items-center rounded-md transition-opacity duration-500 ease-in-out opacity-100">
+            <div className="ml-[20px] rounded-[5px] overflow-hidden border-[1px] absolute sm:static w-[80px] sm:w-[120px] h-[80px] flex justify-center items-center">
               <img
                 src={
                   `https://back.stroybazan1.uz${productData.variants[selectedColorIndex].image}` ||
@@ -488,7 +476,7 @@ const Product = ({ lang, basket, set_basket }) => {
                 className="w-[80px] h-[80px] object-contain"
               />
             </div>
-            <div className="w-full h-full flex flex-col gap-[5px] mt-[20px] ml-[20px]">
+            <div className="w-full h-full flex flex-col gap-[5px] mt-[20px] ml-[120px] absolute sm:static sm:ml-[20px]">
               <h1 className="font-inter font-[500] text-[16px] leading-[22px] text-black">
                 {lang == "uz"
                   ? "Mahsulot savatga qo'shildi"
@@ -502,7 +490,7 @@ const Product = ({ lang, basket, set_basket }) => {
                 {productData[`name_${lang}`]} {selectedSize}
               </h1>
             </div>
-            <div className="w-[250px] flex flex-col items-end gap-[25px] h-full mt-[30px] pr-[20px]">
+            <div className="w-[500px] sm:w-[250px] flex flex-col items-end gap-[25px] h-full mt-[30px] pr-[20px]">
               <X
                 onClick={() => setIsVisible(false)}
                 className="cursor-pointer"
@@ -681,22 +669,21 @@ const Product = ({ lang, basket, set_basket }) => {
                 : "O'lchami"}
               : {selectedSize}
             </h1>
-            <div className="sizes flex gap-[10px] mt-[7px] transition-all duration-300 cursor-pointer">
+            <div className="sizes flex gap-[10px] mt-[7px] transition-all duration-300 cursor-pointer flex-wrap">
               {uniqueSizes.map((sizeObj, index) => (
                 <div
                   key={index}
-                  className={`active:scale-[99%] transition-all duration-200 flex justify-center items-center w-[62px] h-[62px] rounded-[5px] 
-                                    ${
-                                      selectedIndex === index
-                                        ? "border-[rgba(190,160,134,1)] border-[1.5px]"
-                                        : "border-transparent"
-                                    } 
-                                    bg-[rgba(247,247,246,1)]`}
+                  className={`active:scale-[99%] transition-all duration-200 flex justify-center items-center px-2 min-w-[62px] h-[62px] rounded-[5px] 
+                  ${
+                    selectedIndex === index
+                      ? "border-[rgba(190,160,134,1)] border-[1.5px]"
+                      : "border-transparent"
+                  } 
+                  bg-[rgba(247,247,246,1)]`}
                   onClick={() => handleSizeClick(sizeObj.size, index)}
                 >
                   <span className="font-inter whitespace-nowrap max-w-full font-[400] text-[16px] leading-[22px] text-black">
                     {sizeObj.size}
-                    {console.log(sizeObj)}
                   </span>
                 </div>
               ))}
@@ -773,8 +760,20 @@ const Product = ({ lang, basket, set_basket }) => {
               >
                 {!isAnimating
                   ? isAdded
-                    ? (lang == "uz" ? "Qo'shildi ✅" : lang == "en" ? "Added ✅" : lang == "ru" ? "Добавлено ✅" : "Qo'shildi ✅")
-                    : (lang == "uz" ? "Savatchaga qo'shish" : lang == "en" ? "Add to cart" : lang == "ru" ? "Добавить в корзину" : "Savatchaga qo'shish")
+                    ? lang == "uz"
+                      ? "Qo'shildi ✅"
+                      : lang == "en"
+                      ? "Added ✅"
+                      : lang == "ru"
+                      ? "Добавлено ✅"
+                      : "Qo'shildi ✅"
+                    : lang == "uz"
+                    ? "Savatchaga qo'shish"
+                    : lang == "en"
+                    ? "Add to cart"
+                    : lang == "ru"
+                    ? "Добавить в корзину"
+                    : "Savatchaga qo'shish"
                   : ""}
               </button>
               {isAnimating && (

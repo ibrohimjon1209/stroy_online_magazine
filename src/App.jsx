@@ -21,6 +21,10 @@ import Formalization from "./Pages/Formalization/formalization_main";
 import Category_mobile from "./Pages/Category/Category_mobile";
 import Register from "./Pages/Auth/register/register_main";
 import Log_in from "./Pages/Auth/log_in/log_in_main";
+import Enter_language from "./Pages/Enter/Language";
+import Enter_borrow from "./Pages/Enter/Borrow";
+import Enter_category from "./Pages/Enter/Category";
+import Enter_region from "./Pages/Enter/Region";
 import User_offer from "./Pages/User_offer/User_offer";
 const Product = lazy(() => import("./Pages/Product/Product"));
 const Category = lazy(() => import("./Pages/Category/Category"));
@@ -30,17 +34,25 @@ const App = () => {
   const [userSignIn, setUserSignIn] = useState(false);
   const [lang, set_lang] = useState("uz");
   const [city, set_city] = useState("andijan city");
-  const [basket, set_basket] = useState([]);
+  const [basket, set_basket] = useState(() => {
+    const saved = localStorage.getItem("basket");
+    return saved ? JSON.parse(saved) : [];
+  });
 
   useEffect(() => {
     setUserSignIn(localStorage.getItem("userId") ? true : false);
     !localStorage.getItem("lang") && localStorage.setItem("lang", "uz");
     !localStorage.getItem("city") &&
       localStorage.setItem("city", "andijan city");
+    !localStorage.getItem("is_entered") &&
+      localStorage.setItem("is_entered", "false");
     const basketFromStorage = JSON.parse(localStorage.getItem("basket")) || [];
     set_lang(localStorage.getItem("lang") || "uz");
     set_city(localStorage.getItem("city") || "andijan city");
     set_basket(basketFromStorage || []);
+    if (localStorage.getItem("is_entered") == "false") {
+      navigate("/enter/language");
+    }
   }, []);
 
   const [is_found, set_is_found] = useState(true);
@@ -63,6 +75,9 @@ const App = () => {
       window.removeEventListener("offline", updateOnlineStatus);
     };
   }, []);
+  useEffect(() => {
+    localStorage.setItem("basket", JSON.stringify(basket));
+  }, [basket]);
 
   useEffect(() => {
     if ((location == "login" || location == "register") && userSignIn) {
@@ -122,16 +137,18 @@ const App = () => {
     return <InternetChecker lang={lang} />;
   } else {
     return (
-      <div className={`${is_found ? "w-[] sm:w-[1450px]" : "w-full "} m-auto `}>
+      <div className={`${is_found ? "sm:w-[1450px]" : "w-full "} m-auto `}>
         {is_found && !is_another_nav && <Navbar lang={lang} />}
         <div
           className={`${
-            is_found ? "w-[] sm:w-[1450px]" : "w-full"
+            is_found ? "sm:w-[1450px]" : "w-full"
           } m-auto overflow-hidden`}
         >
           <div
             className={`flex flex-col justify-between ${
-              is_found ? "h-[calc(119.9vh-100px)] sm:h-[calc(100)]" : "h-full"
+              is_found
+                ? "h-[calc(106.9vh-100px)] sm:h-[calc(119.5vh-100px)]"
+                : "h-full"
             } w-[100%]`}
             style={{
               ...customScrollbar,
@@ -148,7 +165,7 @@ const App = () => {
                   path="/basket"
                   element={
                     <Basket
-                    set_basket={set_basket}
+                      set_basket={set_basket}
                       basket={basket}
                       set_formalization_open={set_formalization_open}
                       lang={lang}
@@ -156,6 +173,55 @@ const App = () => {
                   }
                 />
                 <Route path="/orders" element={<Orders lang={lang} />} />
+                <Route
+                  path="/enter/language"
+                  element={
+                    localStorage.getItem("is_entered") == "true" ? (
+                      <Navigate to="/" />
+                    ) : (
+                      <Enter_language
+                        lang={lang}
+                        set_lang={set_lang}
+                        set_is_found={set_is_found}
+                      />
+                    )
+                  }
+                />
+                <Route
+                  path="/enter/region"
+                  element={
+                    localStorage.getItem("is_entered") == "true" ? (
+                      <Navigate to="/" />
+                    ) : (
+                      <Enter_region lang={lang} set_is_found={set_is_found} />
+                    )
+                  }
+                />
+                <Route
+                  path="/enter/borrow"
+                  element={
+                    localStorage.getItem("is_entered") == "true" ? (
+                      <Navigate to="/" />
+                    ) : (
+                      <Enter_borrow
+                        lang={lang}
+                        set_city={set_city}
+                        city={city}
+                        set_is_found={set_is_found}
+                      />
+                    )
+                  }
+                />
+                <Route
+                  path="/enter/category"
+                  element={
+                    localStorage.getItem("is_entered") == "true" ? (
+                      <Navigate to="/" />
+                    ) : (
+                      <Enter_category set_is_found={set_is_found} />
+                    )
+                  }
+                />
                 <Route path="/search" element={<Category_mobile />} />
                 <Route
                   path="/profile/*"
@@ -194,8 +260,10 @@ const App = () => {
                 <Route
                   path="/formalization"
                   element={
-                    formalization_open ? (
+                    formalization_open && basket.length ? (
                       <Formalization
+                        basket={basket}
+                        lang={lang}
                         userSignIn={userSignIn}
                         setSelectedLocation={setSelectedLocation}
                         set_is_another_nav={set_is_another_nav}
@@ -211,11 +279,19 @@ const App = () => {
                 />
                 <Route
                   path="/terms"
-                  element={formalization_open ? <Terms /> : <Navigate to="/" />}
+                  element={
+                    formalization_open && basket.length ? (
+                      <Terms lang={lang} />
+                    ) : (
+                      <Navigate to="/" />
+                    )
+                  }
                 />
                 <Route
                   path="*"
-                  element={<Not_found lang={lang} set_is_found={set_is_found} />}
+                  element={
+                    <Not_found lang={lang} set_is_found={set_is_found} />
+                  }
                 />
                 <Route
                   path="/register"
@@ -246,7 +322,7 @@ const App = () => {
           </div>
         </div>
       </div>
-      );
+    );
   }
 };
 

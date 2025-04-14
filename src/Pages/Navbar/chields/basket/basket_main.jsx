@@ -2,7 +2,12 @@ import { Minus, Plus, Check, ChevronLeft } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
-export default function Basket_main({ basket, set_formalization_open, lang }) {
+export default function Basket_main({
+  basket,
+  set_formalization_open,
+  lang,
+  set_basket,
+}) {
   const [products, setProducts] = useState(basket);
 
   const [paymentType, setPaymentType] = useState("immediate");
@@ -28,9 +33,16 @@ export default function Basket_main({ basket, set_formalization_open, lang }) {
     localStorage.setItem("basket", JSON.stringify(products));
   }, [products]);
 
+  useEffect(() => {
+    setProducts(basket);
+  }, [basket]);
+
   const allSelected = products.every((product) => product.selected);
   const toggleSelectAll = () => {
     setProducts(
+      products.map((product) => ({ ...product, selected: !allSelected }))
+    );
+    set_basket(
       products.map((product) => ({ ...product, selected: !allSelected }))
     );
   };
@@ -46,11 +58,20 @@ export default function Basket_main({ basket, set_formalization_open, lang }) {
       );
       return updatedProducts;
     });
+    set_basket(
+      products.map((product) =>
+        product.id === productId &&
+        product.size[lang] === size &&
+        product.color[lang] === color
+          ? { ...product, selected: !product.selected }
+          : product
+      )
+    )
   };
 
   const decreaseQuantity = (productId, size, color) => {
     setProducts((prevProducts) => {
-      return prevProducts
+      const updatedProducts = prevProducts
         .map((product) => {
           if (
             product.id === productId &&
@@ -58,7 +79,6 @@ export default function Basket_main({ basket, set_formalization_open, lang }) {
             product.color[lang] === color
           ) {
             const newQuantity = product.quantity - 1;
-
             return newQuantity > 0
               ? { ...product, quantity: newQuantity }
               : null;
@@ -66,8 +86,12 @@ export default function Basket_main({ basket, set_formalization_open, lang }) {
           return product;
         })
         .filter(Boolean);
+      set_basket(updatedProducts);
+      localStorage.setItem("basket", JSON.stringify(updatedProducts));
+      return updatedProducts;
     });
   };
+
   const increaseQuantity = (productId, size, color) => {
     setProducts((prevProducts) => {
       const updatedProducts = prevProducts.map((product) =>
@@ -77,6 +101,8 @@ export default function Basket_main({ basket, set_formalization_open, lang }) {
           ? { ...product, quantity: product.quantity + 1 }
           : product
       );
+      set_basket(updatedProducts);
+      localStorage.setItem("basket", JSON.stringify(updatedProducts));
       return updatedProducts;
     });
   };
@@ -84,6 +110,7 @@ export default function Basket_main({ basket, set_formalization_open, lang }) {
   const totalPrice = products
     .filter((product) => product.selected)
     .reduce((sum, product) => sum + product.price * product.quantity, 0);
+
   const monthlyPayment = Math.round(totalPrice / 24);
 
   useEffect(() => {
@@ -340,9 +367,15 @@ export default function Basket_main({ basket, set_formalization_open, lang }) {
                 </div>
               </div>
               <Link
-                to="/formalization"
-                onClick={() => set_formalization_open(true)}
-                className="sm:w-[87%] w-[90%] absolute flex items-center justify-center py-4 sm:mt-[8%] mt-[5%] bg-[#E6D1A7] rounded-xl font-inter font-[600] text-[15px] leading-[22px] text-black hover:bg-[#dac59b] transition-colors cursor-pointer duration-300"
+                to={products.length > 0 ? "/formalization" : ""}
+                onClick={() =>
+                  products.length > 0 && set_formalization_open(true)
+                }
+                className={`sm:w-[87%] w-[90%] absolute flex items-center justify-center py-4 sm:mt-[8%] mt-[5%] ${
+                  products.length > 0
+                    ? "bg-[#E6D1A7] hover:bg-[#dac59b] cursor-pointer"
+                    : "bg-[#c9bb9d] hover:bg-[#cdc2aa] cursor-not-allowed"
+                } rounded-xl font-inter font-[600] text-[15px] leading-[22px] text-black transition-colors duration-300`}
               >
                 {lang === "uz"
                   ? "Rasmiylashtirish"

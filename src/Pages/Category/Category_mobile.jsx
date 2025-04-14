@@ -84,7 +84,7 @@ const Category_mobile = () => {
   return (
     <div className="w-full">
       <div>
-        <style jsx>
+        <style jsx="true">
           {`
             .dropdown-enter {
               opacity: 0;

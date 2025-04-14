@@ -4,7 +4,7 @@ import cube from "./Images/orders.svg"
 import cube_a from "./Images/orders_a.svg"
 import like from "./Images/like.svg"
 import like_a from "./Images/like_a.svg"
-import basket from "./Images/basket.svg"
+import basket_i from "./Images/basket.svg"
 import basket_a from "./Images/basket_a.svg"
 import profile from "./Images/profile.svg"
 import profile_a from "./Images/profile_a.svg"
@@ -21,7 +21,7 @@ const getStoredTopics = () => {
   }
 }
 
-const Navbar = ({lang}) => {
+const Navbar = ({lang, set_basket, basket}) => {
   const navigate = useNavigate()
   const inputRef = useRef(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -134,9 +134,10 @@ const Navbar = ({lang}) => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
   }
 
-  const points = [{ name: "Stroy Baza №1" }, { name: "Mebel" }, { name: "Golden house" }]
+  const points = [{ name: "Story Baza №1" }, { name: "Mebel" }, { name: "Gold Klinker" }]
 
-  const [selectedOption, setSelectedOption] = useState(points[0])
+  const sl_option = localStorage.getItem("sl_option_nav")
+  const [selectedOption, setSelectedOption] = useState({name: sl_option} || points[0])
 
   const handleOptionClick = (option) => {
     setSelectedOption(option)
@@ -157,7 +158,7 @@ const Navbar = ({lang}) => {
     }, 300) // Match this to the animation duration
   }
 
-  const to_home = () => navigate("/")
+  const to_home = () => window.location.href = "/"
 
   const handleCategoryItemClick = (categoryId) => {
     navigate(`/category/${categoryId}`)
@@ -446,7 +447,7 @@ const Navbar = ({lang}) => {
             <Link to="/basket">
               <img
                 className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
-                src={location == "basket" || is_basket_hovered ? basket_a : basket}
+                src={location == "basket" || is_basket_hovered ? basket_a : basket_i}
                 onMouseEnter={() => set_is_basket_hovered(true)}
                 onMouseLeave={() => set_is_basket_hovered(false)}
                 alt="basket"
