@@ -783,7 +783,13 @@ const Product = ({ lang, basket, set_basket }) => {
                 </div>
               )}
             </div>
+
           </div>
+
+
+
+
+          
         </div>
       </div>
     </div>
