@@ -2,13 +2,13 @@ const Modal = ({ is_modal_open, set_is_modal_open }) => {
   if (!is_modal_open) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
+    <div className="fixed w-full scale-1 sm:scale-[1.4] inset-0 flex items-center justify-center z-50">
       <div
         className="fixed inset-0 bg-black opacity-70"
         onClick={() => set_is_modal_open(false)}
       />
 
-      <div className="bg-white rounded-lg p-6 w-[310px] h-[350px] relative z-10 mx-4 shadow-lg">
+      <div className="bg-white scale-[0.85] rounded-lg p-6 w-[310px] h-[350px] relative z-10 mx-4 shadow-lg">
         <div className="flex flex-col items-center h-full justify-evenly text-center">
           <div className="w-20 h-20 bg-green-400 rounded-full flex items-center justify-center mb-4">
             <svg

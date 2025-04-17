@@ -28,7 +28,7 @@ const Sidebar = ({ city, set_city, lang, set_lang, isUserSignIn, setUserSignIn, 
   const location = useLocation();
   const isSmallScreen = useMediaQuery({ maxWidth: 640 });
   const [help_modal_open, set_help_modal_open] = useState(false);
-  
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -49,11 +49,14 @@ const Sidebar = ({ city, set_city, lang, set_lang, isUserSignIn, setUserSignIn, 
           surname: user_data.last_name
             ? user_data.last_name
             : "",
-          phone: user_data.phone_number || lang == "uz" ? "Nomalum" : lang == "en" ? "Undefined" : lang == "ru" ? "Не определено" : "Nomalum",
+          phone: user_data.phone_number || (lang == "uz" ? "Nomalum" : lang == "en" ? "Undefined" : lang == "ru" ? "Не определено" : "Nomalum"),
         });
+        console.log(user_data);
+
       } catch (err) {
         console.error(err);
       }
+
     };
 
     if (isUserSignIn) {
@@ -67,9 +70,8 @@ const Sidebar = ({ city, set_city, lang, set_lang, isUserSignIn, setUserSignIn, 
 
   return (
     <div
-      className={`h-auto sm:mx-0 mx-auto w-[100%] ${
-        help_modal_open ? "z-[10000]" : ""
-      } sm:w-[350px]`}
+      className={`h-auto sm:mx-0 mx-auto w-[100%] ${help_modal_open ? "z-[10000]" : ""
+        } sm:w-[350px]`}
     >
       <Routes>
         <Route
@@ -86,11 +88,11 @@ const Sidebar = ({ city, set_city, lang, set_lang, isUserSignIn, setUserSignIn, 
                       <span className="font-inter font-[600] text-[15px] leading-[22px] text-black whitespace-nowrap">
                         {user.name} {user.surname}
                       </span>
-                    <span className="flex flex-row items-center justify-center gap-6">
-                      <span className="font-inter font-[500] text-[13px] leading-[22px] text-black whitespace-nowrap">
-                        {user.phone}
-                      </span>
-                      <span onClick={() => set_edit_profile_open(true)} className="font-inter font-[400] text-[14px] leading-[22px] text-blue-800 hover:underline cursor-pointer whitespace-nowrap">Tahrirlash</span>
+                      <span className="flex flex-row items-center justify-center gap-6">
+                        <span className="font-inter font-[500] text-[13px] leading-[22px] text-black whitespace-nowrap">
+                          {user.phone}
+                        </span>
+                        <span onClick={() => set_edit_profile_open(true)} className="font-inter font-[400] text-[14px] leading-[22px] text-blue-800 hover:underline cursor-pointer whitespace-nowrap">Tahrirlash</span>
                       </span>
                     </div>
                   </div>
