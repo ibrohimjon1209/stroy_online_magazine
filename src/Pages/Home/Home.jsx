@@ -6,6 +6,7 @@ import logo from "./Images/logo_mobile.svg";
 import Carusel from "./Carusel";
 import { Search, CirclePlus, History, X, Heart } from "lucide-react";
 import Download_page from "./Download";
+import { products_get } from "../../Services/products_get";
 
 function Home({ lang }) {
   const inputRef = useRef(null);
@@ -28,20 +29,17 @@ function Home({ lang }) {
     return localStorage.getItem("likedProducts") || [];
   });
 
+  const sl_option_id =
+    localStorage.getItem("sl_option_nav") == "Story Baza №1"
+      ? 0
+      : localStorage.getItem("sl_option_nav") == "Mebel"
+      ? 1
+      : 2;
   useEffect(() => {
     const getProducts = async () => {
       try {
-        const response = await axios.get(
-          "https://back.stroybazan1.uz/api/api/products/?branch=0",
-          {
-            headers: {
-              accept: "application/json",
-              "X-CSRFTOKEN":
-                "B8UmaQE4P3RrkjHA8QHRPrl0hvSU4yProbsYerUqficnXhefiWFxkqRVvGVL7Ws5",
-            },
-          }
-        );
-        setProducts(response.data || []);
+        const response = await products_get(sl_option_id);
+        setProducts(response || []);
       } catch (error) {
         console.error("API xatosi:", error);
       } finally {
@@ -118,7 +116,13 @@ function Home({ lang }) {
 
       <div className="popular w-full px-[15px] sm:px-[77px] mb-[100px]">
         <h1 className="text-[17px] sm:text-[22px] font-semibold mt-3">
-          {lang == "uz" ? "Ommabop tavarlar" : lang == "en" ? "Popular products" : lang == "ru" ? "Популярные товары" : "Ommabop tavarlar"}
+          {lang == "uz"
+            ? "Ommabop tavarlar"
+            : lang == "en"
+            ? "Popular products"
+            : lang == "ru"
+            ? "Популярные товары"
+            : "Ommabop tavarlar"}
         </h1>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-[10px] gap-y-[20px] mt-3">
           {loading ? (
@@ -137,26 +141,42 @@ function Home({ lang }) {
                     />
                   </div>
                   <div className="flex flex-row items-end w-[165px] sm:w-[245px] justify-between mt-1.5 px-3">
-                  <div className="flex flex-col sm:gap-1">
-                  <h1 className="text-black truncate font-semibold text-[14px] sm:text-[16px]">
-                    {product[`name_${lang}`]}
-                  </h1>
-                  <p className="text-black text-[12px] sm:text-[14px]">
-                    {product.variants?.[0]?.price
-                      ? `${lang == "uz" ? "Narxi" : lang == "en" ? "Price" : lang == "ru" ? "Цена" : "Narxi"}: ${parseFloat(product.variants[0].price).toFixed(
-                          2
-                        )} ${uzs_lang}`
-                      : lang == "uz" ? "Narxi mavjud emas" : lang == "en" ? "Price not available" : lang == "ru" ? "Цена не доступна" : "Narxi mavjud emas"}
-                  </p>
-                  </div>
-                <Heart
-                  className="w-[19px] h-[19px] sm:w-[28px] sm:h-[28px] text-[#FF0000] cursor-pointer mb-0.5"
-                  fill={likedProducts.includes(product.id) ? "#FF0000" : "none"}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleLikeToggle(product.id);
-                  }}
-                />
+                    <div className="flex flex-col sm:gap-1">
+                      <h1 className="text-black truncate font-semibold text-[14px] sm:text-[16px]">
+                        {product[`name_${lang}`]}
+                      </h1>
+                      <p className="text-black text-[12px] sm:text-[14px]">
+                        {product.variants?.[0]?.price
+                          ? `${
+                              lang == "uz"
+                                ? "Narxi"
+                                : lang == "en"
+                                ? "Price"
+                                : lang == "ru"
+                                ? "Цена"
+                                : "Narxi"
+                            }: ${parseFloat(product.variants[0].price).toFixed(
+                              2
+                            )} ${uzs_lang}`
+                          : lang == "uz"
+                          ? "Narxi mavjud emas"
+                          : lang == "en"
+                          ? "Price not available"
+                          : lang == "ru"
+                          ? "Цена не доступна"
+                          : "Narxi mavjud emas"}
+                      </p>
+                    </div>
+                    <Heart
+                      className="w-[19px] h-[19px] sm:w-[28px] sm:h-[28px] text-[#FF0000] cursor-pointer mb-0.5"
+                      fill={
+                        likedProducts.includes(product.id) ? "#FF0000" : "none"
+                      }
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleLikeToggle(product.id);
+                      }}
+                    />
                   </div>
                 </Link>
               </div>

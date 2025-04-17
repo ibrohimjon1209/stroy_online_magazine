@@ -610,7 +610,7 @@ const Product = ({ lang, basket, set_basket }) => {
           </div>
 
           <div className="size-div mt-[20px] max-w-full">
-            <h1 className="font-inter font-[400] text-[13px] leading-[22px] text-[rgba(0,0,0,1)]">
+            <h1 className="font-inter font-[400] text-[13px] leading-[22px] text-black">
               {getTranslatedUnit(productData[`units_${lang}`])}: <span className="font-[500]">{selectedSize}</span>
             </h1>
             <div className="sizes flex flex-wrap gap-[10px] mt-[7px] transition-all duration-300 cursor-pointer max-w-full">
@@ -631,7 +631,7 @@ const Product = ({ lang, basket, set_basket }) => {
           </div>
 
           <div className="mt-[20px]">
-            <h1 className="font-inter font-[700] text-[20px] leading-[22px] text-[rgba(0,0,0,1)]">
+            <h1 className="font-inter font-[700] text-[20px] leading-[22px] text-black">
               {productData.variants[selectedColorIndex].price} {uzs_lang}
             </h1>
           </div>
@@ -647,7 +647,7 @@ const Product = ({ lang, basket, set_basket }) => {
                     }`}
                     onClick={() => handlePaymentClick(index)}
                   >
-                    <h1 className="font-inter font-[500] text-[10px] text-[rgba(0,0,0,1)]">{option}</h1>
+                    <h1 className="font-inter font-[500] text-[10px] text-black">{option}</h1>
                   </div>
                 ))}
               </div>
@@ -655,7 +655,7 @@ const Product = ({ lang, basket, set_basket }) => {
                 <h1 className="w-[89px] h-[28px] rounded-[2.5px] bg-[rgba(254,242,157,1)] font-inter font-[500] text-[13px] leading-[22px] flex justify-center items-center">
                   {monthlyPayments[selectedPaymentIndex]} {uzs_lang}
                 </h1>
-                <h1 className="font-inter font-[500] text-[10px] leading-[22px] text-[rgba(0,0,0,1)]">
+                <h1 className="font-inter font-[500] text-[10px] leading-[22px] text-black">
                   x {paymentOptions[lang][selectedPaymentIndex]}
                 </h1>
               </div>
@@ -686,7 +686,7 @@ const Product = ({ lang, basket, set_basket }) => {
 
             <div className="relative">
               <button
-                className={`mt-[20px] w-full h-[60px] rounded-[10px] bg-[rgba(220,195,139,1)] cursor-pointer hover:bg-[#e9d8b2] transition-all duration-200 font-inter font-[600] text-[15px] leading-[22px] text-[rgba(0,0,0,1)] ${
+                className={`mt-[20px] w-full h-[60px] rounded-[10px] bg-[rgba(220,195,139,1)] cursor-pointer hover:bg-[#e9d8b2] transition-all duration-200 font-inter font-[600] text-[15px] leading-[22px] text-black ${
                   isAnimating ? "animate-circle" : ""
                 }`}
                 onClick={handleClick}

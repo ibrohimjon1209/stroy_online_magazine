@@ -1,172 +1,197 @@
-import { useState, useRef, useEffect } from "react"
-import logo from "./Images/logo.svg"
-import cube from "./Images/orders.svg"
-import cube_a from "./Images/orders_a.svg"
-import like from "./Images/like.svg"
-import like_a from "./Images/like_a.svg"
-import basket_i from "./Images/basket.svg"
-import basket_a from "./Images/basket_a.svg"
-import profile from "./Images/profile.svg"
-import profile_a from "./Images/profile_a.svg"
-import vector from "./Images/vector.png"
-import { Link } from "react-router-dom"
-import { useNavigate, useLocation } from "react-router-dom"
-import { ChevronDown, CirclePlus, History, Home, Menu, Package, Search, ShoppingCart, User, X } from "lucide-react"
+import { useState, useRef, useEffect } from "react";
+import logo from "./Images/logo.svg";
+import cube from "./Images/orders.svg";
+import cube_a from "./Images/orders_a.svg";
+import like from "./Images/like.svg";
+import like_a from "./Images/like_a.svg";
+import basket_i from "./Images/basket.svg";
+import basket_a from "./Images/basket_a.svg";
+import profile from "./Images/profile.svg";
+import profile_a from "./Images/profile_a.svg";
+import vector from "./Images/vector.png";
+import { Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  ChevronDown,
+  CirclePlus,
+  History,
+  Home,
+  Menu,
+  Package,
+  Search,
+  ShoppingCart,
+  User,
+  X,
+} from "lucide-react";
+import get_categories from "../../Services/category/get_categories";
 
 const getStoredTopics = () => {
   try {
-    return JSON.parse(localStorage.getItem("searchTopics")) || []
+    return JSON.parse(localStorage.getItem("searchTopics")) || [];
   } catch (error) {
-    return []
+    return [];
   }
-}
+};
 
-const Navbar = ({lang, set_basket, basket}) => {
-  const navigate = useNavigate()
-  const inputRef = useRef(null)
-  const [isOpen, setIsOpen] = useState(false)
-  const [is_category_open, set_is_category_open] = useState(false)
-  const [is_search_open, set_is_search_open] = useState(false)
-  const [is_likes_hovered, set_is_likes_hovered] = useState(false)
-  const [is_orders_hovered, set_is_orders_hovered] = useState(false)
-  const [is_basket_hovered, set_is_basket_hovered] = useState(false)
-  const [is_profile_hovered, set_is_profile_hovered] = useState(false)
-  const location = useLocation().pathname.split("/")[1]
-  const [active, set_active] = useState("")
-  const [categoryAnimation, setCategoryAnimation] = useState(false)
-  const [searchAnimation, setSearchAnimation] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [search_topics, setSearchTopics] = useState(getStoredTopics())
-  const [searchText, setSearchText] = useState("")
-  const [categories, setCategories] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
+const Navbar = ({ lang, set_basket, basket }) => {
+  const navigate = useNavigate();
+  const inputRef = useRef(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [is_category_open, set_is_category_open] = useState(false);
+  const [is_search_open, set_is_search_open] = useState(false);
+  const [is_likes_hovered, set_is_likes_hovered] = useState(false);
+  const [is_orders_hovered, set_is_orders_hovered] = useState(false);
+  const [is_basket_hovered, set_is_basket_hovered] = useState(false);
+  const [is_profile_hovered, set_is_profile_hovered] = useState(false);
+  const location = useLocation().pathname.split("/")[1];
+  const [active, set_active] = useState("");
+  const [categoryAnimation, setCategoryAnimation] = useState(false);
+  const [searchAnimation, setSearchAnimation] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [search_topics, setSearchTopics] = useState(getStoredTopics());
+  const [searchText, setSearchText] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const sl_option_id =
+    localStorage.getItem("sl_option_nav") == "Story Baza №1"
+      ? 0
+      : localStorage.getItem("sl_option_nav") == "Mebel"
+      ? 1
+      : 2;
 
-  // Fetch categories from API
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        setIsLoading(true)
-        const response = await fetch("https://back.stroybazan1.uz/api/api/categories/")
-        if (!response.ok) {
-          throw new Error("Failed to fetch categories")
+        setIsLoading(true);
+        const response = await get_categories();
+        if (!response) {
+          throw new Error("Failed to fetch categories");
         }
-        const data = await response.json()
-        setCategories(data)
+        setCategories(response.filter((item)=>{
+          return item.branch == sl_option_id
+        }));
       } catch (error) {
-        console.error("Error fetching categories:", error)
+        console.error("Error fetching categories:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchCategories()
-  }, [])
+    fetchCategories();
+  }, []);
 
   const handleDeleteTopic = (index) => {
-    const updatedTopics = [...search_topics]
-    updatedTopics.splice(index, 1)
-    setSearchTopics(updatedTopics)
-    localStorage.setItem("searchTopics", JSON.stringify(updatedTopics))
-  }
+    const updatedTopics = [...search_topics];
+    updatedTopics.splice(index, 1);
+    setSearchTopics(updatedTopics);
+    localStorage.setItem("searchTopics", JSON.stringify(updatedTopics));
+  };
 
   const handleCategoryClick = () => {
     if (is_category_open) {
-      setCategoryAnimation(false)
+      setCategoryAnimation(false);
       setTimeout(() => {
-        set_is_category_open(false)
-      }, 300)
+        set_is_category_open(false);
+      }, 300);
     } else {
-      set_is_category_open(true)
+      set_is_category_open(true);
       setTimeout(() => {
-        setCategoryAnimation(true)
-      }, 10)
-      set_is_search_open(false)
-      setSearchAnimation(false)
+        setCategoryAnimation(true);
+      }, 10);
+      set_is_search_open(false);
+      setSearchAnimation(false);
     }
-  }
+  };
 
   const handleSearchClick = () => {
-    const includes = search_topics.includes(searchText)
+    const includes = search_topics.includes(searchText);
     if (is_search_open) {
-      setSearchAnimation(false)
+      setSearchAnimation(false);
       setTimeout(() => {
-        set_is_search_open(false)
-      }, 300)
+        set_is_search_open(false);
+      }, 300);
     } else {
       if (searchText && !includes) {
-        const updatedTopics = [...search_topics, searchText]
-        setSearchTopics(updatedTopics)
-        localStorage.setItem("searchTopics", JSON.stringify(updatedTopics))
+        const updatedTopics = [...search_topics, searchText];
+        setSearchTopics(updatedTopics);
+        localStorage.setItem("searchTopics", JSON.stringify(updatedTopics));
       }
-      set_is_search_open(true)
+      set_is_search_open(true);
       setTimeout(() => {
-        setSearchAnimation(true)
-      }, 10)
-      set_is_category_open(false)
-      setCategoryAnimation(false)
+        setSearchAnimation(true);
+      }, 10);
+      set_is_category_open(false);
+      setCategoryAnimation(false);
       if (inputRef.current) {
-        inputRef.current.focus()
+        inputRef.current.focus();
       }
     }
-  }
+  };
 
   const clearInput = () => {
-    setSearchText("")
+    setSearchText("");
     if (inputRef.current) {
-      inputRef.current.focus()
+      inputRef.current.focus();
     }
-  }
+  };
 
-  // Qidiruv modali tavsiyalaridan birini tanlash funksiyasi
   const handleSelectTopic = (name) => {
-    setSearchText(name)
-    setSearchAnimation(false)
+    setSearchText(name);
+    setSearchAnimation(false);
     setTimeout(() => {
-      set_is_search_open(false)
-    }, 300)
-  }
+      set_is_search_open(false);
+    }, 300);
+  };
 
   const toggleDropdown = () => {
-    setIsOpen(!isOpen)
-  }
+    setIsOpen(!isOpen);
+  };
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen)
-  }
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
 
-  const points = [{ name: "Story Baza №1" }, { name: "Mebel" }, { name: "Gold Klinker" }]
+  const points = [
+    { name: "Story Baza №1", id: 0 },
+    { name: "Mebel", id: 1 },
+    { name: "Gold Klinker", id: 2 },
+  ];
 
-  const sl_option = localStorage.getItem("sl_option_nav")
-  const [selectedOption, setSelectedOption] = useState({name: sl_option} || points[0])
+  const sl_option = localStorage.getItem("sl_option_nav");
+  const [selectedOption, setSelectedOption] = useState(
+    { name: sl_option } || points[0]
+  );
 
-  const handleOptionClick = (option) => {
-    setSelectedOption(option)
-    setIsOpen(false)
-  }
+  const handleOptionClick = (option, id) => {
+    setSelectedOption(option);
+    localStorage.setItem("sl_option_nav", option.name);
+    setIsOpen(false);
+    window.location.href = "/";
+  };
 
   const handleClickOutside_category = () => {
-    setCategoryAnimation(false)
+    setCategoryAnimation(false);
     setTimeout(() => {
-      set_is_category_open(false)
-    }, 300) // Match this to the animation duration
-  }
+      set_is_category_open(false);
+    }, 300); // Match this to the animation duration
+  };
 
   const handleClickOutside_search = () => {
-    setSearchAnimation(false)
+    setSearchAnimation(false);
     setTimeout(() => {
-      set_is_search_open(false)
-    }, 300) // Match this to the animation duration
-  }
+      set_is_search_open(false);
+    }, 300); // Match this to the animation duration
+  };
 
-  const to_home = () => window.location.href = "/"
+  const to_home = () => (window.location.href = "/");
 
   const handleCategoryItemClick = (categoryId) => {
-    navigate(`/category/${categoryId}`)
-    setCategoryAnimation(false)
+    navigate(`/category/${categoryId}`);
+    setCategoryAnimation(false);
     setTimeout(() => {
-      set_is_category_open(false)
-    }, 300)
-  }
+      set_is_category_open(false);
+    }, 300);
+  };
 
   return (
     <>
@@ -205,7 +230,12 @@ const Navbar = ({lang, set_basket, basket}) => {
           {/* Mobile menu button */}
           <div className="flex items-center justify-between w-full md:hidden">
             <div className="flex items-center gap-[5px]">
-              <img src={logo || "/placeholder.svg"} alt="Logo" className="w-8 h-8 cursor-pointer" onClick={to_home} />
+              <img
+                src={logo || "/placeholder.svg"}
+                alt="Logo"
+                className="w-8 h-8 cursor-pointer"
+                onClick={to_home}
+              />
               <h1
                 className="font-inter font-[600] text-[16px] cursor-pointer leading-[22px] text-black"
                 onClick={to_home}
@@ -213,14 +243,22 @@ const Navbar = ({lang, set_basket, basket}) => {
                 STROY BAZA №1
               </h1>
             </div>
-            <button onClick={toggleMobileMenu} className="p-2 text-white md:hidden">
+            <button
+              onClick={toggleMobileMenu}
+              className="p-2 text-white md:hidden"
+            >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
 
           {/* Logo va bosh sahifaga yo'naltirish - desktop */}
           <div className="w-full md:w-[247px] h-full hidden md:flex items-center gap-[5px]">
-            <img src={logo || "/placeholder.svg"} alt="Logo" className="cursor-pointer" onClick={to_home} />
+            <img
+              src={logo || "/placeholder.svg"}
+              alt="Logo"
+              className="cursor-pointer"
+              onClick={to_home}
+            />
             <h1
               className="font-inter font-[600] text-[20px] cursor-pointer leading-[22px] text-black"
               onClick={to_home}
@@ -229,15 +267,20 @@ const Navbar = ({lang, set_basket, basket}) => {
             </h1>
           </div>
 
-          {/* Mobile menu content */}
-          <div className={`${isMobileMenuOpen ? "flex" : "hidden"} md:hidden flex-col w-full gap-4 mt-4`}>
+          <div
+            className={`${
+              isMobileMenuOpen ? "flex" : "hidden"
+            } md:hidden flex-col w-full gap-4 mt-4`}
+          >
             <div className="flex items-center justify-between gap-2">
               <div
                 onClick={handleCategoryClick}
                 className="border-[3px] border-white drop-shadow-xl hover:opacity-75 cursor-pointer w-[100px] h-[40px] bg-transparent flex justify-center items-center rounded-[5px] gap-[5px]"
               >
                 <Menu strokeWidth={1.5} color="white" />
-                <h1 className="font-inter font-[500] text-[13px] text-white uppercase">Katolog</h1>
+                <h1 className="font-inter font-[500] text-[13px] text-white uppercase">
+                  Katolog
+                </h1>
               </div>
 
               <div className="relative w-[calc(100%-120px)]">
@@ -248,7 +291,11 @@ const Navbar = ({lang, set_basket, basket}) => {
                   onClick={toggleDropdown}
                 >
                   <span className="truncate">{selectedOption.name}</span>
-                  <ChevronDown className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+                  <ChevronDown
+                    className={`transition-transform duration-300 ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                  />
                 </div>
                 {isOpen && (
                   <div className="absolute top-[100%] left-0 w-full bg-white rounded-b-[5px] shadow-lg transition-all duration-500 z-50">
@@ -256,7 +303,7 @@ const Navbar = ({lang, set_basket, basket}) => {
                       <div
                         key={index}
                         className="px-4 py-2 cursor-pointer hover:bg-gray-200"
-                        onClick={() => handleOptionClick(option)}
+                        onClick={() => handleOptionClick(option, option.id)}
                       >
                         {option.name}
                       </div>
@@ -270,7 +317,15 @@ const Navbar = ({lang, set_basket, basket}) => {
               <Search className="cursor-pointer" onClick={handleSearchClick} />
               <input
                 type="text"
-                placeholder={lang == "uz" ? "Qidiruv" : lang == "en" ? "Search" : lang == "ru" ? "Поиск" : "Qidiruv"}
+                placeholder={
+                  lang == "uz"
+                    ? "Qidiruv"
+                    : lang == "en"
+                    ? "Search"
+                    : lang == "ru"
+                    ? "Поиск"
+                    : "Qidiruv"
+                }
                 className="w-full placeholder:font-inter placeholder:font-[500] placeholder:text-[15px] placeholder:text-[#737373] border-none pl-[15px] pr-[20px] focus:outline-none focus:ring-0 font-inter font-[500] text-[15px]"
                 ref={inputRef}
                 value={searchText}
@@ -296,7 +351,9 @@ const Navbar = ({lang, set_basket, basket}) => {
                 className="border-[3px] border-white drop-shadow-xl hover:opacity-75 cursor-pointer w-[100px] h-[40px] bg-transparent flex justify-center items-center rounded-[5px] gap-[5px]"
               >
                 <Menu strokeWidth={1.5} color="white" />
-                <h1 className="font-inter font-[500] text-[13px] text-white uppercase">Katolog</h1>
+                <h1 className="font-inter font-[500] text-[13px] text-white uppercase">
+                  Katolog
+                </h1>
               </div>
 
               {is_category_open && (
@@ -306,7 +363,9 @@ const Navbar = ({lang, set_basket, basket}) => {
                 >
                   <div
                     className={`search_modal w-[600px] h-[450px] bg-white border-[1px] overflow-auto border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${
-                      categoryAnimation ? "dropdown-enter-active" : "dropdown-enter"
+                      categoryAnimation
+                        ? "dropdown-enter-active"
+                        : "dropdown-enter"
                     }`}
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -324,12 +383,18 @@ const Navbar = ({lang, set_basket, basket}) => {
                           <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">
                             {category.name_uz}
                           </h1>
-                          <img src={vector || "/placeholder.svg"} className="rotate-[270deg]" alt="arrow" />
+                          <img
+                            src={vector || "/placeholder.svg"}
+                            className="rotate-[270deg]"
+                            alt="arrow"
+                          />
                         </div>
                       ))
                     ) : (
                       <div className="w-full h-[100px] flex justify-center items-center">
-                        <h1 className="font-inter font-[500] text-[16px] text-gray-500">Kategoriyalar mavjud emas</h1>
+                        <h1 className="font-inter font-[500] text-[16px] text-gray-500">
+                          Kategoriyalar mavjud emas
+                        </h1>
                       </div>
                     )}
                   </div>
@@ -340,14 +405,22 @@ const Navbar = ({lang, set_basket, basket}) => {
               <Search className="cursor-pointer" onClick={handleSearchClick} />
               <input
                 type="text"
-                placeholder={lang == "uz" ? "Qidiruv" : lang == "en" ? "Search" : lang == "ru" ? "Поиск" : "Qidiruv"}
+                placeholder={
+                  lang == "uz"
+                    ? "Qidiruv"
+                    : lang == "en"
+                    ? "Search"
+                    : lang == "ru"
+                    ? "Поиск"
+                    : "Qidiruv"
+                }
                 className="w-full placeholder:font-inter placeholder:font-[500] placeholder:text-[15px] placeholder:text-[#737373] border-none pl-[15px] pr-[20px] focus:outline-none focus:ring-0 font-inter font-[500] text-[15px]"
                 ref={inputRef}
                 value={searchText}
                 onClick={handleSearchClick}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    handleSearchClick()
+                    handleSearchClick();
                   }
                 }}
                 onChange={(e) => setSearchText(e.target.value)}
@@ -380,21 +453,31 @@ const Navbar = ({lang, set_basket, basket}) => {
                       >
                         <div className="flex gap-[15px] cursor-pointer">
                           <History strokeWidth={1.75} />
-                          <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">{item}</h1>
+                          <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">
+                            {item}
+                          </h1>
                         </div>
                         <X
                           strokeWidth={1.75}
                           className="cursor-pointer"
                           onClick={(e) => {
-                            e.stopPropagation()
-                            handleDeleteTopic(index)
+                            e.stopPropagation();
+                            handleDeleteTopic(index);
                           }}
                         />
                       </div>
                     ))
                   ) : (
                     <div className="w-full h-[52px] pl-[24px] flex items-center">
-                      <h1 className="font-inter font-[500] text-[16px] text-gray-500">{lang == "uz" ? "Qidiruv tarixi bo'm bo'sh" : lang == "en" ? "Search history is empty" : lang == "ru" ? "История поиска пуста" : "Qidiruv tarixi bo'm bo'sh"}</h1>
+                      <h1 className="font-inter font-[500] text-[16px] text-gray-500">
+                        {lang == "uz"
+                          ? "Qidiruv tarixi bo'm bo'sh"
+                          : lang == "en"
+                          ? "Search history is empty"
+                          : lang == "ru"
+                          ? "История поиска пуста"
+                          : "Qidiruv tarixi bo'm bo'sh"}
+                      </h1>
                     </div>
                   )}
                 </div>
@@ -408,7 +491,11 @@ const Navbar = ({lang, set_basket, basket}) => {
                 onClick={toggleDropdown}
               >
                 <span>{selectedOption.name}</span>
-                <ChevronDown className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  className={`transition-transform duration-300 ${
+                    isOpen ? "rotate-180" : ""
+                  }`}
+                />
               </div>
               {isOpen && (
                 <div className="absolute top-[100%] left-0 w-full bg-white rounded-b-[5px] shadow-lg transition-all duration-500 z-50">
@@ -447,7 +534,11 @@ const Navbar = ({lang, set_basket, basket}) => {
             <Link to="/basket">
               <img
                 className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
-                src={location == "basket" || is_basket_hovered ? basket_a : basket_i}
+                src={
+                  location == "basket" || is_basket_hovered
+                    ? basket_a
+                    : basket_i
+                }
                 onMouseEnter={() => set_is_basket_hovered(true)}
                 onMouseLeave={() => set_is_basket_hovered(false)}
                 alt="basket"
@@ -456,7 +547,11 @@ const Navbar = ({lang, set_basket, basket}) => {
             <Link to="/profile/orders">
               <img
                 className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
-                src={location == "profile" || is_profile_hovered ? profile_a : profile}
+                src={
+                  location == "profile" || is_profile_hovered
+                    ? profile_a
+                    : profile
+                }
                 onMouseEnter={() => set_is_profile_hovered(true)}
                 onMouseLeave={() => set_is_profile_hovered(false)}
                 alt="profile"
@@ -468,25 +563,56 @@ const Navbar = ({lang, set_basket, basket}) => {
 
       <div className="md:hidden fixed -bottom-[calc(2vh-10px)] left-0 right-0 bg-[#BEA086] flex justify-around items-center h-[85px] z-50 rounded-t-[15px]">
         <Link to="/" className="flex flex-col items-center justify-center">
-          <Home size={28} strokeWidth={2} color={location === "" ? "#ffffff" : "#DFCFC2"} />
+          <Home
+            size={28}
+            strokeWidth={2}
+            color={location === "" ? "#ffffff" : "#DFCFC2"}
+          />
         </Link>
-        <Link to="/search" className="flex flex-col items-center justify-center">
-          <Search size={28} strokeWidth={2} color={location === "search" ? "#ffffff" : "#DFCFC2"} />
+        <Link
+          to="/search"
+          className="flex flex-col items-center justify-center"
+        >
+          <Search
+            size={28}
+            strokeWidth={2}
+            color={location === "search" ? "#ffffff" : "#DFCFC2"}
+          />
         </Link>
-        <Link to="/orders" className="flex flex-col items-center justify-center">
-          <Package size={28} strokeWidth={2} color={location === "orders" ? "#ffffff" : "#DFCFC2"} />
+        <Link
+          to="/orders"
+          className="flex flex-col items-center justify-center"
+        >
+          <Package
+            size={28}
+            strokeWidth={2}
+            color={location === "orders" ? "#ffffff" : "#DFCFC2"}
+          />
         </Link>
-        <Link to="/basket" className="flex flex-col items-center justify-center">
-          <ShoppingCart size={28} strokeWidth={2} color={location === "basket" ? "#ffffff" : "#DFCFC2"} />
+        <Link
+          to="/basket"
+          className="flex flex-col items-center justify-center"
+        >
+          <ShoppingCart
+            size={28}
+            strokeWidth={2}
+            color={location === "basket" ? "#ffffff" : "#DFCFC2"}
+          />
         </Link>
-        <Link to="/profile" className="flex flex-col items-center justify-center">
-          <User size={28} strokeWidth={2} color={location === "profile" ? "#ffffff" : "#DFCFC2"} />
+        <Link
+          to="/profile"
+          className="flex flex-col items-center justify-center"
+        >
+          <User
+            size={28}
+            strokeWidth={2}
+            color={location === "profile" ? "#ffffff" : "#DFCFC2"}
+          />
         </Link>
       </div>
       <div className="md:hidden h-[0px]"></div>
     </>
-  )
-}
+  );
+};
 
-export default Navbar
-
+export default Navbar;

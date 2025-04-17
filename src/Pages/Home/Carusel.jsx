@@ -1,60 +1,69 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { banners_get } from "../../Services/general/banners"
+import { useState, useEffect, useCallback } from "react";
+import { banners_get } from "../../Services/general/banners";
 
 function cn(...classes) {
-  return classes.filter(Boolean).join(" ")
+  return classes.filter(Boolean).join(" ");
 }
 
 export default function KitchenCarousel() {
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [slides, setSlides] = useState([])
-  const [smallScreen, setSmallScreen] = useState(window.innerWidth < 768)
-  const [loadedImages, setLoadedImages] = useState({})
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [slides, setSlides] = useState([]);
+  const [smallScreen, setSmallScreen] = useState(window.innerWidth < 768);
+  const [loadedImages, setLoadedImages] = useState({});
+  const sl_option_id =
+    localStorage.getItem("sl_option_nav") == "Story Baza №1"
+      ? 0
+      : localStorage.getItem("sl_option_nav") == "Mebel"
+      ? 1
+      : 2;
 
   useEffect(() => {
-    const handleResize = () => setSmallScreen(window.innerWidth < 768)
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
+    const handleResize = () => setSmallScreen(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await banners_get()
+        const res = await banners_get();
         if (Array.isArray(res)) {
-          setSlides(res)
+          setSlides(res.filter((item) => {
+            return item.branch == sl_option_id;
+          }));
+          
         } else {
-          console.error("Invalid data format", res)
+          console.error("Invalid data format", res);
         }
       } catch (err) {
-        console.error("Error fetching banners:", err)
+        console.error("Error fetching banners:", err);
       }
-    }
-    fetchData()
-  }, [])
+    };
+    fetchData();
+  }, []);
 
   const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length)
-  }, [slides.length])
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  }, [slides.length]);
 
   useEffect(() => {
-    if (slides.length === 0) return
-    const interval = setInterval(nextSlide, 5000)
-    return () => clearInterval(interval)
-  }, [slides, nextSlide])
+    if (slides.length === 0) return;
+    const interval = setInterval(nextSlide, 5000);
+    return () => clearInterval(interval);
+  }, [slides, nextSlide]);
 
   const handleImageLoad = (index) => {
     setLoadedImages((prev) => ({
       ...prev,
       [index]: true,
-    }))
-  }
+    }));
+  };
 
-  if (slides.length === 0) return <div></div>
+  if (slides.length === 0) return <div></div>;
 
-  const extendedSlides = [slides[slides.length - 1], ...slides, slides[0]]
+  const extendedSlides = [slides[slides.length - 1], ...slides, slides[0]];
 
   return (
     <div className="relative w-full h-auto mx-auto overflow-hidden mt-[20px] sm:h-[425px]">
@@ -67,16 +76,17 @@ export default function KitchenCarousel() {
         }}
       >
         {extendedSlides.map((item, index) => (
-          <div key={index} className="relative flex-shrink-0 w-full px-1 sm:w-4/5 sm:px-2">
+          <div
+            key={index}
+            className="relative flex-shrink-0 w-full px-1 sm:w-4/5 sm:px-2"
+          >
             <div className="relative w-[94%] h-[190px] sm:w-[100%] sm:h-[390px]">
-              {/* Gray placeholder */}
               <div
                 className={`absolute inset-0 bg-gray-200 rounded-[10px] sm:rounded-[0px] transition-opacity duration-300 ${
                   loadedImages[index] ? "opacity-0" : "opacity-100"
                 }`}
               />
 
-              {/* Actual image */}
               <img
                 src={`https://back.stroybazan1.uz${item.image}`}
                 className="w-full h-full object-cover rounded-[10px] sm:rounded-[0px]"
@@ -96,11 +106,13 @@ export default function KitchenCarousel() {
             onClick={() => setCurrentSlide(index)}
             className={cn(
               "cursor-pointer w-2 h-2 rounded-full transition-all sm:w-3 sm:h-3",
-              currentSlide === index ? "bg-[#DCC38B] w-6 sm:w-8" : "bg-[#D5D5D5]",
+              currentSlide === index
+                ? "bg-[#DCC38B] w-6 sm:w-8"
+                : "bg-[#D5D5D5]"
             )}
           />
         ))}
       </div>
     </div>
-  )
+  );
 }

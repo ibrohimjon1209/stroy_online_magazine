@@ -250,7 +250,7 @@ const App = () => {
                   }
                 />
                 <Route
-                  path="/category"
+                  path="/category/*"
                   element={
                     <Suspense fallback={<div>Loading...</div>}>
                       <Category />
