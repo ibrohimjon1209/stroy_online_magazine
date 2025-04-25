@@ -27,6 +27,7 @@ import Enter_category from "./Pages/Enter/Category";
 import Enter_region from "./Pages/Enter/Region";
 import User_offer from "./Pages/User_offer/User_offer";
 import get_favorites from "./Services/favorites/get_favorites";
+import create_favorites from "./Services/favorites/create_favorites";
 const Product = lazy(() => import("./Pages/Product/Product"));
 const Category = lazy(() => import("./Pages/Category/Category"));
 
@@ -56,20 +57,29 @@ const App = () => {
     }
   }, []);
 
-  useEffect(()=>{
-    const get_f = async () => {
-      try {
-        const get_f = await get_favorites();
-        localStorage.setItem("likedProducts", JSON.stringify(get_f));
-        console.log(get_f);
-      } catch (err) {
-        console.error("Error:", err);
+  useEffect(() => {
+    if (userSignIn) {
+      const get_f = async () => {
+        try {
+          JSON.parse(localStorage.getItem("likedProducts")).map(
+            async (item) => {
+              await create_favorites(
+                item.product,
+                localStorage.getItem("userId")
+              );
+            }
+          );
+          const get_f = await get_favorites();
+          localStorage.setItem("likedProducts", JSON.stringify(get_f));
+        } catch (err) {
+          console.error("Error:", err);
+        }
+      };
+      if (userSignIn) {
+        get_f();
       }
     }
-    if (userSignIn) {
-      get_f()
-    }
-  },[userSignIn])
+  }, [userSignIn]);
 
   const [is_found, set_is_found] = useState(true);
   const [is_another_nav, set_is_another_nav] = useState(false);
@@ -77,6 +87,8 @@ const App = () => {
   const [is_footer_visible, set_is_footer_visible] = useState(true);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [formalization_open, set_formalization_open] = useState(false);
+  const [searchText, setSearchText] = useState("");
+
   const location = useLocation().pathname.split("/")[1];
 
   useEffect(() => {
@@ -122,7 +134,12 @@ const App = () => {
         set_is_another_nav(false);
       }
     }
-    if (location == "formalization" || location == "terms" || location == "login" || location == "register") {
+    if (
+      location == "formalization" ||
+      location == "terms" ||
+      location == "login" ||
+      location == "register"
+    ) {
     } else {
       set_is_another_nav(false);
     }
@@ -154,7 +171,7 @@ const App = () => {
   } else {
     return (
       <div className={`${is_found ? "sm:w-[1450px]" : "w-full "} m-auto `}>
-        {is_found && !is_another_nav && <Navbar lang={lang} />}
+        {is_found && !is_another_nav && <Navbar lang={lang} searchText={searchText} setSearchText={setSearchText} />}
         <div
           className={`${
             is_found ? "sm:w-[1450px]" : "w-full"
@@ -163,7 +180,11 @@ const App = () => {
           <div
             className={`flex flex-col justify-between ${
               is_found
-                ? `${is_another_nav ? "h-[calc(106.9vh-100px)] sm:h-[calc(118vh)]" : "h-[calc(106.9vh-100px)] sm:h-[calc(119.5vh-100px)]"} `
+                ? `${
+                    is_another_nav
+                      ? "h-[calc(106.9vh-100px)] sm:h-[calc(118vh)]"
+                      : "h-[calc(106.9vh-100px)] sm:h-[calc(119.5vh-100px)]"
+                  } `
                 : "h-full"
             } w-[100%]`}
             style={{
@@ -175,7 +196,7 @@ const App = () => {
           >
             <div>
               <Routes>
-                <Route path="/" element={<Home lang={lang} />} />
+                <Route path="/" element={<Home lang={lang} setSearchText={setSearchText} searchText={searchText} />} />
                 <Route path="/likes" element={<Likes lang={lang} />} />
                 <Route
                   path="/basket"
@@ -269,7 +290,7 @@ const App = () => {
                   path="/category/*"
                   element={
                     <Suspense fallback={<div>Loading...</div>}>
-                      <Category />
+                      <Category searchText={searchText}/>
                     </Suspense>
                   }
                 />

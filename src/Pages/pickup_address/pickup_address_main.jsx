@@ -115,7 +115,7 @@ function RegionSelectionForm() {
 
   return (
     <div className="space-y-[50px] w-[450px]">
-      <div className="space-y-4 flex flex-col">
+      <div className="flex flex-col space-y-4">
         <label className="font-inter font-[500] text-[24px] leading-[22px] text-black">
           Viloyat
         </label>
@@ -127,7 +127,7 @@ function RegionSelectionForm() {
         />
       </div>
 
-      <div className="space-y-4 flex flex-col">
+      <div className="flex flex-col space-y-4">
         <label className="font-inter font-[500] text-[24px] leading-[22px] text-black">
           Shahar / Tuman
         </label>
@@ -139,7 +139,7 @@ function RegionSelectionForm() {
         />
       </div>
 
-      <div className="space-y-4 flex flex-col">
+      <div className="flex flex-col space-y-4">
         <label className="font-inter font-[500] text-[24px] leading-[22px] text-black">
           Ko’cha
         </label>
@@ -166,7 +166,7 @@ const Pickup_address_main = ({ is_pickup, set_is_pickup }) => {
     <div
       className={`w-full ${is_pickup ? "flex" : "hidden"} items-center justify-center flex-col sm:mb-[84px]`}
     >
-      <div className="sticky w-full h-[65px] sm:h-[80px] fixed top-0 z-50">
+      <div className=" w-full h-[65px] sm:h-[80px] fixed top-0 z-50">
         <div className="bg-[#DCC38B] flex items-center gap-[10px] w-full h-full font-inter font-[600] text-[17px] sm:text-[20px] leading-[22px] text-black pl-[13px] sm:pl-[50px]">
           <div onClick={() => set_is_pickup(false)}>
             <ChevronLeft className="scale-110 sm:scale-100 sm:w-[35px] sm:h-[35px] mt-0 sm:mt-[2px] cursor-pointer" />
