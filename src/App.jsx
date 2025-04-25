@@ -108,7 +108,7 @@ const App = () => {
         set_is_another_nav(false);
       }
     }
-    if (location == "formalization" || location == "terms") {
+    if (location == "formalization" || location == "terms" || location == "login" || location == "register") {
     } else {
       set_is_another_nav(false);
     }
@@ -149,7 +149,7 @@ const App = () => {
           <div
             className={`flex flex-col justify-between ${
               is_found
-                ? "h-[calc(106.9vh-100px)] sm:h-[calc(119.5vh-100px)]"
+                ? `${is_another_nav ? "h-[calc(106.9vh-100px)] sm:h-[calc(118vh)]" : "h-[calc(106.9vh-100px)] sm:h-[calc(119.5vh-100px)]"} `
                 : "h-full"
             } w-[100%]`}
             style={{
