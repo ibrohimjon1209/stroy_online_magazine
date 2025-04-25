@@ -1,12 +1,13 @@
 import "./style.css";
 import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import logo from "./Images/logo_mobile.svg";
 import Carusel from "./Carusel";
 import { Search, CirclePlus, History, X, Heart } from "lucide-react";
 import Download_page from "./Download";
 import { products_get } from "../../Services/products_get";
+import create_favorites from "../../Services/favorites/create_favorites";
+import delete_favorites from "../../Services/favorites/delete_favorites";
 
 function Home({ lang }) {
   const inputRef = useRef(null);
@@ -14,27 +15,27 @@ function Home({ lang }) {
   const [searchText, setSearchText] = useState("");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const uzs_lang =
-    lang == "uz"
-      ? "so'm"
-      : lang == "en"
-      ? "uzs"
-      : lang == "ru"
-      ? "сум"
-      : "so'm";
-  const [searchTopics, setSearchTopics] = useState(() => {
-    return localStorage.getItem("searchTopics") || [];
-  });
   const [likedProducts, setLikedProducts] = useState(() => {
-    return localStorage.getItem("likedProducts") || [];
+    const savedLikes = localStorage.getItem("likedProducts");
+    return savedLikes ? JSON.parse(savedLikes) : [];
   });
 
+  const uzs_lang =
+    lang === "uz"
+      ? "so'm"
+      : lang === "en"
+      ? "uzs"
+      : lang === "ru"
+      ? "сум"
+      : "so'm";
+
   const sl_option_id =
-    localStorage.getItem("sl_option_nav") == "Story Baza №1"
+    localStorage.getItem("sl_option_nav") === "Story Baza №1"
       ? 0
-      : localStorage.getItem("sl_option_nav") == "Mebel"
+      : localStorage.getItem("sl_option_nav") === "Mebel"
       ? 1
       : 2;
+
   useEffect(() => {
     const getProducts = async () => {
       try {
@@ -59,12 +60,52 @@ function Home({ lang }) {
     setIsSearchOpen((prev) => !prev);
   };
 
-  const handleLikeToggle = (id) => {
-    const updatedLikes = likedProducts.includes(id)
-      ? likedProducts.filter((item) => item !== id)
-      : [...likedProducts, id];
-    setLikedProducts(updatedLikes);
+  const handleLikeToggle = async (productId) => {
+    const userId = localStorage.getItem("userId"); // Foydalanuvchi ID sini olish
+    if (!userId) return; // Agar userId bo'lmasa, hech narsa qilmaslik
+
+    const isLiked = likedProducts.some((fav) => fav.product === productId); // Mahsulotni like qilish holatini tekshirish
+
+    let updatedLikes;
+    if (isLiked) {
+      updatedLikes = likedProducts.filter((fav) => fav.product !== productId); // Agar liked bo'lsa, olib tashlash
+    } else {
+      updatedLikes = [
+        ...likedProducts,
+        { user: parseInt(userId), product: productId },
+      ]; // Yangi like qo'shish
+    }
+
+    // Liked productsni localStorage'da saqlash
     localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
+
+    if (isLiked) {
+      const favorite = likedProducts.find(
+        (fav) => fav.product === productId && fav.user.toString() === userId
+      );
+      if (favorite) {
+        try {
+          await delete_favorites(favorite.id); // DELETE so'rovini yuborish
+        } catch (error) {
+          console.error("DELETE xatosi:", error);
+        }
+      }
+    } else {
+      try {
+        const newFav = await create_favorites(productId, userId); // POST so'rovini yuborish
+        if (newFav && newFav.data && newFav.data.product) {
+          updatedLikes.push({ user: parseInt(userId), product: productId });
+          localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
+        } else {
+          console.error("POST xatosi: Yangi like qo'shishda xatolik");
+        }
+      } catch (error) {
+        console.error("POST xatosi:", error);
+      }
+    }
+
+    // Liked productsni state'ga o'rnatish
+    setLikedProducts(updatedLikes);
   };
 
   return (
@@ -93,34 +134,13 @@ function Home({ lang }) {
 
       <Carusel />
 
-      {isSearchOpen && (
-        <div className="absolute top-[150px] left-0 h-[91vh] w-full flex justify-center pt-[10px] z-50">
-          {searchTopics.map((item, index) => (
-            <div
-              key={index}
-              className="cursor-pointer w-full h-[52px] flex justify-between items-center bg-transparent hover:bg-gray-100"
-            >
-              <div className="flex gap-[15px]">
-                <History strokeWidth={1.75} />
-                <h1 className="text-black opacity-80">{item}</h1>
-              </div>
-              <X
-                strokeWidth={1.75}
-                className="cursor-pointer"
-                onClick={() => setIsSearchOpen(false)}
-              />
-            </div>
-          ))}
-        </div>
-      )}
-
       <div className="popular w-full px-[15px] sm:px-[77px] mb-[100px]">
         <h1 className="text-[17px] sm:text-[22px] font-semibold mt-3">
-          {lang == "uz"
+          {lang === "uz"
             ? "Ommabop tavarlar"
-            : lang == "en"
+            : lang === "en"
             ? "Popular products"
-            : lang == "ru"
+            : lang === "ru"
             ? "Популярные товары"
             : "Ommabop tavarlar"}
         </h1>
@@ -148,21 +168,21 @@ function Home({ lang }) {
                       <p className="text-black text-[12px] sm:text-[14px]">
                         {product.variants?.[0]?.price
                           ? `${
-                              lang == "uz"
+                              lang === "uz"
                                 ? "Narxi"
-                                : lang == "en"
+                                : lang === "en"
                                 ? "Price"
-                                : lang == "ru"
+                                : lang === "ru"
                                 ? "Цена"
                                 : "Narxi"
                             }: ${parseFloat(product.variants[0].price).toFixed(
                               2
                             )} ${uzs_lang}`
-                          : lang == "uz"
+                          : lang === "uz"
                           ? "Narxi mavjud emas"
-                          : lang == "en"
+                          : lang === "en"
                           ? "Price not available"
-                          : lang == "ru"
+                          : lang === "ru"
                           ? "Цена не доступна"
                           : "Narxi mavjud emas"}
                       </p>
@@ -170,7 +190,9 @@ function Home({ lang }) {
                     <Heart
                       className="w-[19px] h-[19px] sm:w-[28px] sm:h-[28px] text-[#FF0000] cursor-pointer mb-0.5"
                       fill={
-                        likedProducts.includes(product.id) ? "#FF0000" : "none"
+                        likedProducts.some((fav) => fav.product === product.id)
+                          ? "#FF0000"
+                          : "none"
                       }
                       onClick={(e) => {
                         e.preventDefault();
@@ -183,11 +205,11 @@ function Home({ lang }) {
             ))
           ) : (
             <p className="text-center text-gray-500">
-              {lang == "uz"
+              {lang === "uz"
                 ? "Ma'lumot topilmadi."
-                : lang == "en"
+                : lang === "en"
                 ? "No data found."
-                : lang == "ru"
+                : lang === "ru"
                 ? "Данные не найдены."
                 : "Ma'lumot topilmadi."}
             </p>

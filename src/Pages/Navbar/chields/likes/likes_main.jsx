@@ -2,60 +2,61 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
+import { products_get } from "../../../../Services/products_get";
+import delete_favorites from "../../../../Services/favorites/delete_favorites";
 
 const Likes_main = ({ lang }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [likedProducts, setLikedProducts] = useState(
-    localStorage.getItem("likedProducts") || []
+    JSON.parse(localStorage.getItem("likedProducts")) || []
   );
+  const sl_option_id =
+    localStorage.getItem("sl_option_nav") === "Story Baza №1"
+      ? 0
+      : localStorage.getItem("sl_option_nav") === "Mebel"
+      ? 1
+      : 2;
 
   useEffect(() => {
     const getProducts = async () => {
       try {
-        const response = await axios.get(
-          "https://back.stroybazan1.uz/api/api/products/?branch=0",
-          {
-            headers: {
-              accept: "application/json",
-              "X-CSRFTOKEN":
-                "B8UmaQE4P3RrkjHA8QHRPrl0hvSU4yProbsYerUqficnXhefiWFxkqRVvGVL7Ws5",
-            },
-          }
+        const response = await products_get(sl_option_id);
+        // Filter response to include only products in likedProducts
+        const filteredProducts = response.filter((item) =>
+          likedProducts.some((liked) => liked.product === item.id)
         );
-
-        const storedLikes =
-          JSON.parse(localStorage.getItem("likedProducts")) || [];
-        const filteredProducts = (response.data || []).filter((product) =>
-          storedLikes.includes(product.id)
-        );
-
-        setProducts(filteredProducts);
-        setLikedProducts(storedLikes); // LocalStorage bilan sinxronlash
+        // Mark all filtered products as liked
+        filteredProducts.forEach((item) => {
+          item.liked = true;
+        });
+        setProducts(filteredProducts || []);
       } catch (error) {
         console.error("API xatosi:", error);
       } finally {
         setLoading(false);
       }
     };
-
     getProducts();
   }, []);
 
-  const handleLikeToggle = (id) => {
-    const updatedLikes = likedProducts.includes(id)
-      ? likedProducts.filter((item) => item !== id)
-      : [...likedProducts, id];
+  const handleLikeToggle = async (productId) => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
+    try {
+      await delete_favorites(
+        likedProducts.find((fav) => fav.product === productId).id
+      );
+    } catch (error) {
+      console.error("DELETE xatosi:", error);
+    }
 
-    setLikedProducts(updatedLikes);
-    localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
-
-    // Unlike qilinganda mahsulot ro'yxatdan o'chishi uchun
-    setProducts((prevProducts) =>
-      updatedLikes.includes(id)
-        ? prevProducts
-        : prevProducts.filter((p) => p.id !== id)
+    const updatedLikes = likedProducts.filter(
+      (fav) => fav.product !== productId
     );
+    localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
+    setLikedProducts(updatedLikes);
+    setProducts(products.filter((product) => product.id !== productId));
   };
 
   return (
@@ -102,11 +103,7 @@ const Likes_main = ({ lang }) => {
                     <div className="flex items-center mr-2">
                       <Heart
                         className="w-[16px] h-[16px] sm:w-[25px] text-[#FF0000] sm:h-[25px] object-contain cursor-pointer"
-                        fill={
-                          likedProducts.includes(product.id)
-                            ? "#FF0000"
-                            : "none"
-                        }
+                        fill="#FF0000" // Always filled since all products are liked
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -120,11 +117,11 @@ const Likes_main = ({ lang }) => {
             ))
           ) : (
             <p className="w-full text-lg text-center text-gray-500 font-inter">
-              {lang == "uz"
+              {lang === "uz"
                 ? "Sevimlilar yo'q"
-                : lang == "en"
+                : lang === "en"
                 ? "Favorites not found"
-                : lang == "ru"
+                : lang === "ru"
                 ? "Избранное не найдено"
                 : "Sevimlilar yo'q"}
             </p>
