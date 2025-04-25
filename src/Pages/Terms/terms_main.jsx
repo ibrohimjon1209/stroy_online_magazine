@@ -1,10 +1,24 @@
 import { ChevronLeft } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const Terms_main = ({ lang }) => {
-  const text =
-    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem IpsumLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem IpsumLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem IpsumLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem IpsumLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem IpsumLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem IpsumLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets ";
+  const [data, set_data] = useState([]);
+  const API_URL = "https://back.stroybazan1.uz/api/api/user-agreements/";
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((json) => set_data(json))
+      .catch((err) => console.error("Error", err));
+  }, []);
+
+  const getTitle = () => {
+    if (lang === "uz") return "Foydalanuvchi shartnomasi";
+    if (lang === "ru") return "Пользовательское соглашение";
+    if (lang === "en") return "User agreement";
+    return "Foydalanuvchi shartnomasi";
+  };
 
   return (
     <div className="w-full h-full flex flex-col mb-[35px]">
@@ -13,19 +27,16 @@ const Terms_main = ({ lang }) => {
           <Link to="/formalization">
             <ChevronLeft className="scale-110 sm:scale-100 sm:w-[35px] sm:h-[35px] mt-[2px] cursor-pointer" />
           </Link>
-          <p>
-            {lang == "uz"
-              ? "Foydalanuvchi shartnomasi"
-              : "en"
-              ? "User agreement"
-              : "ru"
-              ? "Пользовательское соглашение"
-              : "Foydalanuvchi shartnomasi"}
-          </p>
+          <p>{getTitle()}</p>
         </div>
       </div>
+
       <div className="max-w-[90%] mt-[20px] sm:mt-[35px] mx-auto font-inter font-[600] text-[15px] leading-[22px] text-black text-justify">
-        {text}
+        {data.length > 0 ? (
+          <p>{data[0][`content_${lang}`]}</p>
+        ) : (
+          <p>Yuklanmoqda...</p>
+        )}
       </div>
     </div>
   );

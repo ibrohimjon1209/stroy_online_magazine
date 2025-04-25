@@ -70,7 +70,7 @@ const Sidebar = ({ city, set_city, lang, set_lang, isUserSignIn, setUserSignIn, 
 
   return (
     <div
-      className={`h-auto sm:mx-0 mx-auto w-[100%] ${help_modal_open ? "z-[10000]" : ""
+      className={`h-auto sm:mx-0 m  x-auto w-[100%] ${help_modal_open ? "z-[10000]" : ""
         } sm:w-[350px]`}
     >
       <Routes>

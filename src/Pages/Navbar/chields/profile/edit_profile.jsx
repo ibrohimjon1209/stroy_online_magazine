@@ -47,6 +47,7 @@ const Edit_profile = ({ isOpen, onClose, name, surname }) => {
           onClick={()=>{
             update_user(user_data.name, user_data.surname, localStorage.getItem("userId"), localStorage.getItem("accessToken"));
             onClose();
+            window.location.reload()
           }}
         >
           O'zgarishlarni saqlash

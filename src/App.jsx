@@ -41,6 +41,8 @@ const App = () => {
 
   useEffect(() => {
     setUserSignIn(localStorage.getItem("userId") ? true : false);
+    console.log(userSignIn);
+    
     !localStorage.getItem("lang") && localStorage.setItem("lang", "uz");
     !localStorage.getItem("city") &&
       localStorage.setItem("city", "andijan city");
@@ -83,7 +85,7 @@ const App = () => {
     if ((location == "login" || location == "register") && userSignIn) {
       navigate("/");
     }
-    if (localStorage.getItem("refreshToken"))
+    if (userSignIn)
       if (location == "login" || location == "register") navigate("/");
 
     if (location == "") set_is_found(true);
