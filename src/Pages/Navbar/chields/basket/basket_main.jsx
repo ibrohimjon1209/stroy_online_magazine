@@ -51,15 +51,10 @@ export default function Basket_main({ basket, set_formalization_open, lang, set_
           ? { ...product, selected: !product.selected }
           : product,
       )
+      // Update the parent component's state with the updated products
+      set_basket(updatedProducts)
       return updatedProducts
     })
-    set_basket(
-      products.map((product) =>
-        product.id === productId && product.size[lang] === size && product.color[lang] === color
-          ? { ...product, selected: !product.selected }
-          : product,
-      ),
-    )
   }
 
   const decreaseQuantity = (productId, size, color) => {

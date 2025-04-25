@@ -20,6 +20,7 @@ const LogOutModal = ({ isOpen, onClose, setUserSignIn }) => {
               localStorage.removeItem("refreshToken");
               localStorage.removeItem("accessToken");
               localStorage.removeItem("userId");
+              localStorage.removeItem("likedProducts");
               onClose();
             }}
           >
