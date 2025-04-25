@@ -3,17 +3,17 @@ import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import logo from "./Images/logo_mobile.svg";
 import Carusel from "./Carusel";
-import { Search, CirclePlus, History, X, Heart } from "lucide-react";
+import { Search, CirclePlus, Heart } from "lucide-react";
 import Download_page from "./Download";
 import { products_get } from "../../Services/products_get";
 import create_favorites from "../../Services/favorites/create_favorites";
 import delete_favorites from "../../Services/favorites/delete_favorites";
 
-function Home({ lang }) {
+function Home({ lang, setSearchText, searchText }) {
   const inputRef = useRef(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchText, setSearchText] = useState("");
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [likedProducts, setLikedProducts] = useState(() => {
     const savedLikes = localStorage.getItem("likedProducts");
@@ -41,6 +41,7 @@ function Home({ lang }) {
       try {
         const response = await products_get(sl_option_id);
         setProducts(response || []);
+        setFilteredProducts(response || []); // initially, no filtering
       } catch (error) {
         console.error("API xatosi:", error);
       } finally {
@@ -50,61 +51,81 @@ function Home({ lang }) {
     getProducts();
   }, []);
 
-  const handleSearchClick = () => {
-    if (searchText) {
-      const updatedTopics = [...searchTopics, searchText];
-      setSearchTopics(updatedTopics);
-      localStorage.setItem("searchTopics", JSON.stringify(updatedTopics));
-      setSearchText("");
+  // Filter products based on searchText
+  useEffect(() => {
+    if (searchText.trim()) {
+      const filtered = products.filter((product) =>
+        product[`name_${lang}`]
+          .toLowerCase()
+          .includes(searchText.toLowerCase())
+      );
+      setLoading(true);
+      setTimeout(()=>{
+        setFilteredProducts(filtered);
+        setLoading(false);
+      }, 1000)
+    } else {
+      setLoading(true);
+      setTimeout(()=>{
+        setFilteredProducts(products);
+        setLoading(false);
+      },1000)
     }
+  }, [searchText, products, lang]);
+
+  const handleSearchClick = () => {
     setIsSearchOpen((prev) => !prev);
   };
 
   const handleLikeToggle = async (productId) => {
-    const userId = localStorage.getItem("userId"); // Foydalanuvchi ID sini olish
-    if (!userId) return; // Agar userId bo'lmasa, hech narsa qilmaslik
-
-    const isLiked = likedProducts.some((fav) => fav.product === productId); // Mahsulotni like qilish holatini tekshirish
-
+    const userId = localStorage.getItem("userId");
+    const isLiked = likedProducts.some((fav) => fav.product === productId);
+  
     let updatedLikes;
-    if (isLiked) {
-      updatedLikes = likedProducts.filter((fav) => fav.product !== productId); // Agar liked bo'lsa, olib tashlash
-    } else {
-      updatedLikes = [
-        ...likedProducts,
-        { user: parseInt(userId), product: productId },
-      ]; // Yangi like qo'shish
+  
+    if (!userId) {
+      // No userId: Update localStorage with only productId, no API calls
+      if (isLiked) {
+        updatedLikes = likedProducts.filter((fav) => fav.product !== productId);
+      } else {
+        updatedLikes = [...likedProducts, { product: productId }];
+      }
+      localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
+      setLikedProducts(updatedLikes);
+      return;
     }
-
-    // Liked productsni localStorage'da saqlash
-    localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
-
+  
+    // userId exists: Proceed with API calls
     if (isLiked) {
+      updatedLikes = likedProducts.filter((fav) => fav.product !== productId);
       const favorite = likedProducts.find(
         (fav) => fav.product === productId && fav.user.toString() === userId
       );
       if (favorite) {
         try {
-          await delete_favorites(favorite.id); // DELETE so'rovini yuborish
+          await delete_favorites(favorite.id); // DELETE request
         } catch (error) {
           console.error("DELETE xatosi:", error);
         }
       }
     } else {
+      updatedLikes = [
+        ...likedProducts,
+        { user: parseInt(userId), product: productId },
+      ];
       try {
-        const newFav = await create_favorites(productId, userId); // POST so'rovini yuborish
-        if (newFav && newFav.data && newFav.data.product) {
-          updatedLikes.push({ user: parseInt(userId), product: productId });
-          localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
-        } else {
+        const newFav = await create_favorites(productId, userId);
+        if (!newFav || !newFav.data || !newFav.data.product) {
           console.error("POST xatosi: Yangi like qo'shishda xatolik");
+          return;
         }
       } catch (error) {
         console.error("POST xatosi:", error);
+        return;
       }
     }
-
-    // Liked productsni state'ga o'rnatish
+  
+    localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
     setLikedProducts(updatedLikes);
   };
 
@@ -146,11 +167,11 @@ function Home({ lang }) {
         </h1>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-[10px] gap-y-[20px] mt-3">
           {loading ? (
-            <div className="flex justify-center items-center w-full h-[200px]">
+            <div className="flex justify-center mx-auto items-center scale-[70%] sm:scale-[100%] w-[200%] h-[130px] sm:w-[500%] sm:h-[400px]">
               <div className="loader"></div>
             </div>
-          ) : products.length > 0 ? (
-            products.map((product, index) => (
+          ) : filteredProducts.length > 0 ? (
+            filteredProducts.map((product, index) => (
               <div key={index} className="cursor-pointer">
                 <Link to={`/product/${product.id}`}>
                   <div className="rounded-[10px] w-[160px] h-[160px] sm:w-[245px] sm:h-[245px] bg-[#F2F2F1] overflow-hidden group">
@@ -189,11 +210,9 @@ function Home({ lang }) {
                     </div>
                     <Heart
                       className="w-[19px] h-[19px] sm:w-[28px] sm:h-[28px] text-[#FF0000] cursor-pointer mb-0.5"
-                      fill={
-                        likedProducts.some((fav) => fav.product === product.id)
-                          ? "#FF0000"
-                          : "none"
-                      }
+                      fill={likedProducts.some((fav) => fav.product === product.id)
+                        ? "#FF0000"
+                        : "none"}
                       onClick={(e) => {
                         e.preventDefault();
                         handleLikeToggle(product.id);

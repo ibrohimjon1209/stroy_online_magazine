@@ -81,6 +81,11 @@ const Category_mobile = () => {
     { name: "Kanauf" },
   ];
 
+  // Filter category topics based on searchText
+  const filteredCategoryTopics = category_topics.filter((item) =>
+    item.name.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   return (
     <div className="w-full">
       <div>
@@ -184,7 +189,7 @@ const Category_mobile = () => {
       </div>
 
       <div className="category-topics pt-[15px]">
-        {category_topics.map((item, index) => (
+        {filteredCategoryTopics.map((item, index) => (
           <Link to={"/category"} key={index}>
             <div className="flex justify-between items-center pl-[22px] pr-[31px] w-full h-[52px]">
               <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">

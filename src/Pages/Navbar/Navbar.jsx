@@ -33,7 +33,7 @@ const getStoredTopics = () => {
   }
 };
 
-const Navbar = ({ lang, set_basket, basket }) => {
+const Navbar = ({ lang, setSearchText, searchText }) => {
   const navigate = useNavigate();
   const inputRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -44,12 +44,11 @@ const Navbar = ({ lang, set_basket, basket }) => {
   const [is_basket_hovered, set_is_basket_hovered] = useState(false);
   const [is_profile_hovered, set_is_profile_hovered] = useState(false);
   const location = useLocation().pathname.split("/")[1];
-  const [active, set_active] = useState("");
+  // const [active, set_active] = useState("");
   const [categoryAnimation, setCategoryAnimation] = useState(false);
   const [searchAnimation, setSearchAnimation] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [search_topics, setSearchTopics] = useState(getStoredTopics());
-  const [searchText, setSearchText] = useState("");
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const sl_option_id =
@@ -67,9 +66,11 @@ const Navbar = ({ lang, set_basket, basket }) => {
         if (!response) {
           throw new Error("Failed to fetch categories");
         }
-        setCategories(response.filter((item)=>{
-          return item.branch == sl_option_id
-        }));
+        setCategories(
+          response.filter((item) => {
+            return item.branch == sl_option_id;
+          })
+        );
       } catch (error) {
         console.error("Error fetching categories:", error);
       } finally {

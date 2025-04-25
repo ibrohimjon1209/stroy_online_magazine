@@ -42,18 +42,29 @@ const Likes_main = ({ lang }) => {
 
   const handleLikeToggle = async (productId) => {
     const userId = localStorage.getItem("userId");
-    if (!userId) return;
-    try {
-      await delete_favorites(
-        likedProducts.find((fav) => fav.product === productId).id
-      );
-    } catch (error) {
-      console.error("DELETE xatosi:", error);
+    const updatedLikes = likedProducts.filter((fav) => fav.product !== productId);
+  
+    if (!userId) {
+      // No userId: Update localStorage, remove from products, no API calls
+      localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
+      setLikedProducts(updatedLikes);
+      setProducts(products.filter((product) => product.id !== productId));
+      return;
     }
-
-    const updatedLikes = likedProducts.filter(
-      (fav) => fav.product !== productId
+  
+    // userId exists: Call delete_favorites and update state
+    const favorite = likedProducts.find(
+      (fav) => fav.product === productId && fav.user.toString() === userId
     );
+    if (favorite) {
+      try {
+        await delete_favorites(favorite.id); // DELETE request
+      } catch (error) {
+        console.error("DELETE xatosi:", error);
+      }
+    }
+  
+    // Update localStorage and state
     localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
     setLikedProducts(updatedLikes);
     setProducts(products.filter((product) => product.id !== productId));

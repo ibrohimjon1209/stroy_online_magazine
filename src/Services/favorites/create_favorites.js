@@ -11,7 +11,6 @@ const create_favorites = async (product, user) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response)
     return response.data;
   } catch (err) {
     console.error("Error:", err);
