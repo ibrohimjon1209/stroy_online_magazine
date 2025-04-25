@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { verify } from "../../../Services/auth/verify";
 import { login } from "../../../Services/auth/login";
 import { register } from "../../../Services/auth/register";
+import get_favorites from "../../../Services/favorites/get_favorites";
 import "./style.css";
 
 export default function PhoneVerification({
@@ -108,6 +109,7 @@ export default function PhoneVerification({
         setUserSignIn(true);
         set_is_found(true);
         navigate("/");
+        window.location.reload();
       }
     } catch (error) {
       setErrorMessage(

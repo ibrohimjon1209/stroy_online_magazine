@@ -26,6 +26,7 @@ import Enter_borrow from "./Pages/Enter/Borrow";
 import Enter_category from "./Pages/Enter/Category";
 import Enter_region from "./Pages/Enter/Region";
 import User_offer from "./Pages/User_offer/User_offer";
+import get_favorites from "./Services/favorites/get_favorites";
 const Product = lazy(() => import("./Pages/Product/Product"));
 const Category = lazy(() => import("./Pages/Category/Category"));
 
@@ -41,8 +42,6 @@ const App = () => {
 
   useEffect(() => {
     setUserSignIn(localStorage.getItem("userId") ? true : false);
-    console.log(userSignIn);
-    
     !localStorage.getItem("lang") && localStorage.setItem("lang", "uz");
     !localStorage.getItem("city") &&
       localStorage.setItem("city", "andijan city");
@@ -56,6 +55,21 @@ const App = () => {
       navigate("/enter/language");
     }
   }, []);
+
+  useEffect(()=>{
+    const get_f = async () => {
+      try {
+        const get_f = await get_favorites();
+        localStorage.setItem("likedProducts", JSON.stringify(get_f));
+        console.log(get_f);
+      } catch (err) {
+        console.error("Error:", err);
+      }
+    }
+    if (userSignIn) {
+      get_f()
+    }
+  },[userSignIn])
 
   const [is_found, set_is_found] = useState(true);
   const [is_another_nav, set_is_another_nav] = useState(false);
