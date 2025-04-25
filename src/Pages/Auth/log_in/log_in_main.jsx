@@ -75,7 +75,7 @@ export default function Log_in_main({ set_is_found, setUserSignIn, lang }) {
   }
 
   return (
-    <div className="flex h-[calc(100vh-100px)] flex-col items-center sm:justify-center mt-[12vh] p-4">
+    <div className="flex h-full flex-col items-center sm:justify-center mt-[12vh] p-4">
       <div className="flex flex-col justify-between w-full">
         <div className="relative w-full max-w-md mx-auto space-y-8">
           <h1 className="text-2xl font-medium text-center">{translations[lang]?.title || translations.uz.title}</h1>
