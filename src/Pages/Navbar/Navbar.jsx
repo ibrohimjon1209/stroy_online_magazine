@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import logo from "./Images/logo.svg";
+import logo1 from "./Images/logo.svg";
+import logo2 from "../Enter/Images/photo_1.png";
+import logo3 from "../Enter/Images/photo_3.png";
 import cube from "./Images/orders.svg";
 import cube_a from "./Images/orders_a.svg";
 import like from "./Images/like.svg";
@@ -44,7 +46,6 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
   const [is_basket_hovered, set_is_basket_hovered] = useState(false);
   const [is_profile_hovered, set_is_profile_hovered] = useState(false);
   const location = useLocation().pathname.split("/")[1];
-  // const [active, set_active] = useState("");
   const [categoryAnimation, setCategoryAnimation] = useState(false);
   const [searchAnimation, setSearchAnimation] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -194,6 +195,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
     }, 300);
   };
 
+
   return (
     <>
       <div className="hidden sm:block">
@@ -232,16 +234,16 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
           <div className="flex items-center justify-between w-full md:hidden">
             <div className="flex items-center gap-[5px]">
               <img
-                src={logo || "/placeholder.svg"}
+                src={sl_option == "Story Baza №1" ? logo1 : sl_option == "Mebel" ? logo2 : logo3}
                 alt="Logo"
-                className="w-8 h-8 cursor-pointer"
+                className="cursor-pointer w-7 h-7"
                 onClick={to_home}
               />
               <h1
                 className="font-inter font-[600] text-[16px] cursor-pointer leading-[22px] text-black"
                 onClick={to_home}
               >
-                STROY BAZA №1
+                {sl_option}
               </h1>
             </div>
             <button
@@ -252,10 +254,9 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
             </button>
           </div>
 
-          {/* Logo va bosh sahifaga yo'naltirish - desktop */}
           <div className="w-full md:w-[247px] h-full hidden md:flex items-center gap-[5px]">
             <img
-              src={logo || "/placeholder.svg"}
+              src={sl_option == "Story Baza №1" ? logo1 : sl_option == "Mebel" ? logo2 : logo3}
               alt="Logo"
               className="cursor-pointer"
               onClick={to_home}
@@ -264,7 +265,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
               className="font-inter font-[600] text-[20px] cursor-pointer leading-[22px] text-black"
               onClick={to_home}
             >
-              STROY BAZA №1
+              {sl_option}
             </h1>
           </div>
 
