@@ -248,7 +248,7 @@ const Product = ({ lang, basket, set_basket }) => {
       handleAddToCart()
 
       // Navigate to basket page after a short delay
-      setTimeout(() => {}, 800)
+      setTimeout(() => { }, 800)
     }, 600)
   }
 
@@ -500,11 +500,9 @@ const Product = ({ lang, basket, set_basket }) => {
               {productData.variants.map((variant, index) => (
                 <div
                   key={index}
-                  className={`border-[3px] ${
-                    selectedColorIndex === index ? "border-[rgba(190,160,134,1)]" : "border-transparent"
-                  } overflow-hidden w-[158px] h-[156px] bg-[rgba(242,242,241,1)] rounded-[15px] flex justify-center items-center cursor-pointer ${
-                    !isCurrentSizeVariant(index) ? "dimmed" : ""
-                  }`}
+                  className={`border-[3px] ${selectedColorIndex === index ? "border-[rgba(190,160,134,1)]" : "border-transparent"
+                    } overflow-hidden w-[158px] h-[156px] bg-[rgba(242,242,241,1)] rounded-[15px] flex justify-center items-center cursor-pointer ${!isCurrentSizeVariant(index) ? "dimmed" : ""
+                    }`}
                   onClick={() => handleColorClick(index)}
                 >
                   <img
@@ -532,15 +530,14 @@ const Product = ({ lang, basket, set_basket }) => {
                   `https://back.stroybazan1.uz${productData.variants[selectedColorIndex].image || "/placeholder.svg"}` ||
                   "/placeholder.svg"
                 }
-                className={`w-[162px] sm:w-[504px] h-[188px] sm:h-[504px] object-fill ${
-                  isTransitioning
+                className={`w-[162px] sm:w-[504px] h-[188px] sm:h-[504px] object-fill ${isTransitioning
                     ? slideDirection
                     : slideDirection
                       ? slideDirection === "slide-left"
                         ? "slide-in-right"
                         : "slide-in-left"
                       : ""
-                }`}
+                  }`}
               />
             </div>
           </div>
@@ -591,11 +588,10 @@ const Product = ({ lang, basket, set_basket }) => {
                 <div
                   key={variant.id}
                   className={`transition-all duration-200 overflow-hidden min-w-[62px] w-[62px] h-[80px] flex-shrink-0 flex justify-center items-center rounded-[5px] 
-                          ${
-                            selectedColorIndex === index
-                              ? "border-[1.5px] border-[rgba(190,160,134,1)]"
-                              : "border-transparent"
-                          } 
+                          ${selectedColorIndex === index
+                      ? "border-[1.5px] border-[rgba(190,160,134,1)]"
+                      : "border-transparent"
+                    } 
                           bg-[rgba(247,247,246,1)] cursor-pointer ${!isCurrentSizeVariant(index) ? "dimmed" : ""}`}
                   onClick={() => handleColorClick(index)}
                 >
@@ -642,9 +638,8 @@ const Product = ({ lang, basket, set_basket }) => {
                 {paymentOptions[lang].map((option, index) => (
                   <div
                     key={index}
-                    className={`transition-all duration-100 flex justify-center items-center w-[80px] h-[26px] rounded-[5px] cursor-pointer ${
-                      selectedPaymentIndex === index ? "bg-white border-[1.5px] border-[rgba(190,160,134,1)]" : ""
-                    }`}
+                    className={`transition-all duration-100 flex justify-center items-center w-[80px] h-[26px] rounded-[5px] cursor-pointer ${selectedPaymentIndex === index ? "bg-white border-[1.5px] border-[rgba(190,160,134,1)]" : ""
+                      }`}
                     onClick={() => handlePaymentClick(index)}
                   >
                     <h1 className="font-inter font-[500] text-[10px] text-black">{option}</h1>
@@ -686,9 +681,8 @@ const Product = ({ lang, basket, set_basket }) => {
 
             <div className="relative">
               <button
-                className={`mt-[20px] w-full h-[60px] rounded-[10px] bg-[rgba(220,195,139,1)] cursor-pointer hover:bg-[#e9d8b2] transition-all duration-200 font-inter font-[600] text-[15px] leading-[22px] text-black ${
-                  isAnimating ? "animate-circle" : ""
-                }`}
+                className={`mt-[20px] w-full h-[60px] rounded-[10px] bg-[rgba(220,195,139,1)] cursor-pointer hover:bg-[#e9d8b2] transition-all duration-200 font-inter font-[600] text-[15px] leading-[22px] text-black ${isAnimating ? "animate-circle" : ""
+                  }`}
                 onClick={handleClick}
               >
                 {!isAnimating
@@ -720,6 +714,8 @@ const Product = ({ lang, basket, set_basket }) => {
       </div>
     </div>
   )
+  { console.log(localStorage.getItem(user)) }
+
 }
 
 export default Product
