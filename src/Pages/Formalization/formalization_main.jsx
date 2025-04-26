@@ -15,6 +15,7 @@ import Delivery from "../Map/map_main"
 import Payment_variant from "../payment_variant/payment_main"
 import Pickup_address from "../pickup_address/pickup_address_main"
 import { get_user } from "../../Services/auth/get_user"
+import axios from "axios"
 
 // CSS for vibration animation
 const vibrateAnimation = {
@@ -51,6 +52,8 @@ const Formalization_main = ({
   const [address_inform, set_address_inform] = useState(null)
   const [cashbackAmount, setCashbackAmount] = useState(0)
   const [isVibrating, setIsVibrating] = useState(false)
+  const [notification, setNotification] = useState("")
+  const [isNotificationVisible, setIsNotificationVisible] = useState(false)
 
   set_is_another_nav(is_delivery || is_payment_variant || is_pickup)
   set_is_footer_visible(!is_pickup)
@@ -78,11 +81,10 @@ const Formalization_main = ({
           phone: user_data.phone_number || "...",
         })
 
-        // Fetch cashback from localStorage
         const storedCashback = localStorage.getItem("cashback")
         setCashbackAmount(storedCashback ? Number.parseFloat(storedCashback) : 0)
       } catch (err) {
-        console.error(err)
+        console.error("Fetch user error:", err)
       }
     }
 
@@ -110,8 +112,220 @@ const Formalization_main = ({
             ? "Выберите адрес доставки"
             : "Yetkazib berish manzilini tanlang"
 
+  const refreshToken = async () => {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken")
+      if (!refreshToken) throw new Error("No refresh token available")
+
+      // Replace with your actual refresh endpoint
+      const response = await axios.post("https://back.stroybazan1.uz/api/token/refresh/", {
+        refresh: refreshToken,
+      })
+      const newAccessToken = response.data.access
+      localStorage.setItem("accessToken", newAccessToken)
+      return newAccessToken
+    } catch (error) {
+      console.error("Token refresh failed:", error)
+      setUserSignIn(false)
+      localStorage.removeItem("accessToken")
+      localStorage.removeItem("refreshToken")
+      localStorage.removeItem("userId")
+      setNotification(
+        lang === "uz"
+          ? "Sessiya tugadi, iltimos qayta kiring"
+          : lang === "en"
+            ? "Session expired, please log in again"
+            : lang === "ru"
+              ? "Сессия истекла, пожалуйста, войдите снова"
+              : "Sessiya tugadi, iltimos qayta kiring"
+      )
+      setIsNotificationVisible(true)
+      setTimeout(() => setIsNotificationVisible(false), 3000)
+      return null
+    }
+  }
+
+  const createOrder = async () => {
+    if (!userSignIn) {
+      setNotification(
+        lang === "uz"
+          ? "Iltimos, tizimga kiring"
+          : lang === "en"
+            ? "Please log in"
+            : lang === "ru"
+              ? "Пожалуйста, войдите в систему"
+              : "Iltimos, tizimga kiring"
+      )
+      setIsNotificationVisible(true)
+      setTimeout(() => setIsNotificationVisible(false), 3000)
+      return
+    }
+
+    if (!address_inform) {
+      setNotification(
+        lang === "uz"
+          ? "Iltimos, manzilni tanlang"
+          : lang === "en"
+            ? "Please select an address"
+            : lang === "ru"
+              ? "Пожалуйста, выберите адрес"
+              : "Iltimos, manzilni tanlang"
+      )
+      setIsNotificationVisible(true)
+      setTimeout(() => setIsNotificationVisible(false), 3000)
+      return
+    }
+
+    try {
+      const userId = localStorage.getItem("userId")
+      let accessToken = localStorage.getItem("accessToken")
+
+      if (!userId || !accessToken) {
+        setNotification(
+          lang === "uz"
+            ? "Foydalanuvchi ma'lumotlari topilmadi"
+            : lang === "en"
+              ? "User information not found"
+            : lang === "ru"
+              ? "Информация о пользователе не найдена"
+              : "Foydalanuvchi ma'lumotlari topilmadi"
+        )
+        setIsNotificationVisible(true)
+        setTimeout(() => setIsNotificationVisible(false), 3000)
+        return
+      }
+
+      const totalAmount = basket
+        .filter((item) => item.selected)
+        .reduce((sum, item) => sum + item.price * item.quantity, 0)
+        .toString()
+
+      const paymentMethodMap = {
+        click: "click",
+        payme: "payme",
+        qabul: "cash",
+        installment: "installment",
+      }
+
+      const orderData = {
+        user: parseInt(userId),
+        cashback_used: cashback_is_using ? cashbackAmount.toString() : "0",
+        delivery_date: new Date().toISOString().split("T")[0],
+        payment_method: paymentMethodMap[selectedMethod] || "cash",
+        delivery_method: deliver_type === "bring" ? "pickup" : "delivery",
+        delivery_address: address_inform ? address_inform[`address_${lang}`] : "Default Address",
+        total_amount: totalAmount,
+        branch: 0,
+        items: basket
+          .filter((item) => item.selected)
+          .map((item) => ({
+            product_variant_id: item.variant_id,
+            quantity: item.quantity,
+            price: item.price.toString(),
+            order: 0,
+          })),
+        part: 0,
+      }
+
+      console.log("Order payload:", orderData) // For debugging
+
+      try {
+        const response = await axios.post(
+          "https://back.stroybazan1.uz/api/api/orders/create/",
+          orderData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        )
+
+        setNotification(
+          lang === "uz"
+            ? "Buyurtma muvaffaqiyatli yaratildi"
+            : lang === "en"
+              ? "Order created successfully"
+            : lang === "ru"
+              ? "Заказ успешно создан"
+              : "Buyurtma muvaffaqiyatli yaratildi"
+        )
+        setIsNotificationVisible(true)
+        setTimeout(() => {
+          setIsNotificationVisible(false)
+          set_is_modal_open(false)
+          set_formalization_open(false)
+          // Optionally clear basket
+          // localStorage.setItem("basket", JSON.stringify([]))
+        }, 3000)
+
+        console.log("Order created successfully:", response.data)
+      } catch (error) {
+        if (error.response?.status === 401) {
+          accessToken = await refreshToken()
+          if (accessToken) {
+            const retryResponse = await axios.post(
+              "https://back.stroybazan1.uz/api/api/orders/create/",
+              orderData,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${accessToken}`,
+                },
+              }
+            )
+
+            setNotification(
+              lang === "uz"
+                ? "Buyurtma muvaffaqiyatli yaratildi"
+                : lang === "en"
+                  ? "Order created successfully"
+                : lang === "ru"
+                  ? "Заказ успешно создан"
+                : "Buyurtma muvaffaqiyatli yaratildi"
+            )
+            setIsNotificationVisible(true)
+            setTimeout(() => {
+              setIsNotificationVisible(false)
+              set_is_modal_open(false)
+              set_formalization_open(false)
+              // localStorage.setItem("basket", JSON.stringify([]))
+            }, 3000)
+
+            console.log("Order created successfully:", retryResponse.data)
+            return
+          }
+        }
+        throw error
+      }
+    } catch (error) {
+      console.error("Order creation error:", error.response?.data || error.message)
+      setNotification(
+        lang === "uz"
+          ? error.response?.data?.detail || "Buyurtma yaratishda xatolik"
+          : lang === "en"
+            ? error.response?.data?.detail || "Error creating order"
+          : lang === "ru"
+            ? error.response?.data?.detail || "Ошибка при создании заказа"
+            : error.response?.data?.detail || "Buyurtma yaratishda xatolik"
+      )
+      setIsNotificationVisible(true)
+      setTimeout(() => setIsNotificationVisible(false), 3000)
+    }
+  }
+
   return (
     <div className="flex flex-col w-full h-full mb-17 sm:mb-0">
+      {/* Notification Popup */}
+      {isNotificationVisible && notification && (
+        <div className="absolute z-50 top-10 left-1/2 transform -translate-x-1/2 w-[90%] sm:w-[400px] bg-white rounded-lg shadow-lg p-4 flex items-center justify-between">
+          <span className="font-inter font-[500] text-[16px] text-black">{notification}</span>
+          <button onClick={() => setIsNotificationVisible(false)} className="text-black">
+            ✕
+          </button>
+        </div>
+      )}
+
       <div className="w-full fixed z-50 h-[65px] bg-[#DCC38B] sm:hidden block">
         <Link
           onClick={() => set_formalization_open(false)}
@@ -381,9 +595,9 @@ const Formalization_main = ({
                         ? "Muddatli to'lov"
                         : lang === "en"
                           ? "Installment"
-                          : lang === "ru"
-                            ? "Рассрочка"
-                            : "Muddatli to'lov"}
+                        : lang === "ru"
+                          ? "Рассрочка"
+                          : "Muddatli to'lov"}
                     </span>
                   </div>
                   <div
@@ -547,7 +761,10 @@ const Formalization_main = ({
               </div>
             </div>
             <button
-              onClick={() => set_is_modal_open(true)}
+              onClick={() => {
+                set_is_modal_open(true)
+                createOrder()
+              }}
               className="w-full py-4 sm:py-6 bg-[#DCC38B] font-inter mt-8 sm:mt-5 font-[600] text-[16px] sm:text-[22px] leading-[22px] text-black rounded-[10px] cursor-pointer hover:scale-[101%] active:scale-[99%] duration-300"
             >
               {lang === "uz"
