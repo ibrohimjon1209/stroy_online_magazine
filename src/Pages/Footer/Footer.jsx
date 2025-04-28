@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import app_store from "./Images/app_store.jpg";
 import google_play from "./Images/google_play.png";
 import logo from "./Images/logo.png";
@@ -7,8 +7,55 @@ import youtube from "./Images/youtube.svg";
 import apple from "./Images/apple.png";
 import play from "./Images/play.png";
 import instagram from "./Images/instagram.svg";
+import { support_get } from "../../Services/general/support";
 
 const Footer = ({ lang = "uz" }) => {
+  const [media, set_media] = useState(null);
+  const [support, set_support] = useState([]);
+  const sl_option_id =
+    localStorage.getItem("sl_option_nav") === "Story Baza №1"
+      ? 0
+      : localStorage.getItem("sl_option_nav") === "Mebel"
+      ? 1
+      : 2;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await support_get();
+        const filtered = res.filter((item) => {
+          return item.branch == sl_option_id;
+        });
+        set_support(filtered.slice(0, 3));
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      console.error("Cleanup function ishladi");
+    };
+  }, []);
+
+  useEffect(() => {
+    fetch("https://back.stroybazan1.uz/api/api/social-media/latest/")
+      .then((res) => res.json())
+      .then((json) => {
+        set_media(
+          json.filter((item) => {
+            return item.branch == sl_option_id;
+          })
+        );
+        console.log(media);
+        
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
+
   const translations = {
     categories: {
       uz: "Kategoriyalar",
@@ -129,29 +176,16 @@ const Footer = ({ lang = "uz" }) => {
           <h1 className="font-inter font-[700] text-[24px] text-[#FFFFFF]">
             {translations.haveQuestion[lang]}
           </h1>
-          <div className="flex gap-[35px]">
-            <div className="flex flex-col gap-[16px]">
-              <h1 className="text-[#FFFFFF]">
-                {translations.payment.installment[lang]} :
-              </h1>
-              <h1 className="text-[#FFFFFF]">
-                {translations.payment.about_product[lang]} :
-              </h1>
-              <h1 className="text-[#FFFFFF]">
-                {translations.payment.about_app[lang]} :
-              </h1>
-            </div>
-            <div className="flex flex-col gap-[16px]">
-              <h1 className="text-[#FFFFFF]">
-                +998 90 019 29 39
-              </h1>
-              <h1 className="text-[#FFFFFF]">
-                +998 71 123 45 67
-              </h1>
-              <h1 className="text-[#FFFFFF]">
-                +998 33 014 15 20
-              </h1>
-            </div>
+          <div className="flex flex-col gap-[16px]">
+            {support.map((item) => (
+              <div
+                key={item.id}
+                className="flex flex-row justify-between items-center mr-15 gap-[35px]"
+              >
+                <h1 className="text-[#FFFFFF]">{item[`title_${lang}`]} :</h1>
+                <h1 className="text-[#FFFFFF]">{item.phone_number}</h1>
+              </div>
+            ))}
           </div>
         </div>
       </div>
