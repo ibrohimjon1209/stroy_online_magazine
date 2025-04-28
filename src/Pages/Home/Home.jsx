@@ -11,6 +11,10 @@ import delete_favorites from "../../Services/favorites/delete_favorites";
 
 function Home({ lang, setSearchText, searchText }) {
   const inputRef = useRef(null);
+  const [selectedBranch, setSelectedBranch] = useState(
+    localStorage.getItem("sl_option_nav") || "Story Baza №1"
+  );
+
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
@@ -24,17 +28,17 @@ function Home({ lang, setSearchText, searchText }) {
     lang === "uz"
       ? "so'm"
       : lang === "en"
-      ? "uzs"
-      : lang === "ru"
-      ? "сум"
-      : "so'm";
+        ? "uzs"
+        : lang === "ru"
+          ? "сум"
+          : "so'm";
 
   const sl_option_id =
     localStorage.getItem("sl_option_nav") === "Story Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Mebel"
-      ? 1
-      : 2;
+        ? 1
+        : 2;
 
   useEffect(() => {
     const getProducts = async () => {
@@ -60,16 +64,16 @@ function Home({ lang, setSearchText, searchText }) {
           .includes(searchText.toLowerCase())
       );
       setLoading(true);
-      setTimeout(()=>{
+      setTimeout(() => {
         setFilteredProducts(filtered);
         setLoading(false);
       }, 1000)
     } else {
       setLoading(true);
-      setTimeout(()=>{
+      setTimeout(() => {
         setFilteredProducts(products);
         setLoading(false);
-      },1000)
+      }, 1000)
     }
   }, [searchText, products, lang]);
 
@@ -80,9 +84,9 @@ function Home({ lang, setSearchText, searchText }) {
   const handleLikeToggle = async (productId) => {
     const userId = localStorage.getItem("userId");
     const isLiked = likedProducts.some((fav) => fav.product === productId);
-  
+
     let updatedLikes;
-  
+
     if (!userId) {
       // No userId: Update localStorage with only productId, no API calls
       if (isLiked) {
@@ -94,7 +98,7 @@ function Home({ lang, setSearchText, searchText }) {
       setLikedProducts(updatedLikes);
       return;
     }
-  
+
     // userId exists: Proceed with API calls
     if (isLiked) {
       updatedLikes = likedProducts.filter((fav) => fav.product !== productId);
@@ -124,33 +128,58 @@ function Home({ lang, setSearchText, searchText }) {
         return;
       }
     }
-  
+
     localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
     setLikedProducts(updatedLikes);
   };
 
+  const handleBranchClick = (branchName) => {
+    setSelectedBranch(branchName);
+    localStorage.setItem("sl_option_nav", branchName);
+    window.location.reload(); // reload qilmasa ham bo'ladi, aytaman keyin
+  };
+
   return (
     <div>
-      <div className="w-full h-[150px] flex flex-col items-center bg-[#DCC38B] sm:hidden">
-        <img src={logo} className="w-[77px] h-[71px] mt-[10px]" alt="Logo" />
-        <div className="w-[90%] h-[40px] pl-[23.5px] bg-[#FFFFFF] rounded-[10px] flex items-center mt-4">
-          <Search className="cursor-pointer" onClick={handleSearchClick} />
-          <input
-            type="text"
-            placeholder="Search"
-            className="w-full border-none pl-[15px] pr-[20px] focus:outline-none"
-            ref={inputRef}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
-          {searchText && (
-            <CirclePlus
-              className="rotate-[45deg] mr-[15px] cursor-pointer"
-              strokeWidth={1.75}
-              onClick={() => setSearchText("")}
+      <div className="w-full h-[220px] sm:h-[0px]">
+        <div className="w-full h-[150px] flex flex-col items-center bg-[#DCC38B] sm:hidden">
+          <img src={logo} className="w-[77px] h-[71px] mt-[10px]" alt="Logo" />
+          <div className="w-[90%] h-[40px] pl-[23.5px] bg-[#FFFFFF] rounded-[10px] flex items-center mt-4">
+            <Search className="cursor-pointer" onClick={handleSearchClick} />
+            <input
+              type="text"
+              placeholder="Search"
+              className="w-full border-none pl-[15px] pr-[20px] focus:outline-none"
+              ref={inputRef}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
             />
-          )}
+            {searchText && (
+              <CirclePlus
+                className="rotate-[45deg] mr-[15px] cursor-pointer"
+                strokeWidth={1.75}
+                onClick={() => setSearchText("")}
+              />
+            )}
+          </div>
         </div>
+
+        <div className="branches-home px-[22px] block sm:hidden">
+          <div className="rounded-[10px] h-[50px] mt-[20px] border-[0.5px] border-[#8879798C] px-[18px] flex items-center justify-between">
+            {["Story Baza №1", "Mebel", "Gold Klinker"].map((branch, idx) => (
+              <div
+                key={idx}
+                onClick={() => handleBranchClick(branch)}
+                className={`font-inter font-[500] text-[13px] leading-[22px] cursor-pointer ${selectedBranch === branch ? "text-[#DA9700]" : "text-[#0D1218]"
+                  }`}
+              >
+                {branch}
+              </div>
+            ))}
+          </div>
+        </div>
+
+
       </div>
 
       <Carusel />
@@ -160,10 +189,10 @@ function Home({ lang, setSearchText, searchText }) {
           {lang === "uz"
             ? "Ommabop tavarlar"
             : lang === "en"
-            ? "Popular products"
-            : lang === "ru"
-            ? "Популярные товары"
-            : "Ommabop tavarlar"}
+              ? "Popular products"
+              : lang === "ru"
+                ? "Популярные товары"
+                : "Ommabop tavarlar"}
         </h1>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-[10px] gap-y-[20px] mt-3">
           {loading ? (
@@ -188,24 +217,23 @@ function Home({ lang, setSearchText, searchText }) {
                       </h1>
                       <p className="text-black text-[12px] sm:text-[14px]">
                         {product.variants?.[0]?.price
-                          ? `${
-                              lang === "uz"
-                                ? "Narxi"
-                                : lang === "en"
-                                ? "Price"
-                                : lang === "ru"
+                          ? `${lang === "uz"
+                            ? "Narxi"
+                            : lang === "en"
+                              ? "Price"
+                              : lang === "ru"
                                 ? "Цена"
                                 : "Narxi"
-                            }: ${parseFloat(product.variants[0].price).toFixed(
-                              2
-                            )} ${uzs_lang}`
+                          }: ${parseFloat(product.variants[0].price).toFixed(
+                            2
+                          )} ${uzs_lang}`
                           : lang === "uz"
-                          ? "Narxi mavjud emas"
-                          : lang === "en"
-                          ? "Price not available"
-                          : lang === "ru"
-                          ? "Цена не доступна"
-                          : "Narxi mavjud emas"}
+                            ? "Narxi mavjud emas"
+                            : lang === "en"
+                              ? "Price not available"
+                              : lang === "ru"
+                                ? "Цена не доступна"
+                                : "Narxi mavjud emas"}
                       </p>
                     </div>
                     <Heart
@@ -227,10 +255,10 @@ function Home({ lang, setSearchText, searchText }) {
               {lang === "uz"
                 ? "Ma'lumot topilmadi."
                 : lang === "en"
-                ? "No data found."
-                : lang === "ru"
-                ? "Данные не найдены."
-                : "Ma'lumot topilmadi."}
+                  ? "No data found."
+                  : lang === "ru"
+                    ? "Данные не найдены."
+                    : "Ma'lumot topilmadi."}
             </p>
           )}
         </div>
