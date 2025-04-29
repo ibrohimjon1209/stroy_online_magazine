@@ -15,7 +15,7 @@ export default function KitchenCarousel() {
   const sl_option_id =
     localStorage.getItem("sl_option_nav") == "Story Baza №1"
       ? 0
-      : localStorage.getItem("sl_option_nav") == "Mebel"
+      : localStorage.getItem("sl_option_nav") == "Giaz Mebel"
       ? 1
       : 2;
 

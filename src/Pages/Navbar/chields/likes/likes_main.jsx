@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { products_get } from "../../../../Services/products_get";
@@ -14,7 +13,7 @@ const Likes_main = ({ lang }) => {
   const sl_option_id =
     localStorage.getItem("sl_option_nav") === "Story Baza №1"
       ? 0
-      : localStorage.getItem("sl_option_nav") === "Mebel"
+      : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
       ? 1
       : 2;
 

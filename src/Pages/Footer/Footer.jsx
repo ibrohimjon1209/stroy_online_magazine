@@ -15,7 +15,7 @@ const Footer = ({ lang = "uz" }) => {
   const sl_option_id =
     localStorage.getItem("sl_option_nav") === "Story Baza №1"
       ? 0
-      : localStorage.getItem("sl_option_nav") === "Mebel"
+      : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
       ? 1
       : 2;
 
@@ -193,7 +193,7 @@ const Footer = ({ lang = "uz" }) => {
         <div className="h-[2px] bg-[rgba(118,109,109,0.57)] w-full"></div>
         <div className="flex items-center justify-center h-full">
           <h1 className="text-[rgba(255,255,255,0.81)]">
-            © 2024 - 2025 STROY BAZA №1 (Powered by NSD Co.) v1.00.0
+            © 2024 - 2025 STROY BAZA №1 (<a href="https://t.me/nsd_corporation" className="text-blue-400">Powered by NSD Co.</a>) v1.00.0
           </h1>
         </div>
       </div>
