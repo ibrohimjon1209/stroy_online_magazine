@@ -48,8 +48,7 @@ const Footer = ({ lang = "uz" }) => {
             return item.branch == sl_option_id;
           })
         );
-        console.log(media);
-        
+        console.log(json);
       })
       .catch((err) => {
         console.error(err);
@@ -162,14 +161,30 @@ const Footer = ({ lang = "uz" }) => {
             {translations.socialMedia[lang]}
           </h1>
           <div className="flex gap-[11px]">
-            {[instagram, telegram, youtube].map((icon, index) => (
-              <img
-                key={index}
-                src={icon}
-                className="cursor-pointer w-[37px] h-[37px] p-1 bg-[#111111] rounded-[3px]"
-                alt="Social Icon"
-              />
-            ))}
+            <img
+              src={instagram}
+              onClick={() => {
+                window.open(media.instagram)
+              }}
+              className="cursor-pointer w-[37px] h-[37px] p-1 bg-[#111111] rounded-[3px]"
+              alt="Social Icon"
+            />
+            <img
+              src={telegram}
+              onClick={() => {
+                window.open(media.telegram)
+              }}
+              className="cursor-pointer w-[37px] h-[37px] p-1 bg-[#111111] rounded-[3px]"
+              alt="Social Icon"
+            />
+            <img
+              src={youtube}
+              onClick={() => {
+                window.open(media.youtube)
+              }}
+              className="cursor-pointer w-[37px] h-[37px] p-1 bg-[#111111] rounded-[3px]"
+              alt="Social Icon"
+            />
           </div>
         </div>
         <div className="ml-[111px] flex flex-col gap-[35px]">
@@ -193,7 +208,11 @@ const Footer = ({ lang = "uz" }) => {
         <div className="h-[2px] bg-[rgba(118,109,109,0.57)] w-full"></div>
         <div className="flex items-center justify-center h-full">
           <h1 className="text-[rgba(255,255,255,0.81)]">
-            © 2024 - 2025 STROY BAZA №1 (<a href="https://t.me/nsd_corporation" className="text-blue-400">Powered by NSD Co.</a>) v1.00.0
+            © 2024 - 2025 STROY BAZA №1 (
+            <a href="https://t.me/nsd_corporation" className="text-blue-400">
+              Powered by NSD Co.
+            </a>
+            ) v1.00.0
           </h1>
         </div>
       </div>

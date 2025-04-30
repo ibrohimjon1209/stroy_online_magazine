@@ -1,8 +1,13 @@
-import React, { useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import React, { useState, useEffect } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { Navigate } from "react-router-dom";
 
 const customIcon = new L.Icon({
   iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
@@ -26,6 +31,25 @@ const MapPage = ({
   const defaultPosition = [40.7836, 72.3501];
 
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [initialPosition, setInitialPosition] = useState(defaultPosition);
+  const [isMapLoaded, setIsMapLoaded] = useState(false); // Map loaded state
+
+  useEffect(() => {
+    if (addresses_list && addresses_list.length > 0) {
+      const validAddresses = addresses_list.filter(
+        (item) => item.latitude && item.longitude
+      );
+      if (validAddresses.length > 0) {
+        const randomIndex = Math.floor(Math.random() * validAddresses.length);
+        const randomAddress = validAddresses[randomIndex];
+        setInitialPosition([
+          parseFloat(randomAddress.latitude),
+          parseFloat(randomAddress.longitude),
+        ]);
+        setSelectedAddress(randomAddress);
+      }
+    }
+  }, [addresses_list]);
 
   const getAddressByLang = (item, lang) => {
     if (lang === "ru") return item.address_ru;
@@ -45,15 +69,20 @@ const MapPage = ({
         active === "map" ? "block" : "hidden"
       } relative max-w-[100%] h-[90vh] sm:h-[86vh] -mb-[200px] sm:mb-2 mx-auto mt-0 sm:mt-6 border border-gray-300 rounded-lg shadow-lg`}
     >
+      {/* MapContainer */}
       <MapContainer
-        center={defaultPosition}
+        center={initialPosition}
         zoom={13}
         className="z-0 w-full h-full overflow-hidden rounded-lg"
         style={{ height: "100%", width: "100%" }}
+        whenCreated={(map) => {
+          map.on("load", () => setIsMapLoaded(true)); // Trigger when map is fully loaded
+        }}
       >
+        {/* TileLayer */}
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
 
         {addresses_list
@@ -85,22 +114,28 @@ const MapPage = ({
           })}
       </MapContainer>
 
+      {/* LOADER ko'rsatkichi */}
+      {!isMapLoaded && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/70">
+          <div className="w-10 h-10 border-4 border-yellow-400 rounded-full border-t-transparent animate-spin"></div>
+        </div>
+      )}
+
+      {/* Ma'lumot va tanlash tugmasi */}
       <div className="absolute z-10 p-4 bg-white border border-gray-300 rounded-lg shadow-lg w-72 sm:w-64 bottom-6 right-6">
         {selectedAddress ? (
-          <>
-            <p className="text-sm text-gray-800">
-              <strong>
-                {lang == "uz"
-                  ? "Manzil:"
-                  : lang == "en"
-                  ? "Address:"
-                  : lang == "ru"
-                  ? "Адрес:"
-                  : "Manzil:"}
-              </strong>{" "}
-              {getAddressByLang(selectedAddress, lang)}
-            </p>
-          </>
+          <p className="text-sm text-gray-800">
+            <strong>
+              {lang == "uz"
+                ? "Manzil:"
+                : lang == "en"
+                ? "Address:"
+                : lang == "ru"
+                ? "Адрес:"
+                : "Manzil:"}
+            </strong>{" "}
+            {getAddressByLang(selectedAddress, lang)}
+          </p>
         ) : (
           <p className="text-sm text-gray-800">
             {lang == "uz"
