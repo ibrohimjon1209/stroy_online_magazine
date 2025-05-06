@@ -10,7 +10,7 @@ const category = [
     photo: photo_1,
   },
   {
-    name: "Story Baza №1",
+    name: "Stroy Baza №1",
     photo: photo_2,
   },
   {

@@ -23,7 +23,7 @@ const getStoredTopics = () => {
 function Home({ lang, setSearchText, searchText }) {
   const inputRef = useRef(null);
   const [selectedBranch, setSelectedBranch] = useState(
-    localStorage.getItem("sl_option_nav") || "Story Baza №1"
+    localStorage.getItem("sl_option_nav") || "Stroy Baza №1"
   );
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -46,7 +46,7 @@ function Home({ lang, setSearchText, searchText }) {
       : "so'm";
 
   const sl_option_id =
-    localStorage.getItem("sl_option_nav") === "Story Baza №1"
+    localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
       ? 1
@@ -252,7 +252,7 @@ function Home({ lang, setSearchText, searchText }) {
 
         <div className="branches-home px-[22px] block sm:hidden">
           <div className="rounded-[10px] h-[50px] mt-[20px] border-[0.5px] border-[#8879798C] px-[18px] flex items-center justify-between">
-            {["Story Baza №1", "Giaz Mebel", "Gold Klinker"].map(
+            {["Stroy Baza №1", "Giaz Mebel", "Gold Klinker"].map(
               (branch, idx) => (
                 <div
                   key={idx}

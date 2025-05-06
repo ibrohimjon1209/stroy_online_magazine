@@ -24,7 +24,7 @@ const Category = ({ searchText }) => {
     return JSON.parse(localStorage.getItem("likedProducts")) || [];
   });
   const sl_option_id =
-    localStorage.getItem("sl_option_nav") === "Story Baza №1"
+    localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
       ? 1

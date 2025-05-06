@@ -7,6 +7,14 @@ import { useEffect, useState } from "react";
 
 const BottomModal = ({ isOpen, onClose, lang }) => {
   const [support, set_support] = useState([]);
+  const [media, set_media] = useState(null);
+  const sl_option_id =
+    localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
+      ? 0
+      : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
+      ? 1
+      : 2;
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -22,6 +30,21 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
     return () => {
       console.error("Cleanup function ishladi");
     };
+  }, []);
+
+  useEffect(() => {
+    fetch("https://back.stroybazan1.uz/api/api/social-media/latest/")
+      .then((res) => res.json())
+      .then((json) => {
+        set_media(
+          json.filter((item) => {
+            return item.branch == sl_option_id;
+          })
+        );
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   }, []);
 
   if (!isOpen) return null;
@@ -81,33 +104,40 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
 
           <div className="pt-1 flex flex-col gap-[10px]">
             <div className="flex justify-center gap-5 mb-4">
-              <a
-                href="https://www.instagram.com/"
-                className="flex flex-row gap-[8px] items-center"
-              >
-                <img src={instagram_icon} />
-                <span className="font-inter text-[15px] font-[600] leading-[22px]">
-                  Instagram
-                </span>
-              </a>
-              <a
-                href="https://www.youtube.com/"
-                className="flex flex-row gap-[8px] items-center"
-              >
-                <img src={youtube_icon} />
-                <span className="font-inter text-[15px] font-[600] leading-[22px]">
-                  Youtube
-                </span>
-              </a>
-              <a
-                href="https://t.me/"
-                className="flex flex-row gap-[8px] items-center"
-              >
-                <img src={telegram_icon} />
-                <span className="font-inter text-[15px] font-[600] leading-[22px]">
-                  Telegram
-                </span>
-              </a>
+              {media && media.length > 0 && (
+                <>
+                  <a
+                    href={media[0]?.instagram}
+                    target="_blank"
+                    className="flex flex-row gap-[8px] items-center"
+                  >
+                    <img src={instagram_icon} />
+                    <span className="font-inter text-[15px] font-[600] leading-[22px]">
+                      Instagram
+                    </span>
+                  </a>
+                  <a
+                    href={media[0]?.youtube}
+                    target="_blank"
+                    className="flex flex-row gap-[8px] items-center"
+                  >
+                    <img src={youtube_icon} />
+                    <span className="font-inter text-[15px] font-[600] leading-[22px]">
+                      Youtube
+                    </span>
+                  </a>
+                  <a
+                    href={media[0]?.telegram}
+                    target="_blank"
+                    className="flex flex-row gap-[8px] items-center"
+                  >
+                    <img src={telegram_icon} />
+                    <span className="font-inter text-[15px] font-[600] leading-[22px]">
+                      Telegram
+                    </span>
+                  </a>
+                </>
+              )}
             </div>
 
             <div className="text-center font-inter font-[500] text-[16px] leading-[22px] text-gray-500">

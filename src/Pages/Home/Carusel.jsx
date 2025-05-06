@@ -13,7 +13,7 @@ export default function KitchenCarousel() {
   const [smallScreen, setSmallScreen] = useState(window.innerWidth < 768);
   const [loadedImages, setLoadedImages] = useState({});
   const sl_option_id =
-    localStorage.getItem("sl_option_nav") == "Story Baza №1"
+    localStorage.getItem("sl_option_nav") == "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") == "Giaz Mebel"
       ? 1

@@ -13,7 +13,7 @@ const Footer = ({ lang = "uz" }) => {
   const [media, set_media] = useState(null);
   const [support, set_support] = useState([]);
   const sl_option_id =
-    localStorage.getItem("sl_option_nav") === "Story Baza №1"
+    localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
       ? 1
@@ -48,7 +48,6 @@ const Footer = ({ lang = "uz" }) => {
             return item.branch == sl_option_id;
           })
         );
-        console.log(json);
       })
       .catch((err) => {
         console.error(err);
@@ -164,7 +163,8 @@ const Footer = ({ lang = "uz" }) => {
             <img
               src={instagram}
               onClick={() => {
-                window.open(media.instagram)
+                window.open(media[0].instagram)
+                
               }}
               className="cursor-pointer w-[37px] h-[37px] p-1 bg-[#111111] rounded-[3px]"
               alt="Social Icon"
@@ -172,7 +172,7 @@ const Footer = ({ lang = "uz" }) => {
             <img
               src={telegram}
               onClick={() => {
-                window.open(media.telegram)
+                window.open(media[0].telegram)
               }}
               className="cursor-pointer w-[37px] h-[37px] p-1 bg-[#111111] rounded-[3px]"
               alt="Social Icon"
@@ -180,7 +180,7 @@ const Footer = ({ lang = "uz" }) => {
             <img
               src={youtube}
               onClick={() => {
-                window.open(media.youtube)
+                window.open(media[0].youtube)
               }}
               className="cursor-pointer w-[37px] h-[37px] p-1 bg-[#111111] rounded-[3px]"
               alt="Social Icon"
