@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 const category = [
   {
-    name: "Mebel",
+    name: "Giaz Mebel",
     photo: photo_1,
   },
   {
