@@ -6,6 +6,14 @@ import delete_favorites from "../../../../Services/favorites/delete_favorites";
 
 const Likes_main = ({ lang }) => {
   const [products, setProducts] = useState([]);
+  const uzs_lang =
+    lang === "uz"
+      ? "so'm"
+      : lang === "en"
+      ? "UZS"
+      : lang === "ru"
+      ? "сум"
+      : "so'm";
   const [loading, setLoading] = useState(true);
   const [likedProducts, setLikedProducts] = useState(() => {
     try {
@@ -48,7 +56,13 @@ const Likes_main = ({ lang }) => {
 
   const handleLikeToggle = async (productId) => {
     const userId = localStorage.getItem("userId");
+<<<<<<< HEAD
     const updatedLikes = likedProducts.filter((fav) => fav.product !== productId);
+=======
+    const updatedLikes = likedProducts.filter(
+      (fav) => fav.product !== productId
+    );
+>>>>>>> b930b7f354cd25afb637deb01792e1a1c65e4d1d
 
     if (!userId) {
       // No userId: Update localStorage, remove from products, no API calls
@@ -109,11 +123,33 @@ const Likes_main = ({ lang }) => {
                     <Link to={`/product/${product.id}`}>
                       <p className="font-inter font-[500] text-[12px] sm:text-[14px] text-black">
                         {product.variants &&
+<<<<<<< HEAD
                           product.variants.length > 0 &&
                           product.variants[0].price
                           ? `Narxi: ${parseFloat(
                             product.variants[0].price
                           ).toFixed(2)} UZS`
+=======
+                        product.variants.length > 0 &&
+                        product.variants[0].price
+                          ? `${
+                              lang === "uz"
+                                ? "Narxi"
+                                : lang === "en"
+                                ? "Price"
+                                : lang === "ru"
+                                ? "Цена"
+                                : "Narxi"
+                            }: ${parseFloat(product.variants[0].price).toFixed(
+                              2
+                            )} ${uzs_lang}`
+                          : lang == "uz"
+                          ? "Narxi mavjud emas"
+                          : lang == "en"
+                          ? "Price not found"
+                          : lang == "ru"
+                          ? "Цена не найдена"
+>>>>>>> b930b7f354cd25afb637deb01792e1a1c65e4d1d
                           : "Narxi mavjud emas"}
                       </p>
                     </Link>

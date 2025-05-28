@@ -7,6 +7,14 @@ const Favorites_main = ({ lang }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [likedProducts, setLikedProducts] = useState([]);
+  const uzs_lang =
+    lang === "uz"
+      ? "so'm"
+      : lang === "en"
+      ? "uzs"
+      : lang === "ru"
+      ? "сум"
+      : "so'm";
 
   useEffect(() => {
     const storedLikes = localStorage.getItem("likedProducts");
@@ -78,7 +86,7 @@ const Favorites_main = ({ lang }) => {
               <div className="flex flex-col gap-[8px] sm:gap-[4px] p-2">
                 <Link to={`/product/${product.id}`}>
                   <h1 className="font-inter font-[600] text-[11px] sm:text-[15px] text-black truncate">
-                    {product.name_uz}
+                    {product[`name_${lang}`]}
                   </h1>
                 </Link>
                 <div className="flex items-center justify-between gap-3">
@@ -87,9 +95,23 @@ const Favorites_main = ({ lang }) => {
                       {product.variants &&
                       product.variants.length > 0 &&
                       product.variants[0].price
-                        ? `Narxi: ${parseFloat(
-                            product.variants[0].price
-                          ).toFixed(2)} UZS`
+                        ? `${
+                            lang === "uz"
+                              ? "Narxi"
+                              : lang === "en"
+                              ? "Price"
+                              : lang === "ru"
+                              ? "Цена"
+                              : "Narxi"
+                          }: ${parseFloat(product.variants[0].price).toFixed(
+                            2
+                          )} ${uzs_lang}`
+                        : lang == "uz"
+                        ? "Narxi mavjud emas"
+                        : lang == "en"
+                        ? "Price not found"
+                        : lang == "ru"
+                        ? "Цена не найдена"
                         : "Narxi mavjud emas"}
                     </p>
                   </Link>
@@ -112,7 +134,13 @@ const Favorites_main = ({ lang }) => {
         </div>
       ) : (
         <p className="w-full text-lg text-center text-gray-500 font-inter">
-          {lang == "uz" ? "Sevimlilar yo'q" : lang == "en" ? "Favorites not found" : lang == "ru" ? "Избранное не найдено" : "Sevimlilar yo'q"}
+          {lang == "uz"
+            ? "Sevimlilar yo'q"
+            : lang == "en"
+            ? "Favorites not found"
+            : lang == "ru"
+            ? "Избранное не найдено"
+            : "Sevimlilar yo'q"}
         </p>
       )}
     </div>
