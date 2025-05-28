@@ -7,15 +7,22 @@ import delete_favorites from "../../../../Services/favorites/delete_favorites";
 const Likes_main = ({ lang }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [likedProducts, setLikedProducts] = useState(
-    JSON.parse(localStorage.getItem("likedProducts")) || []
-  );
+  const [likedProducts, setLikedProducts] = useState(() => {
+    try {
+      const stored = localStorage.getItem("likedProducts");
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      console.error("Could not parse likedProducts from localStorage:", e);
+      return [];
+    }
+  });
+
   const sl_option_id =
     localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
-      ? 1
-      : 2;
+        ? 1
+        : 2;
 
   useEffect(() => {
     const getProducts = async () => {
@@ -42,7 +49,7 @@ const Likes_main = ({ lang }) => {
   const handleLikeToggle = async (productId) => {
     const userId = localStorage.getItem("userId");
     const updatedLikes = likedProducts.filter((fav) => fav.product !== productId);
-  
+
     if (!userId) {
       // No userId: Update localStorage, remove from products, no API calls
       localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
@@ -50,7 +57,7 @@ const Likes_main = ({ lang }) => {
       setProducts(products.filter((product) => product.id !== productId));
       return;
     }
-  
+
     // userId exists: Call delete_favorites and update state
     const favorite = likedProducts.find(
       (fav) => fav.product === productId && fav.user.toString() === userId
@@ -62,7 +69,7 @@ const Likes_main = ({ lang }) => {
         console.error("DELETE xatosi:", error);
       }
     }
-  
+
     // Update localStorage and state
     localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
     setLikedProducts(updatedLikes);
@@ -102,11 +109,11 @@ const Likes_main = ({ lang }) => {
                     <Link to={`/product/${product.id}`}>
                       <p className="font-inter font-[500] text-[12px] sm:text-[14px] text-black">
                         {product.variants &&
-                        product.variants.length > 0 &&
-                        product.variants[0].price
+                          product.variants.length > 0 &&
+                          product.variants[0].price
                           ? `Narxi: ${parseFloat(
-                              product.variants[0].price
-                            ).toFixed(2)} UZS`
+                            product.variants[0].price
+                          ).toFixed(2)} UZS`
                           : "Narxi mavjud emas"}
                       </p>
                     </Link>
@@ -130,10 +137,10 @@ const Likes_main = ({ lang }) => {
               {lang === "uz"
                 ? "Sevimlilar yo'q"
                 : lang === "en"
-                ? "Favorites not found"
-                : lang === "ru"
-                ? "Избранное не найдено"
-                : "Sevimlilar yo'q"}
+                  ? "Favorites not found"
+                  : lang === "ru"
+                    ? "Избранное не найдено"
+                    : "Sevimlilar yo'q"}
             </p>
           )}
         </div>

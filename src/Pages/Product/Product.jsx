@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useRef } from "react"
 import product_1 from "./Images/product_1.svg"
 import product_2 from "./Images/product_2.webp"
@@ -7,7 +5,7 @@ import product_3 from "./Images/product_3.png"
 import { X, ChevronLeft, ChevronRight } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 
-const Product = ({ lang, basket, set_basket }) => {
+const Product = ({ lang, basket, set_basket, userSignIn }) => {
   const navigate = useNavigate()
   const [productData, setProductData] = useState(null)
   const [selectedSize, setSelectedSize] = useState("4x6")
@@ -46,6 +44,23 @@ const Product = ({ lang, basket, set_basket }) => {
 
       if (existingIndex !== -1) {
         updatedBasket[existingIndex].quantity += 1
+        if (userSignIn) {
+          const new_order = async () => {
+            fetch("https://back.stroybazan1.uz/api/api/orders/create/",
+              {
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  method: "POST",
+                  body: JSON.stringify({
+                    user: localStorage.getItem("userId")
+                  })
+              })
+              .then(function(res){ console.log(res); console.log(localStorage.getItem("userId")) })
+              .catch(function(res){ console.log(res) })
+          }
+          new_order()
+        }
       } else {
         const newItem = {
           img: `https://back.stroybazan1.uz${productData.variants[selectedColorIndex].image}`,
@@ -70,6 +85,9 @@ const Product = ({ lang, basket, set_basket }) => {
         }
 
         updatedBasket.push(newItem)
+        if (userSignIn) {
+          console.log(newItem)
+        }
       }
       set_basket(updatedBasket)
       localStorage.setItem("basket", JSON.stringify(updatedBasket))
@@ -531,12 +549,12 @@ const Product = ({ lang, basket, set_basket }) => {
                   "/placeholder.svg"
                 }
                 className={`w-[162px] sm:w-[504px] h-[188px] sm:h-[504px] object-fill ${isTransitioning
-                    ? slideDirection
-                    : slideDirection
-                      ? slideDirection === "slide-left"
-                        ? "slide-in-right"
-                        : "slide-in-left"
-                      : ""
+                  ? slideDirection
+                  : slideDirection
+                    ? slideDirection === "slide-left"
+                      ? "slide-in-right"
+                      : "slide-in-left"
+                    : ""
                   }`}
               />
             </div>
@@ -714,7 +732,6 @@ const Product = ({ lang, basket, set_basket }) => {
       </div>
     </div>
   )
-  { console.log(localStorage.getItem(user)) }
 
 }
 
