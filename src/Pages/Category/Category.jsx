@@ -175,7 +175,7 @@ const Category = ({ searchText }) => {
                 <Link to={`/product/${product.id}`}>
                   <div className="rounded-[10px] w-[160px] h-[160px] sm:w-[245px] sm:h-[245px] bg-[#F2F2F1] overflow-hidden group">
                     <img
-                      src={`https://back.stroybazan1.uz/${product.image}`}
+                      src={`https://backkk.stroybazan1.uz/${product.image}`}
                       className="object-cover w-full h-full transition-transform group-hover:scale-105"
                       alt={product[`name_${lang}`]}
                     />

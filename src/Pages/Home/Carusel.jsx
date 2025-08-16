@@ -88,7 +88,7 @@ export default function KitchenCarousel() {
               />
 
               <img
-                src={`https://back.stroybazan1.uz${item.image}`}
+                src={`https://backkk.stroybazan1.uz${item.image}`}
                 className="w-full h-full object-cover rounded-[10px] sm:rounded-[0px]"
                 alt=""
                 onLoad={() => handleImageLoad(index)}

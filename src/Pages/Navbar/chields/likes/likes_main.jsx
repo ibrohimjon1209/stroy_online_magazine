@@ -96,7 +96,7 @@ const Likes_main = ({ lang }) => {
                 <Link to={`/product/${product.id}`}>
                   <div className="w-full aspect-square rounded-[10px] bg-[#F2F2F1] flex justify-center items-center overflow-hidden group">
                     <img
-                      src={`https://back.stroybazan1.uz/${product.image}`}
+                      src={`https://backkk.stroybazan1.uz/${product.image}`}
                       className="object-contain w-full h-full transition-transform duration-300 transform group-hover:scale-105"
                       alt={product.name_uz}
                     />

@@ -118,7 +118,7 @@ const Formalization_main = ({
       if (!refreshToken) throw new Error("No refresh token available")
 
       // Replace with your actual refresh endpoint
-      const response = await axios.post("https://back.stroybazan1.uz/api/token/refresh/", {
+      const response = await axios.post("https://backkk.stroybazan1.uz/api/token/refresh/", {
         refresh: refreshToken,
       })
       const newAccessToken = response.data.access
@@ -231,7 +231,7 @@ const Formalization_main = ({
 
       try {
         const response = await axios.post(
-          "https://back.stroybazan1.uz/api/api/orders/create/",
+          "https://backkk.stroybazan1.uz/api/api/orders/create/",
           orderData,
           {
             headers: {
@@ -265,7 +265,7 @@ const Formalization_main = ({
           accessToken = await refreshToken()
           if (accessToken) {
             const retryResponse = await axios.post(
-              "https://back.stroybazan1.uz/api/api/orders/create/",
+              "https://backkk.stroybazan1.uz/api/api/orders/create/",
               orderData,
               {
                 headers: {

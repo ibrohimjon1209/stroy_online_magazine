@@ -20,14 +20,14 @@ const Cashback_main = ({ lang }) => {
   useEffect(() => {
     if (userId) {
       // API'ni chaqirish uchun user ID dan foydalanish
-      fetch(`https://back.stroybazan1.uz/api/api/users/${userId}/`)
+      fetch(`https://backkk.stroybazan1.uz/api/api/users/${userId}/`)
         .then((response) => response.json())
         .then((data) => {
           set_userCashback(parseFloat(data.cashback_balance));  // cashback_balance ni o'qish
         });
 
       // Orderlar ro'yxatini olish
-      fetch("https://back.stroybazan1.uz/api/api/orders/")
+      fetch("https://backkk.stroybazan1.uz/api/api/orders/")
         .then((response) => response.json())
         .then((data) => {
           // orderlar ma'lumotlarini olish

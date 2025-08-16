@@ -33,7 +33,7 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
   }, []);
 
   useEffect(() => {
-    fetch("https://back.stroybazan1.uz/api/api/social-media/latest/")
+    fetch("https://backkk.stroybazan1.uz/api/api/social-media/latest/")
       .then((res) => res.json())
       .then((json) => {
         set_media(

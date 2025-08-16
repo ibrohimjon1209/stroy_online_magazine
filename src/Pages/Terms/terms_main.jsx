@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Terms_main = ({ lang }) => {
   const [data, set_data] = useState([]);
-  const API_URL = "https://back.stroybazan1.uz/api/api/user-agreements/";
+  const API_URL = "https://backkk.stroybazan1.uz/api/api/user-agreements/";
 
   useEffect(() => {
     fetch(API_URL)

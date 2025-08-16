@@ -48,7 +48,7 @@ const Product = ({ lang, basket, set_basket }) => {
         updatedBasket[existingIndex].quantity += 1
       } else {
         const newItem = {
-          img: `https://back.stroybazan1.uz${productData.variants[selectedColorIndex].image}`,
+          img: `https://backkk.stroybazan1.uz${productData.variants[selectedColorIndex].image}`,
           id: productData.id,
           name: {
             uz: productData.name_uz,
@@ -84,7 +84,7 @@ const Product = ({ lang, basket, set_basket }) => {
     try {
       const url = window.location.href
       const id = url.split("/").pop()
-      const response = await fetch(`https://back.stroybazan1.uz/api/api/products/${id}/`)
+      const response = await fetch(`https://backkk.stroybazan1.uz/api/api/products/${id}/`)
       const data = await response.json()
       setProductData(data)
       setSelectedSize(data.variants[0][`size_${lang}`])
@@ -452,7 +452,7 @@ const Product = ({ lang, basket, set_basket }) => {
             <div className="ml-[20px] rounded-[5px] overflow-hidden border-[1px] absolute sm:static w-[80px] sm:w-[120px] h-[80px] flex justify-center items-center">
               <img
                 src={
-                  `https://back.stroybazan1.uz${productData.variants[selectedColorIndex].image || "/placeholder.svg"}` ||
+                  `https://backkk.stroybazan1.uz${productData.variants[selectedColorIndex].image || "/placeholder.svg"}` ||
                   "/placeholder.svg"
                 }
                 className="w-[80px] h-[80px] object-contain"
@@ -506,7 +506,7 @@ const Product = ({ lang, basket, set_basket }) => {
                   onClick={() => handleColorClick(index)}
                 >
                   <img
-                    src={`https://back.stroybazan1.uz${variant.image || "/placeholder.svg"}` || "/placeholder.svg"}
+                    src={`https://backkk.stroybazan1.uz${variant.image || "/placeholder.svg"}` || "/placeholder.svg"}
                     className="w-[158px] h-[156px] object-fill"
                   />
                 </div>
@@ -527,7 +527,7 @@ const Product = ({ lang, basket, set_basket }) => {
               </div>
               <img
                 src={
-                  `https://back.stroybazan1.uz${productData.variants[selectedColorIndex].image || "/placeholder.svg"}` ||
+                  `https://backkk.stroybazan1.uz${productData.variants[selectedColorIndex].image || "/placeholder.svg"}` ||
                   "/placeholder.svg"
                 }
                 className={`w-[162px] sm:w-[504px] h-[188px] sm:h-[504px] object-fill ${isTransitioning
@@ -596,7 +596,7 @@ const Product = ({ lang, basket, set_basket }) => {
                   onClick={() => handleColorClick(index)}
                 >
                   <img
-                    src={`https://back.stroybazan1.uz${variant.image}`}
+                    src={`https://backkk.stroybazan1.uz${variant.image}`}
                     alt={variant.color_uz}
                     className="object-contain w-full h-full"
                   />

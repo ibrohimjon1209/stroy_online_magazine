@@ -25,7 +25,7 @@ const Favorites_main = ({ lang }) => {
     const getProducts = async () => {
       try {
         const response = await axios.get(
-          "https://back.stroybazan1.uz/api/api/products/?branch=0",
+          "https://backkk.stroybazan1.uz/api/api/products/?branch=0",
           {
             headers: {
               accept: "application/json",
@@ -77,7 +77,7 @@ const Favorites_main = ({ lang }) => {
               <Link to={`/product/${product.id}`}>
                 <div className="w-full h-[150px] sm:h-[150px] aspect-square rounded-[10px] bg-[#F2F2F1] flex justify-center items-center overflow-hidden group">
                   <img
-                    src={`https://back.stroybazan1.uz/${product.image}`}
+                    src={`https://backkk.stroybazan1.uz/${product.image}`}
                     className="object-cover w-full h-full transition-transform duration-300 transform group-hover:scale-105"
                     alt={product.name_uz}
                   />

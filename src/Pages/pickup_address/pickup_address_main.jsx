@@ -74,8 +74,8 @@ function RegionSelectionForm() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const regionRes = await axios.get("https://back.stroybazan1.uz/api/api/regions/");
-        const cityRes = await axios.get("https://back.stroybazan1.uz/api/api/cities/");
+        const regionRes = await axios.get("https://backkk.stroybazan1.uz/api/api/regions/");
+        const cityRes = await axios.get("https://backkk.stroybazan1.uz/api/api/cities/");
         setRegions(regionRes.data);
         setCities(cityRes.data);
       } catch (err) {
