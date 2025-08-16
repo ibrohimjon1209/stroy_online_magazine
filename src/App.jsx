@@ -61,7 +61,7 @@ const App = () => {
     if (userSignIn) {
       const get_f = async () => {
         try {
-          JSON.parse(localStorage.getItem("likedProducts")).map(
+          JSON.parse(localStorage.getItem("likedProducts"))?.map(
             async (item) => {
               await create_favorites(
                 item.product,
@@ -173,20 +173,17 @@ const App = () => {
       <div className={`${is_found ? "sm:w-[1450px]" : "w-full "} m-auto `}>
         {is_found && !is_another_nav && <Navbar lang={lang} searchText={searchText} setSearchText={setSearchText} />}
         <div
-          className={`${
-            is_found ? "sm:w-[1450px]" : "w-full"
-          } m-auto overflow-hidden`}
+          className={`${is_found ? "sm:w-[1450px]" : "w-full"
+            } m-auto overflow-hidden`}
         >
           <div
-            className={`flex flex-col justify-between ${
-              is_found
-                ? `${
-                    is_another_nav
-                      ? "h-[calc(106.9vh-100px)] sm:h-[calc(118vh)]"
-                      : "h-[calc(106.9vh-100px)] sm:h-[calc(119.5vh-100px)]"
-                  } `
+            className={`flex flex-col justify-between ${is_found
+                ? `${is_another_nav
+                  ? "h-[calc(106.9vh-100px)] sm:h-[calc(118vh)]"
+                  : "h-[calc(106.9vh-100px)] sm:h-[calc(119.5vh-100px)]"
+                } `
                 : "h-full"
-            } w-[100%]`}
+              } w-[100%]`}
             style={{
               ...customScrollbar,
               overflowY: "auto",
@@ -282,6 +279,7 @@ const App = () => {
                         set_basket={set_basket}
                         basket={basket}
                         lang={lang}
+                        userSignIn={userSignIn}
                       />
                     </Suspense>
                   }
@@ -290,7 +288,7 @@ const App = () => {
                   path="/category/*"
                   element={
                     <Suspense fallback={<div>Loading...</div>}>
-                      <Category searchText={searchText}/>
+                      <Category searchText={searchText} />
                     </Suspense>
                   }
                 />
