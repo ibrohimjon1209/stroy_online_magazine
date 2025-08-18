@@ -17,7 +17,7 @@ const Category = ({ searchText }) => {
   const [notification, setNotification] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [loading, setLoading] = useState(true);
-  const lang = window.localStorage.getItem("lang") || "uz"; // Fallback to 'uz' if lang is not set
+  const lang = window.localStorage.getItem("lang") || "uz";
   const [category_data, set_category_data] = useState(null);
   const category_id = useLocation().pathname.split("/")[2];
   const [likedProducts, setLikedProducts] = useState(() => {
@@ -154,7 +154,7 @@ const Category = ({ searchText }) => {
           <div className="w-full h-[65px] bg-[#DCC38B]">
             <Link
               className="w-full h-full flex items-center gap-[10px] pl-[13px]"
-              to={"/"}
+              to={"/search"}
             >
               <ChevronLeft className="scale-110" />
               <h1 className="font-inter font-[500] text-[15px] leading-[22px] text-black">

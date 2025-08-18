@@ -594,34 +594,37 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
               {productData[`name_${lang}`]}
             </h1>
           </div>
-          <div className="color-div mt-[7px] flex flex-col gap-[6px] max-w-full">
-            <h1 className="font-inter font-[400] text-[13px] leading-[22px] text-black">
-              {lang == "uz" ? "Rang" : lang == "en" ? "Color" : lang == "ru" ? "Цвет" : "Rang"} :{" "}
-              <span className="font-[500]">
-                {productData?.variants?.[selectedColorIndex]?.[`color_${lang}`] || ""}{" "}
-              </span>
-            </h1>
-            <div className="select-color flex flex-wrap gap-[10px] max-w-full">
-              {productData?.variants?.map((variant, index) => (
-                <div
-                  key={variant.id}
-                  className={`transition-all duration-200 overflow-hidden min-w-[62px] w-[62px] h-[80px] flex-shrink-0 flex justify-center items-center rounded-[5px] 
-                          ${selectedColorIndex === index
-                      ? "border-[1.5px] border-[rgba(190,160,134,1)]"
-                      : "border-transparent"
-                    } 
-                          bg-[rgba(247,247,246,1)] cursor-pointer ${!isCurrentSizeVariant(index) ? "dimmed" : ""}`}
-                  onClick={() => handleColorClick(index)}
-                >
-                  <img
-                    src={`https://backkk.stroybazan1.uz${variant.image}`}
-                    alt={variant.color_uz}
-                    className="object-contain w-full h-full"
-                  />
-                </div>
-              ))}
+                    {productData?.variants?.some(v => v.color_uz || v.color_ru || v.color_en) && (
+            <div className="color-div mt-[7px] flex flex-col gap-[6px] max-w-full">
+              <h1 className="font-inter font-[400] text-[13px] leading-[22px] text-black">
+                {lang == "uz" ? "Rang" : lang == "en" ? "Color" : lang == "ru" ? "Цвет" : "Rang"} :{" "}
+                <span className="font-[500]">
+                  {productData?.variants?.[selectedColorIndex]?.[`color_${lang}`] || ""}{" "}
+                </span>
+              </h1>
+              <div className="select-color flex flex-wrap gap-[10px] max-w-full">
+                {productData?.variants?.map((variant, index) => (
+                  <div
+                    key={variant.id}
+                    className={`transition-all duration-200 overflow-hidden min-w-[62px] w-[62px] h-[80px] flex-shrink-0 flex justify-center items-center rounded-[5px] 
+                  ${selectedColorIndex === index
+                        ? "border-[1.5px] border-[rgba(190,160,134,1)]"
+                        : "border-transparent"
+                      } 
+                  bg-[rgba(247,247,246,1)] cursor-pointer ${!isCurrentSizeVariant(index) ? "dimmed" : ""}`}
+                    onClick={() => handleColorClick(index)}
+                  >
+                    <img
+                      src={`https://back.stroybazan1.uz${variant.image || productData.image}`}
+                      alt={variant.color_uz}
+                      className="object-contain w-full h-full"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
 
           <div className="size-div mt-[20px] max-w-full">
             <h1 className="font-inter font-[400] text-[13px] leading-[22px] text-black">
