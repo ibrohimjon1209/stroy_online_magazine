@@ -46,7 +46,7 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
         updatedBasket[existingIndex].quantity += 1
         if (userSignIn) {
           const new_order = async () => {
-            fetch("https://back.stroybazan1.uz/api/api/orders/create/",
+            fetch("https://backkk.stroybazan1.uz/api/api/orders/create/",
               {
                   headers: {
                     'Content-Type': 'application/json'
@@ -615,7 +615,7 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
                     onClick={() => handleColorClick(index)}
                   >
                     <img
-                      src={`https://back.stroybazan1.uz${variant.image || productData.image}`}
+                      src={`https://backkk.stroybazan1.uz${variant.image || productData.image}`}
                       alt={variant.color_uz}
                       className="object-contain w-full h-full"
                     />

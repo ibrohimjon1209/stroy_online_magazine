@@ -76,12 +76,12 @@ const Footer = ({ lang = "uz" }) => {
       ru: "Есть вопросы? Звоните",
     },
     menu: {
-      home: { uz: "Bosh sahifa", en: "Home", ru: "Главная" },
-      search: { uz: "Qidiruv", en: "Search", ru: "Поиск" },
-      order: { uz: "Buyurtma", en: "Order", ru: "Заказ" },
-      cart: { uz: "Savat", en: "Cart", ru: "Корзина" },
-      profile: { uz: "Profil", en: "Profile", ru: "Профиль" },
-      likes: { uz: "Yoqqanlar", en: "Likes", ru: "Избранное" },
+      home: { uz: "Bosh sahifa", en: "Home", ru: "Главная", link: "/" },
+      search: { uz: "Qidiruv", en: "Search", ru: "Поиск", link: "/" },
+      order: { uz: "Buyurtma", en: "Order", ru: "Заказ", link: "/orders" },
+      cart: { uz: "Savat", en: "Cart", ru: "Корзина", link: "/basket" },
+      profile: { uz: "Profil", en: "Profile", ru: "Профиль", link: "/profile/orders" },
+      likes: { uz: "Yoqqanlar", en: "Likes", ru: "Избранное", link: "/likes" },
     },
     payment: {
       installment: { uz: "Nasiya savdo", en: "Installment", ru: "Рассрочка" },
@@ -109,14 +109,14 @@ const Footer = ({ lang = "uz" }) => {
             </h1>
             <div className="flex gap-[10px] text-[rgba(255,255,255,0.41)]">
               <div className="flex flex-col gap-[9px]">
-                <h1>{translations.menu.home[lang]}</h1>
-                <h1>{translations.menu.search[lang]}</h1>
-                <h1>{translations.menu.order[lang]}</h1>
+                <a href={translations.menu.home.link}>{translations.menu.home[lang]}</a>
+                <a href={translations.menu.cart.link} className="block sm:hidden">{translations.menu.search[lang]}</a>
+                <a href={translations.menu.order.link}>{translations.menu.order[lang]}</a>
               </div>
               <div className="flex flex-col gap-[9px]">
-                <h1>{translations.menu.cart[lang]}</h1>
-                <h1>{translations.menu.profile[lang]}</h1>
-                <h1>{translations.menu.likes[lang]}</h1>
+                <a href={translations.menu.cart.link}>{translations.menu.cart[lang]}</a>
+                <a href={translations.menu.profile.link}>{translations.menu.profile[lang]}</a>
+                <a href={translations.menu.likes.link}>{translations.menu.likes[lang]}</a>
               </div>
             </div>
           </div>
