@@ -4,11 +4,21 @@ import { support_get } from "../../../../../../Services/general/support";
 
 const Help_main = ({ lang }) => {
   const [support, set_support] = useState([]);
+  const sl_option_id =
+    localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
+      ? 0
+      : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
+      ? 1
+      : 2;
+      
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await support_get();
-        set_support(res);
+        const filtered = res.filter((item) => {
+          return item.branch == sl_option_id;
+        });
+        set_support(filtered.slice(0, 3));
       } catch (err) {
         console.error(err);
       }

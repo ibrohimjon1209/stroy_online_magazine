@@ -19,7 +19,10 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
     const fetchData = async () => {
       try {
         const res = await support_get();
-        set_support(res);
+        const filtered = res.filter((item) => {
+          return item.branch == sl_option_id;
+        });
+        set_support(filtered.slice(0, 3));
       } catch (err) {
         console.error(err);
       }
