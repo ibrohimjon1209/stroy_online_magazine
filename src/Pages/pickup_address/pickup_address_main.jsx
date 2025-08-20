@@ -166,8 +166,8 @@ const Pickup_address_main = ({ is_pickup, set_is_pickup }) => {
     <div
       className={`w-full ${is_pickup ? "flex" : "hidden"} items-center justify-center flex-col sm:mb-[84px]`}
     >
-      <div className=" w-full h-[65px] sm:h-[80px] fixed top-0 z-50">
-        <div className="bg-[#DCC38B] flex items-center gap-[10px] w-full h-full font-inter font-[600] text-[17px] sm:text-[20px] leading-[22px] text-black pl-[13px] sm:pl-[50px]">
+      <div className=" flex justify-center top-[5px] w-full h-[65px] sm:h-[80px] fixed z-50">
+        <div className="bg-[#DCC38B] flex items-center gap-[10px] w-[1450px]  rounded-[15px] h-full font-inter font-[600] text-[17px] sm:text-[20px] leading-[22px] text-black pl-[13px] sm:pl-[50px]">
           <div onClick={() => set_is_pickup(false)}>
             <ChevronLeft className="scale-110 sm:scale-100 sm:w-[35px] sm:h-[35px] mt-0 sm:mt-[2px] cursor-pointer" />
           </div>

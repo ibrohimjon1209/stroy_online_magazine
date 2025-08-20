@@ -199,7 +199,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
   return (
     <>
       <div className="hidden sm:block">
-        <div className="w-full h-auto md:h-[80px] flex flex-col md:flex-row justify-between gap-[20px] z-50 items-center px-[4.2%] sticky mt-[5px] rounded-[15px] bg-[#DCC38B] py-4 md:py-0">
+        <div className="w-full h-auto md:h-[80px] flex flex-col  md:flex-row justify-between gap-[20px] z-50 items-center px-[4.2%] sticky mt-[5px] rounded-[15px] bg-[#DCC38B] py-4 md:py-0">
           <style jsx="true">{`
             .dropdown-enter {
               opacity: 0;
