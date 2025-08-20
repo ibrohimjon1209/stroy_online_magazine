@@ -1,16 +1,12 @@
-"use client"
-
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { ChevronLeft, X } from "lucide-react"
 import { order_get } from "../../../../Services/order/get_my"
 
 const Orders_main = ({ lang }) => {
-  // State to track which orders have expanded product views
   const [expandedOrders, setExpandedOrders] = useState([])
   const [productDetails, setProductDetails] = useState({})
 
-  // Toggle product visibility for an order
   const toggleProductView = (orderId) => {
     if (expandedOrders.includes(orderId)) {
       setExpandedOrders(expandedOrders.filter((id) => id !== orderId))
