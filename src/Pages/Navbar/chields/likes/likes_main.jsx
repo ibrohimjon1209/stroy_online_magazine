@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { products_get } from "../../../../Services/products_get";
 import delete_favorites from "../../../../Services/favorites/delete_favorites";
+import no_liked from './imgs/no_like.png'
 
 const Likes_main = ({ lang }) => {
   const [products, setProducts] = useState([]);
@@ -10,10 +11,10 @@ const Likes_main = ({ lang }) => {
     lang === "uz"
       ? "so'm"
       : lang === "en"
-      ? "UZS"
-      : lang === "ru"
-      ? "сум"
-      : "so'm";
+        ? "UZS"
+        : lang === "ru"
+          ? "сум"
+          : "so'm";
   const [loading, setLoading] = useState(true);
   const [likedProducts, setLikedProducts] = useState(() => {
     try {
@@ -141,15 +142,33 @@ const Likes_main = ({ lang }) => {
               </div>
             ))
           ) : (
-            <p className="w-full text-lg text-center text-gray-500 font-inter">
-              {lang === "uz"
-                ? "Sevimlilar yo'q"
-                : lang === "en"
-                  ? "Favorites not found"
-                  : lang === "ru"
-                    ? "Избранное не найдено"
-                    : "Sevimlilar yo'q"}
-            </p>
+            <div className="w-[1450px] h-full mt-[50px] flex flex-col justify-center items-center">
+
+              <img src={no_liked} alt="" className="w-[400px] hover:scale-[103%] transition-all duration-[0.3s]" />
+
+
+              <h1 className="w-full mt-[10px] text-[25px] text-center text-gray-800 font-[600] font-inter">
+                {lang === "uz"
+                  ? "Sevimlilar yo'q"
+                  : lang === "en"
+                    ? "Favorites not found"
+                    : lang === "ru"
+                      ? "Избранное не найдено"
+                      : "Sevimlilar yo'q"}
+              </h1>
+
+
+              <h1 className="w-full mt-[10px] text-[18px] text-center text-gray-700 font-[500] font-inter">
+                {lang === "uz"
+                  ? "Mahsulotdagi ♡ belgisini bosing. Akkauntga kiring va barcha sevimlilar saqlanadi."
+                  : lang === "en"
+                    ? "Click the ♡ icon on a product. Log in to your account and all favorites will be saved."
+                    : lang === "ru"
+                      ? "Нажмите на ♡ на товаре. Войдите в аккаунт, и все избранное будет сохранено."
+                      : "Mahsulotdagi ♡ belgisini bosing. Akkauntga kiring va barcha sevimlilar saqlanadi."}
+              </h1>
+
+            </div>
           )}
         </div>
       </div>

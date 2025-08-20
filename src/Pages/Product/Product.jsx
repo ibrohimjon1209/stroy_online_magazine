@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect, useRef } from "react"
 import product_1 from "./Images/product_1.svg"
 import product_2 from "./Images/product_2.webp"
@@ -46,18 +48,22 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
         updatedBasket[existingIndex].quantity += 1
         if (userSignIn) {
           const new_order = async () => {
-            fetch("https://backkk.stroybazan1.uz/api/api/orders/create/",
-              {
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  method: "POST",
-                  body: JSON.stringify({
-                    user: localStorage.getItem("userId")
-                  })
+            fetch("https://backkk.stroybazan1.uz/api/api/orders/create/", {
+              headers: {
+                "Content-Type": "application/json",
+              },
+              method: "POST",
+              body: JSON.stringify({
+                user: localStorage.getItem("userId"),
+              }),
+            })
+              .then((res) => {
+                console.log(res)
+                console.log(localStorage.getItem("userId"))
               })
-              .then(function(res){ console.log(res); console.log(localStorage.getItem("userId")) })
-              .catch(function(res){ console.log(res) })
+              .catch((res) => {
+                console.log(res)
+              })
           }
           new_order()
         }
@@ -162,16 +168,10 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
   const handlePrevImage = () => {
     if (!productData || !productData.variants || productData.variants.length === 0) return
 
-    // Get current size
-    const currentSize = productData.variants[selectedColorIndex][`size_${lang}`].toLowerCase().trim()
+    const totalVariants = productData.variants.length
+    if (totalVariants <= 1) return
 
-    const sameSize = sizeVariants[currentSize] || []
-    if (sameSize.length <= 1) return
-
-    const currentPosInSize = sameSize.indexOf(selectedColorIndex)
-
-    const prevPos = currentPosInSize > 0 ? currentPosInSize - 1 : sameSize.length - 1
-    const newIndex = sameSize[prevPos]
+    const newIndex = selectedColorIndex > 0 ? selectedColorIndex - 1 : totalVariants - 1
 
     setSlideDirection("slide-right")
     setIsTransitioning(true)
@@ -179,9 +179,10 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
     setTimeout(() => {
       setSelectedColorIndex(newIndex)
 
-      const sizeIndex = uniqueSizes.findIndex(
-        (item) => item.size.toLowerCase() === productData.variants[newIndex][`size_${lang}`].toLowerCase(),
-      )
+      const newSize = productData.variants[newIndex][`size_${lang}`]
+      setSelectedSize(newSize)
+
+      const sizeIndex = uniqueSizes.findIndex((item) => item.size.toLowerCase() === newSize.toLowerCase())
 
       if (sizeIndex !== -1) {
         setSelectedIndex(sizeIndex)
@@ -197,15 +198,10 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
   const handleNextImage = () => {
     if (!productData || !productData.variants || productData.variants.length === 0) return
 
-    const currentSize = productData.variants[selectedColorIndex][`size_${lang}`].toLowerCase().trim()
+    const totalVariants = productData.variants.length
+    if (totalVariants <= 1) return
 
-    const sameSize = sizeVariants[currentSize] || []
-    if (sameSize.length <= 1) return
-
-    const currentPosInSize = sameSize.indexOf(selectedColorIndex)
-
-    const nextPos = currentPosInSize < sameSize.length - 1 ? currentPosInSize + 1 : 0
-    const newIndex = sameSize[nextPos]
+    const newIndex = selectedColorIndex < totalVariants - 1 ? selectedColorIndex + 1 : 0
 
     setSlideDirection("slide-left")
     setIsTransitioning(true)
@@ -213,9 +209,10 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
     setTimeout(() => {
       setSelectedColorIndex(newIndex)
 
-      const sizeIndex = uniqueSizes.findIndex(
-        (item) => item.size.toLowerCase() === productData.variants[newIndex][`size_${lang}`].toLowerCase(),
-      )
+      const newSize = productData.variants[newIndex][`size_${lang}`]
+      setSelectedSize(newSize)
+
+      const sizeIndex = uniqueSizes.findIndex((item) => item.size.toLowerCase() === newSize.toLowerCase())
 
       if (sizeIndex !== -1) {
         setSelectedIndex(sizeIndex)
@@ -266,7 +263,7 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
       handleAddToCart()
 
       // Navigate to basket page after a short delay
-      setTimeout(() => { }, 800)
+      setTimeout(() => {}, 800)
     }, 600)
   }
 
@@ -303,7 +300,7 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
   const currentSize = selectedVariant?.[`size_${lang}`] ? selectedVariant[`size_${lang}`].toLowerCase().trim() : ""
 
   const currentSizeVariants = sizeVariants[currentSize] || []
-  const hasMultipleVariants = currentSizeVariants.length > 1
+  const hasMultipleVariants = productData?.variants?.length > 1
 
   // Get the unit in the current language
   const unit = productData[`units_${lang}`] || ""
@@ -518,9 +515,11 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
               {productData.variants.map((variant, index) => (
                 <div
                   key={index}
-                  className={`border-[3px] ${selectedColorIndex === index ? "border-[rgba(190,160,134,1)]" : "border-transparent"
-                    } overflow-hidden w-[158px] h-[156px] bg-[rgba(242,242,241,1)] rounded-[15px] flex justify-center items-center cursor-pointer ${!isCurrentSizeVariant(index) ? "dimmed" : ""
-                    }`}
+                  className={`border-[3px] ${
+                    selectedColorIndex === index ? "border-[rgba(190,160,134,1)]" : "border-transparent"
+                  } overflow-hidden w-[158px] h-[156px] bg-[rgba(242,242,241,1)] rounded-[15px] flex justify-center items-center cursor-pointer ${
+                    !isCurrentSizeVariant(index) ? "dimmed" : ""
+                  }`}
                   onClick={() => handleColorClick(index)}
                 >
                   <img
@@ -548,14 +547,15 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
                   `https://backkk.stroybazan1.uz${productData.variants[selectedColorIndex].image || "/placeholder.svg"}` ||
                   "/placeholder.svg"
                 }
-                className={`w-[162px] sm:w-[504px] h-[188px] sm:h-[504px] object-fill ${isTransitioning
-                  ? slideDirection
-                  : slideDirection
-                    ? slideDirection === "slide-left"
-                      ? "slide-in-right"
-                      : "slide-in-left"
-                    : ""
-                  }`}
+                className={`w-[162px] sm:w-[504px] h-[188px] sm:h-[504px] object-fill ${
+                  isTransitioning
+                    ? slideDirection
+                    : slideDirection
+                      ? slideDirection === "slide-left"
+                        ? "slide-in-right"
+                        : "slide-in-left"
+                      : ""
+                }`}
               />
             </div>
           </div>
@@ -594,7 +594,7 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
               {productData[`name_${lang}`]}
             </h1>
           </div>
-                    {productData?.variants?.some(v => v.color_uz || v.color_ru || v.color_en) && (
+          {productData?.variants?.some((v) => v.color_uz || v.color_ru || v.color_en) && (
             <div className="color-div mt-[7px] flex flex-col gap-[6px] max-w-full">
               <h1 className="font-inter font-[400] text-[13px] leading-[22px] text-black">
                 {lang == "uz" ? "Rang" : lang == "en" ? "Color" : lang == "ru" ? "Цвет" : "Rang"} :{" "}
@@ -603,28 +603,34 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
                 </span>
               </h1>
               <div className="select-color flex flex-wrap gap-[10px] max-w-full">
-                {productData?.variants?.map((variant, index) => (
-                  <div
-                    key={variant.id}
-                    className={`transition-all duration-200 overflow-hidden min-w-[62px] w-[62px] h-[80px] flex-shrink-0 flex justify-center items-center rounded-[5px] 
-                  ${selectedColorIndex === index
+                {productData?.variants
+                  ?.filter((variant) => variant.color_uz || variant.color_ru || variant.color_en)
+                  .map((variant, index) => {
+                    const originalIndex = productData.variants.findIndex((v) => v.id === variant.id)
+
+                    return (
+                      <div
+                        key={variant.id}
+                        className={`transition-all duration-200 overflow-hidden min-w-[62px] w-[62px] h-[80px] flex-shrink-0 flex justify-center items-center rounded-[5px] 
+                    ${
+                      selectedColorIndex === originalIndex
                         ? "border-[1.5px] border-[rgba(190,160,134,1)]"
                         : "border-transparent"
-                      } 
-                  bg-[rgba(247,247,246,1)] cursor-pointer ${!isCurrentSizeVariant(index) ? "dimmed" : ""}`}
-                    onClick={() => handleColorClick(index)}
-                  >
-                    <img
-                      src={`https://backkk.stroybazan1.uz${variant.image || productData.image}`}
-                      alt={variant.color_uz}
-                      className="object-contain w-full h-full"
-                    />
-                  </div>
-                ))}
+                    } 
+                    bg-[rgba(247,247,246,1)] cursor-pointer ${!isCurrentSizeVariant(originalIndex) ? "dimmed" : ""}`}
+                        onClick={() => handleColorClick(originalIndex)}
+                      >
+                        <img
+                          src={`https://backkk.stroybazan1.uz${variant.image || productData.image}`}
+                          alt={variant.color_uz}
+                          className="object-contain w-full h-full"
+                        />
+                      </div>
+                    )
+                  })}
               </div>
             </div>
           )}
-
 
           <div className="size-div mt-[20px] max-w-full">
             <h1 className="font-inter font-[400] text-[13px] leading-[22px] text-black">
@@ -659,8 +665,9 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
                 {paymentOptions[lang].map((option, index) => (
                   <div
                     key={index}
-                    className={`transition-all duration-100 flex justify-center items-center w-[80px] h-[26px] rounded-[5px] cursor-pointer ${selectedPaymentIndex === index ? "bg-white border-[1.5px] border-[rgba(190,160,134,1)]" : ""
-                      }`}
+                    className={`transition-all duration-100 flex justify-center items-center w-[80px] h-[26px] rounded-[5px] cursor-pointer ${
+                      selectedPaymentIndex === index ? "bg-white border-[1.5px] border-[rgba(190,160,134,1)]" : ""
+                    }`}
                     onClick={() => handlePaymentClick(index)}
                   >
                     <h1 className="font-inter font-[500] text-[10px] text-black">{option}</h1>
@@ -702,8 +709,9 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
 
             <div className="relative">
               <button
-                className={`mt-[20px] w-full h-[60px] rounded-[10px] bg-[rgba(220,195,139,1)] cursor-pointer hover:bg-[#e9d8b2] transition-all duration-200 font-inter font-[600] text-[15px] leading-[22px] text-black ${isAnimating ? "animate-circle" : ""
-                  }`}
+                className={`mt-[20px] w-full h-[60px] rounded-[10px] bg-[rgba(220,195,139,1)] cursor-pointer hover:bg-[#e9d8b2] transition-all duration-200 font-inter font-[600] text-[15px] leading-[22px] text-black ${
+                  isAnimating ? "animate-circle" : ""
+                }`}
                 onClick={handleClick}
               >
                 {!isAnimating
@@ -735,7 +743,6 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
       </div>
     </div>
   )
-
 }
 
 export default Product

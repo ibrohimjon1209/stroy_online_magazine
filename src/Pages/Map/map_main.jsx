@@ -30,8 +30,8 @@ const Delivery_main = ({
         is_delivery ? "flex" : "hidden"
       } flex-col mb-[84px]`}
     >
-      <div className="w-full h-[65px] sm:h-[80px] top-0 z-50">
-        <div className="bg-[#DCC38B] flex items-center gap-[10px] w-full h-full font-inter font-[600] text-[17px] sm:text-[20px] leading-[22px] text-black pl-[13px] sm:pl-[50px]">
+      <div className=" flex justify-center w-full h-[65px] sm:h-[80px] top-0 z-50">
+        <div className="bg-[#DCC38B] flex items-center gap-[10px] w-[1450px] rounded-[15px] mt-[5px] h-full font-inter font-[600] text-[17px] sm:text-[20px] leading-[22px] text-black pl-[13px] sm:pl-[50px]">
           <div
             onClick={() =>
               active === "map" ? set_active("address") : set_is_delivery(false)

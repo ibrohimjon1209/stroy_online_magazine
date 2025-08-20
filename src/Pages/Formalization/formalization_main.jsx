@@ -1,5 +1,3 @@
-"use client"
-
 import { Check, ChevronLeft, ChevronRight, User } from "lucide-react"
 import { Link } from "react-router-dom"
 import arrive_icon from "./imgs/arrive_icon.png"
@@ -186,9 +184,9 @@ const Formalization_main = ({
             ? "Foydalanuvchi ma'lumotlari topilmadi"
             : lang === "en"
               ? "User information not found"
-            : lang === "ru"
-              ? "Информация о пользователе не найдена"
-              : "Foydalanuvchi ma'lumotlari topilmadi"
+              : lang === "ru"
+                ? "Информация о пользователе не найдена"
+                : "Foydalanuvchi ma'lumotlari topilmadi"
         )
         setIsNotificationVisible(true)
         setTimeout(() => setIsNotificationVisible(false), 3000)
@@ -246,9 +244,9 @@ const Formalization_main = ({
             ? "Buyurtma muvaffaqiyatli yaratildi"
             : lang === "en"
               ? "Order created successfully"
-            : lang === "ru"
-              ? "Заказ успешно создан"
-              : "Buyurtma muvaffaqiyatli yaratildi"
+              : lang === "ru"
+                ? "Заказ успешно создан"
+                : "Buyurtma muvaffaqiyatli yaratildi"
         )
         setIsNotificationVisible(true)
         setTimeout(() => {
@@ -280,9 +278,9 @@ const Formalization_main = ({
                 ? "Buyurtma muvaffaqiyatli yaratildi"
                 : lang === "en"
                   ? "Order created successfully"
-                : lang === "ru"
-                  ? "Заказ успешно создан"
-                : "Buyurtma muvaffaqiyatli yaratildi"
+                  : lang === "ru"
+                    ? "Заказ успешно создан"
+                    : "Buyurtma muvaffaqiyatli yaratildi"
             )
             setIsNotificationVisible(true)
             setTimeout(() => {
@@ -305,12 +303,39 @@ const Formalization_main = ({
           ? error.response?.data?.detail || "Buyurtma yaratishda xatolik"
           : lang === "en"
             ? error.response?.data?.detail || "Error creating order"
-          : lang === "ru"
-            ? error.response?.data?.detail || "Ошибка при создании заказа"
-            : error.response?.data?.detail || "Buyurtma yaratishda xatolik"
+            : lang === "ru"
+              ? error.response?.data?.detail || "Ошибка при создании заказа"
+              : error.response?.data?.detail || "Buyurtma yaratishda xatolik"
       )
       setIsNotificationVisible(true)
       setTimeout(() => setIsNotificationVisible(false), 3000)
+    }
+  }
+  const purchase = async () => {
+    try {
+      const response = await fetch("https://bakkk.stroybazan1.uz/api/api/order/create/", {
+        method: "POST",
+        body: {
+          cart_items:
+            basket
+              .filter((item) => item.selected)
+              .map((item) => ({
+                variant_id: item.variant_id,
+                quantity: item.quantity,
+                product_id: item.id,
+              }))
+          ,
+          delivery_address: "string",
+          payment_method: "cash",
+          use_cashback: true,
+          branch_id: 0,
+          part: 0,
+          status: "pending",
+          delivery_method: "delivery"
+        }
+      });
+    } catch (err) {
+      console.error(err)
     }
   }
 
@@ -339,9 +364,8 @@ const Formalization_main = ({
         </Link>
       </div>
       <div
-        className={`w-full sm:w-[76%] sm:mt-0 mt-12 ${
-          is_delivery || is_payment_variant || is_pickup ? "hidden" : "block"
-        } mx-auto bg-white mb-[20px]`}
+        className={`w-full sm:w-[76%] sm:mt-0 mt-12 ${is_delivery || is_payment_variant || is_pickup ? "hidden" : "block"
+          } mx-auto bg-white mb-[20px]`}
       >
         <div className="p-6 pt-[35px]">
           <h2 className="font-inter font-[600] text-[15px] leading-[22px] text-black">
@@ -405,17 +429,15 @@ const Formalization_main = ({
           <div className="relative flex p-1 bg-gray-100 rounded-xl mt-[20px] sm:mt-[35px] mb-4 h-[40px] sm:h-[60px] w-full sm:w-[95%] mx-auto font-inter font-[500] text-[13px] sm:text-[18px] leading-[22px] text-black">
             <button
               onClick={() => set_deliver_type("bring")}
-              className={`flex-1 py-1 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
-                deliver_type === "bring" ? "bg-white shadow-sm duration-500" : "text-gray-500"
-              }`}
+              className={`flex-1 py-1 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${deliver_type === "bring" ? "bg-white shadow-sm duration-500" : "text-gray-500"
+                }`}
             >
               {lang === "uz" ? "Olib ketish" : lang === "en" ? "Pickup" : lang === "ru" ? "Забрать" : "Olib ketish"}
             </button>
             <button
               onClick={() => set_deliver_type("deliver")}
-              className={`flex-1 py-1 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
-                deliver_type === "deliver" ? "bg-white shadow-sm duration-500" : "text-gray-500"
-              }`}
+              className={`flex-1 py-1 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${deliver_type === "deliver" ? "bg-white shadow-sm duration-500" : "text-gray-500"
+                }`}
             >
               {lang === "uz"
                 ? "Yetkazib berish"
@@ -486,16 +508,14 @@ const Formalization_main = ({
               </div>
               <div className="flex items-center gap-3">
                 <span
-                  className={`${
-                    cashback_is_using ? "translate-x-0" : "translate-x-10"
-                  } text-[13px] duration-200 sm:text-[18px] sm:font-medium ${cashbackAmount < 1000 ? "text-red-500 font-bold" : ""}`}
+                  className={`${cashback_is_using ? "translate-x-0" : "translate-x-10"
+                    } text-[13px] duration-200 sm:text-[18px] sm:font-medium ${cashbackAmount < 1000 ? "text-red-500 font-bold" : ""}`}
                 >
                   {cashbackAmount.toLocaleString()} {uzs_lang}
                 </span>
                 <div
-                  className={`${
-                    cashback_is_using ? "translate-x-0" : "translate-x-10"
-                  } p-1 duration-200 ${cashbackAmount < 1000 ? "bg-red-500" : "bg-green-500"} rounded-full`}
+                  className={`${cashback_is_using ? "translate-x-0" : "translate-x-10"
+                    } p-1 duration-200 ${cashbackAmount < 1000 ? "bg-red-500" : "bg-green-500"} rounded-full`}
                 >
                   <Check className="w-3 h-3 text-white sm:h-4 sm:w-4" />
                 </div>
@@ -529,9 +549,8 @@ const Formalization_main = ({
                     <span className="font-inter font-[600] text-[15px] leading-[22px] text-black">Click</span>
                   </div>
                   <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
-                      selectedMethod === "click" ? "bg-[#BEA086]" : ""
-                    }`}
+                    className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${selectedMethod === "click" ? "bg-[#BEA086]" : ""
+                      }`}
                   >
                     {selectedMethod === "click" && <Check className="w-4 h-4 text-white" />}
                   </div>
@@ -549,9 +568,8 @@ const Formalization_main = ({
                     <span className="font-inter font-[600] text-[15px] leading-[22px] text-black">Pay me</span>
                   </div>
                   <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
-                      selectedMethod === "payme" ? "bg-[#BEA086]" : ""
-                    }`}
+                    className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${selectedMethod === "payme" ? "bg-[#BEA086]" : ""
+                      }`}
                   >
                     {selectedMethod === "payme" && <Check className="w-4 h-4 text-white" />}
                   </div>
@@ -577,9 +595,8 @@ const Formalization_main = ({
                     </span>
                   </div>
                   <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
-                      selectedMethod === "qabul" ? "bg-[#BEA086]" : ""
-                    }`}
+                    className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${selectedMethod === "qabul" ? "bg-[#BEA086]" : ""
+                      }`}
                   >
                     {selectedMethod === "qabul" && <Check className="w-4 h-4 text-white" />}
                   </div>
@@ -595,15 +612,14 @@ const Formalization_main = ({
                         ? "Muddatli to'lov"
                         : lang === "en"
                           ? "Installment"
-                        : lang === "ru"
-                          ? "Рассрочка"
-                          : "Muddatli to'lov"}
+                          : lang === "ru"
+                            ? "Рассрочка"
+                            : "Muddatli to'lov"}
                     </span>
                   </div>
                   <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
-                      selectedMethod === "installment" ? "bg-[#BEA086]" : ""
-                    }`}
+                    className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${selectedMethod === "installment" ? "bg-[#BEA086]" : ""
+                      }`}
                   >
                     {selectedMethod === "installment" && <Check className="w-4 h-4 text-white" />}
                   </div>
@@ -748,14 +764,14 @@ const Formalization_main = ({
                 <span>
                   {selectedMethod === "installment"
                     ? (
-                        basket
-                          .filter((item) => item.selected)
-                          .reduce((sum, item) => sum + item.price * item.quantity, 0) * 1
-                      ).toLocaleString()
-                    : basket
+                      basket
                         .filter((item) => item.selected)
-                        .reduce((sum, item) => sum + item.price * item.quantity, 0)
-                        .toLocaleString()}{" "}
+                        .reduce((sum, item) => sum + item.price * item.quantity, 0) * 1
+                    ).toLocaleString()
+                    : basket
+                      .filter((item) => item.selected)
+                      .reduce((sum, item) => sum + item.price * item.quantity, 0)
+                      .toLocaleString()}{" "}
                   {uzs_lang}
                 </span>
               </div>
@@ -816,7 +832,7 @@ const Formalization_main = ({
         set_is_payment_variant={set_is_payment_variant}
         set_address_inform={set_address_inform}
       />
-      <Pickup_address is_pickup={is_pickup} set_is_pickup={set_is_pickup} />
+      <Pickup_address is_pickup={is_pickup} set_is_pickup={set_is_pickup} set_address_inform={set_address_inform}/>
     </div>
   )
 }
