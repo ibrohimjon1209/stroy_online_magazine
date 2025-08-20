@@ -383,7 +383,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                           className="w-full h-[52px] pl-[34px] pr-[43px] flex justify-between items-center bg-transparent hover:bg-gray-100 cursor-pointer"
                         >
                           <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">
-                            {category.name_uz}
+                            {category[`name_${lang}`]}
                           </h1>
                           <img
                             src={vector || "/placeholder.svg"}

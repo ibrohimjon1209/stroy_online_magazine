@@ -1,12 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { ChevronLeft, X } from "lucide-react"
+import { order_get } from "../../../../Services/order/get_my"
 
 const Orders_main = ({ lang }) => {
   // State to track which orders have expanded product views
   const [expandedOrders, setExpandedOrders] = useState([])
+  const [productDetails, setProductDetails] = useState({})
 
   // Toggle product visibility for an order
   const toggleProductView = (orderId) => {
@@ -14,134 +16,67 @@ const Orders_main = ({ lang }) => {
       setExpandedOrders(expandedOrders.filter((id) => id !== orderId))
     } else {
       setExpandedOrders([...expandedOrders, orderId])
+      fetchProductsForOrder(orderId)
     }
   }
 
-  const orders = [
-    {
-      id: "63224636",
-      status: {
-        uz: "Xaridorga Berilgan",
-        en: "Delivered",
-        ru: "Доставлен",
-      },
-      statusColor: "green",
-      deliveryDate: {
-        uz: "Juma 10 yanvar",
-        en: "Wednesday 10 January",
-        ru: "Четверг 10 января",
-      },
-      processDate: {
-        uz: "Juma 10 yanvar",
-        en: "Wednesday 10 January",
-        ru: "Четверг 10 января",
-      },
-      quantity: 1,
-      totalPrice: "126.650",
-      product: {
-        name: "PENOPLEX COMFORT",
-        price: "125.650",
-        seller: "1,599 sotuvchi / 12oy",
-        image: "/placeholder.svg?height=70&width=70",
-      },
-      // Added sample products for demonstration
-      products: [
-        {
-          id: "p1",
-          name: "PENOPLEX COMFORT 50mm",
-          price: "65.650",
-          quantity: 1,
-          image: "/placeholder.svg?height=50&width=50",
-        },
-        {
-          id: "p2",
-          name: "PENOPLEX COMFORT 100mm",
-          price: "60.000",
-          quantity: 1,
-          image: "/placeholder.svg?height=50&width=50",
-        },
-      ],
-    },
-    {
-      id: "63224637",
-      status: {
-        uz: "Jarayonda",
-        en: "In progress",
-        ru: "В процессе",
-      },
-      statusColor: "yellow",
-      deliveryDate: {
-        uz: "Juma 10 yanvar",
-        en: "Wednesday 10 January",
-        ru: "Четверг 10 января",
-      },
-      processDate: {
-        uz: "Juma 10 yanvar",
-        en: "Wednesday 10 January",
-        ru: "Четверг 10 января",
-      },
-      quantity: 1,
-      totalPrice: "126.650",
-      product: {
-        name: "PENOPLEX COMFORT",
-        price: "125.650",
-        seller: "1,599 sotuvchi / 12oy",
-        image: "/placeholder.svg?height=70&width=70",
-      },
-      products: [
-        {
-          id: "p3",
-          name: "PENOPLEX COMFORT 50mm",
-          price: "126.650",
-          quantity: 1,
-          image: "/placeholder.svg?height=50&width=50",
-        },
-      ],
-    },
-    {
-      id: "63224638",
-      status: {
-        uz: "Bekor qilingan",
-        en: "Canceled",
-        ru: "Отменен",
-      },
-      statusColor: "red",
-      deliveryDate: {
-        uz: "Juma 10 yanvar",
-        en: "Wednesday 10 January",
-        ru: "Четверг 10 января",
-      },
-      processDate: {
-        uz: "Juma 10 yanvar",
-        en: "Wednesday 10 January",
-        ru: "Четверг 10 января",
-      },
-      quantity: 1,
-      totalPrice: "126.650",
-      product: {
-        name: "PENOPLEX COMFORT",
-        price: "125.650",
-        seller: "1,599 sotuvchi / 12oy",
-        image: "/placeholder.svg?height=70&width=70",
-      },
-      products: [
-        {
-          id: "p4",
-          name: "PENOPLEX COMFORT 75mm",
-          price: "85.650",
-          quantity: 1,
-          image: "/placeholder.svg?height=50&width=50",
-        },
-        {
-          id: "p5",
-          name: "PENOPLEX COMFORT 25mm",
-          price: "41.000",
-          quantity: 1,
-          image: "/placeholder.svg?height=50&width=50",
-        },
-      ],
-    },
-  ]
+  const [orders, set_orders] = useState([])
+
+  useEffect(() => {
+    try {
+      order_get(localStorage.getItem("accessToken")).then((res) => {
+        if (res) {
+          set_orders(res)
+        }
+      })
+    } catch (err) {}
+  }, [])
+
+  const get_product = async (id) => {
+    try {
+      const res = await fetch(`https://backkk.stroybazan1.uz/api/api/products/${id}/`)
+
+      if (!res.ok) {
+        throw new Error("Serverda xatolik: " + res.status)
+      }
+
+      const data = await res.json()
+
+      return data
+    } catch (err) {
+      console.error("Xatolik:", err.message)
+    }
+  }
+
+  const fetchProductsForOrder = async (orderId) => {
+    const order = orders.find((o) => o.id === orderId)
+    if (!order) return
+
+    const productPromises = order.items.map(async (item) => {
+      const productData = await get_product(item.product_variant.id)
+      return {
+        id: item.product_variant.id,
+        data: productData,
+      }
+    })
+
+    try {
+      const products = await Promise.all(productPromises)
+      const productMap = {}
+      products.forEach((product) => {
+        if (product.data) {
+          productMap[product.id] = product.data
+        }
+      })
+
+      setProductDetails((prev) => ({
+        ...prev,
+        [orderId]: productMap,
+      }))
+    } catch (error) {
+      console.error("Mahsulot ma'lumotlarini olishda xatolik:", error)
+    }
+  }
 
   const uzs_lang = lang == "uz" ? "so'm" : lang == "en" ? "uzs" : lang == "ru" ? "сум" : "so'm"
 
@@ -171,13 +106,60 @@ const Orders_main = ({ lang }) => {
                 </div>
                 <div
                   className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium
-                  ${order.statusColor === "green" ? "text-green-700 bg-green-100" : ""}
-                  ${order.statusColor === "yellow" ? "text-yellow-700 bg-yellow-100" : ""}
-                  ${order.statusColor === "blue" ? "text-blue-700 bg-blue-100" : ""}
-                  ${order.statusColor === "red" ? "text-red-700 bg-red-100" : ""}
+                  ${order.status === "delivered" ? "text-green-700 bg-green-100" : ""}
+                  ${order.status === "processing" ? "text-yellow-700 bg-yellow-100" : ""}
+                  ${order.status === "in_payment" ? "text-yellow-700 bg-yellow-100" : ""}
+                  ${order.status === "pending" ? "text-yellow-700 bg-yellow-100" : ""}
+                  ${order.status === "shipped" ? "text-blue-700 bg-blue-100" : ""}
+                  ${order.status === "cancelled" ? "text-red-700 bg-red-100" : ""}
                 `}
                 >
-                  {order.status[lang]}
+                  {order.status === "delivered"
+                    ? lang == "uz"
+                      ? "Yetkazilgan"
+                      : lang == "en"
+                        ? "Delivered"
+                        : lang == "ru"
+                          ? "Доставлен"
+                          : "Yetkazilgan"
+                    : ""}
+                  {order.status === "processing"
+                    ? lang == "uz"
+                      ? "Jarayonda"
+                      : lang == "en"
+                        ? "In progress"
+                        : lang == "ru"
+                          ? "В процессе"
+                          : "Jarayonda"
+                    : ""}
+                  {order.status === "in_payment"
+                    ? lang == "uz"
+                      ? "Jarayonda"
+                      : lang == "en"
+                        ? "In progress"
+                        : lang == "ru"
+                          ? "В процессе"
+                          : "Jarayonda"
+                    : ""}
+                  {order.status === "pending"
+                    ? lang == "uz"
+                      ? "Jarayonda"
+                      : lang == "en"
+                        ? "In progress"
+                        : lang == "ru"
+                          ? "В процессе"
+                          : "Jarayonda"
+                    : ""}
+                  {order.status === "shipped"
+                    ? lang == "uz"
+                      ? "Yetkazilmoqda"
+                      : lang == "en"
+                        ? "Delivering"
+                        : lang == "ru"
+                          ? "Доставляется"
+                          : "Yetkazilmoqda"
+                    : ""}
+                  {order.status === "cancelled" ? "" : ""}
                 </div>
               </div>
 
@@ -185,30 +167,69 @@ const Orders_main = ({ lang }) => {
                 <div className="flex justify-between text-base">
                   <span className="text-gray-600">
                     {lang == "uz"
-                      ? "Yetkazish sanasi"
+                      ? "Yaratilgan sanasi"
                       : lang == "en"
-                        ? "Delivery date"
+                        ? "Created date"
                         : lang == "ru"
-                          ? "Дата доставки"
-                          : "Yetkazish sanasi"}
+                          ? "Дата создания"
+                          : "Yaratilgan sanasi"}
                   </span>
-                  <span className="font-medium text-gray-900">{order.deliveryDate[lang]}</span>
+                  <span className="font-medium text-gray-900">
+                    {new Date(order.created_at).toLocaleString(
+                      lang === "uz" ? "uz-UZ" : lang === "en" ? "en-US" : "ru-RU",
+                      {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      },
+                    )}
+                  </span>
                 </div>
                 <div className="flex justify-between text-base">
                   <span className="text-gray-600">
                     {lang == "uz"
-                      ? "dona mahsulot"
+                      ? "Yetkazib berish manzili"
                       : lang == "en"
-                        ? "piece of product"
+                        ? "Delivery address"
                         : lang == "ru"
-                          ? "штук товара"
-                          : "dona mahsulot"}
+                          ? "Адрес доставки"
+                          : "Yetkazib berish manzili"}
                   </span>
-                  <span className="font-medium text-gray-900">{order.processDate[lang]}</span>
+                  <span className="font-medium text-gray-900">{order.delivery_address}</span>
                 </div>
                 <div className="flex justify-between text-base">
                   <span className="text-gray-600">
-                    {order.quantity}{" "}
+                    {lang == "uz"
+                      ? "To'lov usuli"
+                      : lang == "en"
+                        ? "Payment method"
+                        : lang == "ru"
+                          ? "Способ оплаты"
+                          : ""}
+                  </span>
+                  <span className="font-medium text-gray-900">
+                    {order.payment_method === "cash" &&
+                      (lang === "uz" ? "Naqd" : lang === "en" ? "Cash" : lang === "ru" ? "Наличные" : "")}
+
+                    {order.payment_method === "payme" && "Payme"}
+
+                    {order.payment_method === "click" && "Click"}
+
+                    {order.payment_method === "installments_payment" &&
+                      (lang === "uz"
+                        ? "Nasiya to'lov"
+                        : lang === "en"
+                          ? "Installment payment"
+                          : lang === "ru"
+                            ? "Рассрочка"
+                            : "")}
+                  </span>
+                </div>
+                <div className="flex justify-between text-base">
+                  <span className="text-gray-600">
+                    {order.items.length}{" "}
                     {lang == "uz"
                       ? "dona mahsulot"
                       : lang == "en"
@@ -218,28 +239,11 @@ const Orders_main = ({ lang }) => {
                           : "dona mahsulot"}
                   </span>
                   <span className="font-medium text-gray-900">
-                    {order.totalPrice} {uzs_lang}
+                    {order.total_amount} {uzs_lang}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
-                <img
-                  src={order.product.image || "/placeholder.svg"}
-                  alt={order.product.name}
-                  width={70}
-                  height={70}
-                  className="object-contain rounded"
-                />
-                <div>
-                  <div className="text-lg font-bold">{order.product.name}</div>
-                  <div className="font-medium text-gray-900">
-                    {order.product.price} {uzs_lang}
-                  </div>
-                </div>
-              </div>
-
-              {/* Product list that shows when expanded */}
               {expandedOrders.includes(order.id) && (
                 <div className="pt-4 mt-4 space-y-4 border-t">
                   <div className="flex items-center justify-between">
@@ -254,7 +258,7 @@ const Orders_main = ({ lang }) => {
                     </h3>
                     <button
                       onClick={() => toggleProductView(order.id)}
-                      className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                      className="text-gray-500 cursor-pointer hover:text-gray-700 focus:outline-none"
                       aria-label="Close"
                     >
                       <X size={20} />
@@ -262,33 +266,47 @@ const Orders_main = ({ lang }) => {
                   </div>
 
                   <div className="space-y-3">
-                    {order.products.map((product) => (
-                      <div key={product.id} className="flex items-center justify-between p-3 rounded-md bg-gray-50">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={product.image || "/placeholder.svg"}
-                            alt={product.name}
-                            width={50}
-                            height={50}
-                            className="object-contain rounded"
-                          />
-                          <div>
-                            <div className="font-medium">{product.name}</div>
-                            <div className="text-sm text-gray-600">
-                              {product.quantity} {lang == "uz" ? "dona" : lang == "en" ? "pcs" : "шт."}
+                    {order.items.map((product) => {
+                      const productData = productDetails[order.id]?.[product.product_variant.id]
+
+                      return (
+                        <div
+                          key={product.product_variant.id}
+                          className="flex items-center justify-between p-3 rounded-md bg-gray-50"
+                        >
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={`https://backkk.stroybazan1.uz/${product.product_variant.image}`}
+                              width={50}
+                              height={50}
+                              className="object-contain rounded"
+                            />
+                            <div>
+                              <div className="font-medium">
+                                {productData
+                                  ? productData[`name_${lang}`] || productData.name || "Mahsulot nomi"
+                                  : lang === "uz"
+                                    ? "Yuklanmoqda..."
+                                    : lang === "en"
+                                      ? "Loading..."
+                                      : "Загрузка..."}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {product.quantity} {lang == "uz" ? "dona" : lang == "en" ? "pcs" : "шт."}
+                              </div>
                             </div>
                           </div>
+                          <div className="font-medium">
+                            {product.price} {uzs_lang}
+                          </div>
                         </div>
-                        <div className="font-medium">
-                          {product.price} {uzs_lang}
-                        </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
 
                   <button
                     onClick={() => toggleProductView(order.id)}
-                    className="w-full py-2 text-center text-white transition-colors bg-orange-500 rounded-md hover:bg-orange-600"
+                    className="w-full py-2 text-center text-white transition-colors bg-orange-500 rounded-md cursor-pointer hover:bg-orange-600"
                   >
                     {lang == "uz" ? "Yopish" : lang == "en" ? "Close" : lang == "ru" ? "Закрыть" : "Yopish"}
                   </button>
@@ -302,12 +320,12 @@ const Orders_main = ({ lang }) => {
                   className="text-base font-medium text-orange-500 cursor-pointer hover:underline"
                 >
                   {lang == "uz"
-                    ? "Maxsulotni ko'rsatish"
+                    ? "Maxsulotlarni ko'rsatish"
                     : lang == "en"
-                      ? "View product"
+                      ? "View products"
                       : lang == "ru"
-                        ? "Просмотр товара"
-                        : "Maxsulotni ko'rsatish"}
+                        ? "Просмотр товаров"
+                        : "Maxsulotlarni ko'rsatish"}
                 </button>
               )}
             </div>

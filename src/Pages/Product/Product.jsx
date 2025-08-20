@@ -440,7 +440,7 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
           pointer-events: none;
         }
         .disabled-nav {
-          opacity: 0.3;
+          opacity: 0;
           cursor: not-allowed;
           pointer-events: none;
         }
@@ -532,13 +532,13 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
             </div>
             <div className="flex justify-center items-center big-selected-image relative w-full sm:w-[504px] h-[330px] sm:h-[504px] overflow-hidden bg-[rgba(242,242,241,1)] rounded-[15px]">
               <div
-                className={`nav-button nav-button-left ${!hasMultipleVariants ? "disabled-nav" : ""}`}
+                className={`nav-button cursor-pointer nav-button-left ${!hasMultipleVariants ? "disabled-nav" : ""}`}
                 onClick={handlePrevImage}
               >
                 <ChevronLeft size={24} />
               </div>
               <div
-                className={`nav-button nav-button-right ${!hasMultipleVariants ? "disabled-nav" : ""}`}
+                className={`nav-button cursor-pointer nav-button-right ${!hasMultipleVariants ? "disabled-nav" : ""}`}
                 onClick={handleNextImage}
               >
                 <ChevronRight size={24} />
@@ -677,7 +677,7 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
               </div>
             </div>
 
-            <p className="mt-[10px] w-[318px] font-inter font-[500] text-[12px] leading-[22px] text-[rgba(0,0,0,0.75)]">
+            <p className="mt-[10px] w-[318px] font-inter font-[400] text-[15px] leading-[22px] text-[rgba(0,0,0,0.75)]">
               {lang == "uz"
                 ? "Siz buyurtmani 3 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."
                 : lang == "en"
@@ -688,14 +688,14 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
             </p>
 
             <div className="payment-options p-[20px] mt-[20px] w-full h-fit rounded-[10px] border-[1px] border-[rgba(213,213,213,1)]">
-              <h1 className="font-inter font-[500] text-[12px] leading-[22px] text-[rgba(0,0,0,0.75)]">
-                {t_term.deliveryTitle} <span className="font-inter font-[800]">{t_term.deliveryHighlight1}</span>{" "}
+              <h1 className="font-inter font-[400] text-[15px] leading-[22px] text-[rgba(0,0,0,0.75)]">
+                {t_term.deliveryTitle} <span className="font-inter font-[700]">{t_term.deliveryHighlight1}</span>{" "}
                 {lang == "uz" ? "ichida." : "."} {t_term.deliveryHighlight2}
               </h1>
 
               <div className="mt-[20px] w-full h-[1px] bg-[rgba(213,213,213,1)]"></div>
 
-              <h1 className="mt-[20px] font-inter font-[500] text-[12px] leading-[22px] text-[rgba(0,0,0,0.75)]">
+              <h1 className="mt-[20px] font-inter font-[400] text-[15px] leading-[22px] text-[rgba(0,0,0,0.75)]">
                 {t_term.installmentText}
               </h1>
             </div>

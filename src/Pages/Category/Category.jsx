@@ -17,7 +17,7 @@ const Category = ({ searchText }) => {
   const [notification, setNotification] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [loading, setLoading] = useState(true);
-  const lang = window.localStorage.getItem("lang") || "uz";
+  const lang = window.localStorage.getItem("lang");
   const [category_data, set_category_data] = useState(null);
   const category_id = useLocation().pathname.split("/")[2];
   const [likedProducts, setLikedProducts] = useState(() => {
