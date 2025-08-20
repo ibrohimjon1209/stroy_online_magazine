@@ -517,9 +517,7 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
                   key={index}
                   className={`border-[3px] ${
                     selectedColorIndex === index ? "border-[rgba(190,160,134,1)]" : "border-transparent"
-                  } overflow-hidden w-[158px] h-[156px] bg-[rgba(242,242,241,1)] rounded-[15px] flex justify-center items-center cursor-pointer ${
-                    !isCurrentSizeVariant(index) ? "dimmed" : ""
-                  }`}
+                  } overflow-hidden w-[158px] h-[156px] bg-[rgba(242,242,241,1)] rounded-[15px] flex justify-center items-center cursor-pointer`}
                   onClick={() => handleColorClick(index)}
                 >
                   <img
