@@ -21,7 +21,6 @@ const Profile_main = ({ isUserSignIn, setUserSignIn, set_is_found, lang, set_lan
   const [is_logout_open, set_is_logout_open] = useState(false);
   const [edit_profile_open, set_edit_profile_open] = useState(false);
   const [user, set_user] = useState({});
-  console.log(user.id);
   
   const location = useLocation().pathname;
   const titles = {

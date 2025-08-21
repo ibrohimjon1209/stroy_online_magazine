@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import { Heart } from "lucide-react";
 
 const Favorites_main = ({ lang }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [likedProducts, setLikedProducts] = useState([]);
+  const sl_option_id =
+    localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
+      ? 0
+      : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
+      ? 1
+      : 2;
+
   const uzs_lang =
     lang === "uz"
       ? "so'm"
@@ -24,17 +30,10 @@ const Favorites_main = ({ lang }) => {
 
     const getProducts = async () => {
       try {
-        const response = await axios.get(
-          "https://backkk.stroybazan1.uz/api/api/products/?branch=0",
-          {
-            headers: {
-              accept: "application/json",
-              "X-CSRFTOKEN":
-                "B8UmaQE4P3RrkjHA8QHRPrl0hvSU4yProbsYerUqficnXhefiWFxkqRVvGVL7Ws5",
-            },
-          }
+        const response = fetch(
+          `https://backkk.stroybazan1.uz/api/api/products/?branch=${sl_option_id}`
         );
-
+        console.log(response);
         const likedOnly = response.data.filter((product) =>
           likedIds.includes(product.id)
         );
