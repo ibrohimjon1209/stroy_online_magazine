@@ -89,7 +89,7 @@ export default function KitchenCarousel() {
 
               <img
                 src={`https://backkk.stroybazan1.uz${item.image}`}
-                className="w-full h-full object-cover rounded-[10px] sm:rounded-[0px]"
+                className="w-full h-full object-fill rounded-[10px] sm:rounded-[0px]"
                 alt=""
                 onLoad={() => handleImageLoad(index)}
                 style={{ opacity: loadedImages[index] ? 1 : 0 }}

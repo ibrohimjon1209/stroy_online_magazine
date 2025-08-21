@@ -15,7 +15,6 @@ import Delivery from "../Map/map_main"
 import Payment_variant from "../payment_variant/payment_main"
 import Pickup_address from "../pickup_address/pickup_address_main"
 import { get_user } from "../../Services/auth/get_user"
-import axios from "axios"
 import { order_create } from "../../Services/auth/create_order"
 
 // CSS for vibration animation
@@ -122,149 +121,6 @@ const Formalization_main = ({
           : lang === "ru"
             ? "Выберите адрес доставки"
             : "Yetkazib berish manzilini tanlang"
-
-  const refreshToken = async () => {
-    try {
-      const refreshToken = localStorage.getItem("refreshToken")
-      if (!refreshToken) throw new Error("No refresh token available")
-
-      // Replace with your actual refresh endpoint
-      const response = await axios.post("https://backkk.stroybazan1.uz/api/token/refresh/", {
-        refresh: refreshToken,
-      })
-      const newAccessToken = response.data.access
-      localStorage.setItem("accessToken", newAccessToken)
-      return newAccessToken
-    } catch (error) {
-      console.error("Token refresh failed:", error)
-      setUserSignIn(false)
-      localStorage.removeItem("accessToken")
-      localStorage.removeItem("refreshToken")
-      localStorage.removeItem("userId")
-      setNotification(
-        lang === "uz"
-          ? "Sessiya tugadi, iltimos qayta kiring"
-          : lang === "en"
-            ? "Session expired, please log in again"
-            : lang === "ru"
-              ? "Сессия истекла, пожалуйста, войдите снова"
-              : "Sessiya tugadi, iltimos qayta kiring",
-      )
-      setIsNotificationVisible(true)
-      setTimeout(() => setIsNotificationVisible(false), 3000)
-      return null
-    }
-  }
-
-  const processPayment = async (orderId) => {
-    try {
-      console.log("[v0] processPayment called with orderId:", orderId)
-      console.log("[v0] selectedMethod:", selectedMethod)
-
-      const paymentMethodMap = {
-        click: "click",
-        payme: "payme",
-      }
-
-      const paymentMethod = paymentMethodMap[selectedMethod]
-      console.log("[v0] paymentMethod mapped to:", paymentMethod)
-
-      if (!paymentMethod) {
-        console.log("[v0] No payment method found, skipping payment processing")
-        return // Only process payment for payme and click
-      }
-
-      console.log("[v0] Making payment API call...")
-      const response = await axios.put(
-        `https://backkk.stroybazan1.uz/pay/api/orders/${orderId}/payment/`,
-        {
-          payment_method: paymentMethod,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            "Content-Type": "application/json",
-          },
-        },
-      )
-
-      console.log("[v0] Payment API response:", response.data)
-
-      if (response.data && response.data.payment_link) {
-        console.log("[v0] Redirecting to payment link:", response.data.payment_link)
-        // Redirect to payment link
-        window.location.href = response.data.payment_link
-      } else {
-        console.log("[v0] No payment_link found in response")
-      }
-    } catch (error) {
-      console.error("[v0] Payment processing error:", error)
-      console.error("[v0] Error response:", error.response?.data)
-      setNotification(
-        lang === "uz"
-          ? "To'lov jarayonida xatolik yuz berdi"
-          : lang === "en"
-            ? "Error occurred during payment"
-            : lang === "ru"
-              ? "Ошибка при обработке платежа"
-              : "To'lov jarayonida xatolik yuz berdi",
-      )
-      setIsNotificationVisible(true)
-      setTimeout(() => setIsNotificationVisible(false), 3000)
-    }
-  }
-
-  const handleOrderCreation = async () => {
-    try {
-      console.log("[v0] handleOrderCreation called")
-      console.log("[v0] selectedMethod:", selectedMethod)
-
-      set_is_modal_open(true)
-
-      // Call existing order creation function
-      console.log("[v0] Calling order_create...")
-      const orderResult = await order_create(localStorage.getItem("accessToken"), {
-        basket,
-        address_inform,
-        selectedMethod,
-        cashback_is_using,
-        sl_option_id,
-        deliver_type,
-      })
-
-      console.log("[v0] order_create result:", orderResult)
-      console.log("[v0] orderResult keys:", Object.keys(orderResult || {}))
-      console.log("[v0] orderResult type:", typeof orderResult)
-      console.log("[v0] orderResult stringified:", JSON.stringify(orderResult, null, 2))
-
-      const orderId = orderResult?.id || orderResult?.order_id || orderResult?.orderId || orderResult?.pk
-      console.log("[v0] Extracted orderId:", orderId)
-
-      // If order was created successfully and payment method is payme or click
-      if (orderId && (selectedMethod === "payme" || selectedMethod === "click")) {
-        console.log("[v0] Order created successfully, processing payment...")
-        await processPayment(orderId)
-      } else {
-        console.log("[v0] Order creation failed or payment method is not payme/click")
-        console.log("[v0] orderId:", orderId)
-        console.log("[v0] selectedMethod:", selectedMethod)
-        console.log("[v0] Payment methods check:", selectedMethod === "payme", selectedMethod === "click")
-      }
-    } catch (error) {
-      console.error("[v0] Order creation error:", error)
-      setNotification(
-        lang === "uz"
-          ? "Buyurtma yaratishda xatolik"
-          : lang === "en"
-            ? "Error creating order"
-            : lang === "ru"
-              ? "Ошибка при создании заказа"
-              : "Buyurtma yaratishda xatolik",
-      )
-      setIsNotificationVisible(true)
-      setTimeout(() => setIsNotificationVisible(false), 3000)
-    }
-  }
 
   return (
     <div className="flex flex-col w-full h-full mb-17 sm:mb-0">
@@ -723,7 +579,15 @@ const Formalization_main = ({
               </div>
             </div>
             <button
-              onClick={handleOrderCreation}
+              onClick={order_create(localStorage.getItem("accessToken"),
+  {
+    basket,
+    address_inform,
+    selectedMethod,
+    cashback_is_using,
+    sl_option_id,
+    deliver_type,
+  })}
               className="w-full py-4 sm:py-6 bg-[#DCC38B] font-inter mt-8 sm:mt-5 font-[600] text-[16px] sm:text-[22px] leading-[22px] text-black rounded-[10px] cursor-pointer hover:scale-[101%] active:scale-[99%] duration-300"
             >
               {lang === "uz"
