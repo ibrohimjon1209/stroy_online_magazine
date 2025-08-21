@@ -32,7 +32,7 @@ export const order_create = async (
             : selectedMethod === "qabul"
             ? "cash"
             : null,
-        use_cashback: cashback_is_using,
+        use_cashback: cashback_is_using ,
         branch_id: address_inform?.id || null,
         part: sl_option_id,
         status: "pending",

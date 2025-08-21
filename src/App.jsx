@@ -40,6 +40,32 @@ const App = () => {
     const saved = localStorage.getItem("basket");
     return saved ? JSON.parse(saved) : [];
   });
+  const [pay_id, set_pay_id] = useState(null);
+  const [server_response, set_server_response] = useState(null);
+
+  useEffect(() => {
+  if (pay_id) {
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(
+          `https://backkk.stroybazan1.uz/pay/api/goldhouse/status/${pay_id}`
+        );
+        const data = await response.json();
+        console.log("Status:", data);
+
+        // Agar serverdan kerakli ma'lumot kelsa intervalni to'xtatamiz
+        if (data && data.success) {
+          clearInterval(interval);
+          set_pay_id(0);
+        }
+      } catch (err) {
+      }
+    }, 1000);
+
+    // Komponent unmount bo‘lganda intervalni tozalash
+    return () => clearInterval(interval);
+  }
+}, [pay_id]);
 
   useEffect(() => {
     setUserSignIn(localStorage.getItem("userId") ? true : false);

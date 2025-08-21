@@ -91,9 +91,6 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
         }
 
         updatedBasket.push(newItem)
-        if (userSignIn) {
-          console.log(newItem)
-        }
       }
       set_basket(updatedBasket)
       localStorage.setItem("basket", JSON.stringify(updatedBasket))
