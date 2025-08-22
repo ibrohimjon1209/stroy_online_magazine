@@ -287,7 +287,7 @@ function Home({ lang, setSearchText, searchText }) {
 
       <Carusel />
 
-      <div className="popular w-full px-[15px] sm:px-[77px] mb-[100px]">
+      <div className="popular w-full px-[15px] sm:px-[77px] mb-[50px]">
         <h1 className="text-[17px] sm:text-[22px] font-semibold mt-3">
           {lang === "uz"
             ? "Ommabop tavarlar"

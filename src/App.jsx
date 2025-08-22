@@ -28,6 +28,7 @@ import Enter_region from "./Pages/Enter/Region";
 import User_offer from "./Pages/User_offer/User_offer";
 import get_favorites from "./Services/favorites/get_favorites";
 import create_favorites from "./Services/favorites/create_favorites";
+import Installment from "./Pages/Installment/installment";
 const Product = lazy(() => import("./Pages/Product/Product"));
 const Category = lazy(() => import("./Pages/Category/Category"));
 
@@ -36,6 +37,7 @@ const App = () => {
   const [userSignIn, setUserSignIn] = useState(false);
   const [lang, set_lang] = useState("uz");
   const [city, set_city] = useState("andijan city");
+  const [is_SI, set_is_SI] = useState(false);
   const [basket, set_basket] = useState(() => {
     const saved = localStorage.getItem("basket");
     return saved ? JSON.parse(saved) : [];
@@ -78,6 +80,7 @@ const App = () => {
     set_lang(localStorage.getItem("lang") || "uz");
     set_city(localStorage.getItem("city") || "andijan city");
     set_basket(basketFromStorage || []);
+    set_is_SI(localStorage.getItem("is_SI") || false);
     if (localStorage.getItem("is_entered") == "false") {
       navigate("/enter/language");
     }
@@ -141,6 +144,7 @@ const App = () => {
       if (location == "login" || location == "register") navigate("/");
 
     if (location == "") set_is_found(true);
+    if ((location == "installment") && is_SI) set_is_found(false);
     if (
       location == "delivery" ||
       (location == "terms" && formalization_open) ||
@@ -332,7 +336,18 @@ const App = () => {
                         set_is_footer_visible={set_is_footer_visible}
                         set_formalization_open={set_formalization_open}
                         setUserSignIn={setUserSignIn}
+                        set_is_SI={set_is_SI}
                       />
+                    ) : (
+                      <Navigate to="/" />
+                    )
+                  }
+                />
+                <Route
+                  path="/installment"
+                  element={
+                    is_SI ? (
+                      <Installment/>
                     ) : (
                       <Navigate to="/" />
                     )

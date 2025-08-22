@@ -50,7 +50,7 @@ export default function KitchenCarousel() {
 
   useEffect(() => {
     if (slides.length === 0) return;
-    const interval = setInterval(nextSlide, 5000);
+    const interval = setInterval(nextSlide, 8000);
     return () => clearInterval(interval);
   }, [slides, nextSlide]);
 

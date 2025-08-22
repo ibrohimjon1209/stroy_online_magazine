@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { Check, ChevronLeft, ChevronRight, User } from "lucide-react"
-import { Link } from "react-router-dom"
-import arrive_icon from "./imgs/arrive_icon.png"
-import cash_icon from "./imgs/cash_icon.png"
-import payment_time from "./imgs/payment_time.png"
-import on_arrive from "./imgs/on_arrive.png"
-import pay_me from "./imgs/pay_me.png"
-import click from "./imgs/click.png"
-import alif_icon from "./imgs/alif.png"
-import Modal from "./modal"
-import { useEffect, useState } from "react"
-import Delivery from "../Map/map_main"
-import Payment_variant from "../payment_variant/payment_main"
-import Pickup_address from "../pickup_address/pickup_address_main"
-import { get_user } from "../../Services/auth/get_user"
-import axios from "axios"
-import { order_create } from "../../Services/auth/create_order"
+import { Check, ChevronLeft, ChevronRight, Info, User } from "lucide-react";
+import { Link, Navigate } from "react-router-dom";
+import arrive_icon from "./imgs/arrive_icon.png";
+import cash_icon from "./imgs/cash_icon.png";
+import payment_time from "./imgs/payment_time.png";
+import on_arrive from "./imgs/on_arrive.png";
+import pay_me from "./imgs/pay_me.png";
+import click from "./imgs/click.png";
+import alif_icon from "./imgs/alif.png";
+import Modal from "./modal";
+import { useEffect, useState } from "react";
+import Delivery from "../Map/map_main";
+import Payment_variant from "../payment_variant/payment_main";
+import Pickup_address from "../pickup_address/pickup_address_main";
+import { get_user } from "../../Services/auth/get_user";
+import axios from "axios";
+import { order_create } from "../../Services/auth/create_order";
 
 // CSS for vibration animation
 const vibrateAnimation = {
@@ -29,7 +29,7 @@ const vibrateAnimation = {
     "80%": { transform: "translateX(2px)" },
     "100%": { transform: "translateX(0)" },
   },
-}
+};
 
 const Formalization_main = ({
   basket,
@@ -41,29 +41,46 @@ const Formalization_main = ({
   set_is_footer_visible,
   set_formalization_open,
   setUserSignIn,
+  set_is_SI,
 }) => {
-  const [userData, setUserData] = useState({ name: "...", phone: "..." })
-  const [deliver_type, set_deliver_type] = useState("pickup")
-  const [selectedMethod, setSelectedMethod] = useState("installment")
-  const [is_modal_open, set_is_modal_open] = useState(false)
-  const [is_delivery, set_is_delivery] = useState(false)
-  const [is_pickup, set_is_pickup] = useState(false)
-  const [is_payment_variant, set_is_payment_variant] = useState(false)
-  const [cashback_is_using, set_cashback_is_using] = useState(false)
-  const [address_inform, set_address_inform] = useState(null)
-  const [cashbackAmount, setCashbackAmount] = useState(0)
-  const [isVibrating, setIsVibrating] = useState(false)
-  const [notification, setNotification] = useState("")
-  const [isNotificationVisible, setIsNotificationVisible] = useState(false)
+  const [userData, setUserData] = useState({ name: "...", phone: "..." });
+  const [deliver_type, set_deliver_type] = useState("pickup");
+  const [selectedMethod, setSelectedMethod] = useState("click");
+  const [is_modal_open, set_is_modal_open] = useState(false);
+  const [is_delivery, set_is_delivery] = useState(false);
+  const [is_pickup, set_is_pickup] = useState(false);
+  const [is_payment_variant, set_is_payment_variant] = useState(false);
+  const [cashback_is_using, set_cashback_is_using] = useState(false);
+  const [address_inform, set_address_inform] = useState(null);
+  const [cashbackAmount, setCashbackAmount] = useState(0);
+  const [isVibrating, setIsVibrating] = useState(false);
+  const [notification, setNotification] = useState("");
+  const [isNotificationVisible, setIsNotificationVisible] = useState(false);
+  const totalPrice = basket
+    .filter((item) => item.selected)
+    .reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  let payable = totalPrice - cashbackAmount;
+
+  // Agar cashback jami narxni qoplab yuborsa
+  if (payable <= 0) {
+    payable = 0;
+  }
+
+  // Agar cashback ishlatganda < 1000 qolib ketayotgan bo‘lsa
+  if (payable > 0 && payable < 1000) {
+    payable = 1000;
+  }
+
   const sl_option_id =
     localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
-        ? 1
-        : 2
+      ? 1
+      : 2;
 
-  set_is_another_nav(is_delivery || is_payment_variant || is_pickup)
-  set_is_footer_visible(!is_pickup)
+  set_is_another_nav(is_delivery || is_payment_variant || is_pickup);
+  set_is_footer_visible(!is_pickup);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -71,110 +88,121 @@ const Formalization_main = ({
         const user_data = await get_user(
           localStorage.getItem("userId"),
           localStorage.getItem("accessToken"),
-          setUserSignIn,
-        )
-        if (!user_data) return
+          setUserSignIn
+        );
+        if (!user_data) return;
 
         setUserData({
           name: user_data.first_name
             ? `${user_data.first_name} ${user_data.last_name}`
             : lang === "uz"
-              ? "Foydalanuvchi"
-              : lang === "en"
-                ? "User"
-                : lang === "ru"
-                  ? "Пользователь"
-                  : "Foydalanuvchi",
+            ? "Foydalanuvchi"
+            : lang === "en"
+            ? "User"
+            : lang === "ru"
+            ? "Пользователь"
+            : "Foydalanuvchi",
           phone: user_data.phone_number || "...",
-        })
+        });
 
-        const storedCashback = localStorage.getItem("cashback")
-        setCashbackAmount(storedCashback ? Number.parseFloat(storedCashback) : 0)
+        setCashbackAmount(user_data.cashback_balance);
       } catch (err) {
-        console.error("Fetch user error:", err)
+        console.error("Fetch user error:", err);
       }
-    }
+    };
 
     if (userSignIn) {
-      fetchUserData()
+      fetchUserData();
     }
-  }, [userSignIn, lang, setUserSignIn])
+  }, [userSignIn, lang, setUserSignIn]);
 
   useEffect(() => {
-    set_address_inform(null)
-  }, [deliver_type])
+    set_address_inform(null);
+  }, [deliver_type]);
 
-  const uzs_lang = lang === "uz" ? "so'm" : lang === "en" ? "uzs" : lang === "ru" ? "сум" : "so'm"
+  const uzs_lang =
+    lang === "uz"
+      ? "so'm"
+      : lang === "en"
+      ? "uzs"
+      : lang === "ru"
+      ? "сум"
+      : "so'm";
 
   const label_delivery =
     deliver_type === "pickup"
       ? lang === "uz"
         ? "Olib ketish manzilini tanlang"
         : lang === "en"
-          ? "Select pickup location"
-          : lang === "ru"
-            ? "Выберите место самовывоза"
-            : "Olib ketish manzilini tanlang"
+        ? "Select pickup location"
+        : lang === "ru"
+        ? "Выберите место самовывоза"
+        : "Olib ketish manzilini tanlang"
       : lang === "uz"
-        ? "Yetkazib berish manzilini tanlang"
-        : lang === "en"
-          ? "Select delivery address"
-          : lang === "ru"
-            ? "Выберите адрес доставки"
-            : "Yetkazib berish manzilini tanlang"
+      ? "Yetkazib berish manzilini tanlang"
+      : lang === "en"
+      ? "Select delivery address"
+      : lang === "ru"
+      ? "Выберите адрес доставки"
+      : "Yetkazib berish manzilini tanlang";
 
   const refreshToken = async () => {
     try {
-      const refreshToken = localStorage.getItem("refreshToken")
-      if (!refreshToken) throw new Error("No refresh token available")
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) throw new Error("No refresh token available");
 
       // Replace with your actual refresh endpoint
-      const response = await axios.post("https://backkk.stroybazan1.uz/api/token/refresh/", {
-        refresh: refreshToken,
-      })
-      const newAccessToken = response.data.access
-      localStorage.setItem("accessToken", newAccessToken)
-      return newAccessToken
+      const response = await axios.post(
+        "https://backkk.stroybazan1.uz/api/token/refresh/",
+        {
+          refresh: refreshToken,
+        }
+      );
+      const newAccessToken = response.data.access;
+      localStorage.setItem("accessToken", newAccessToken);
+      return newAccessToken;
     } catch (error) {
-      console.error("Token refresh failed:", error)
-      setUserSignIn(false)
-      localStorage.removeItem("accessToken")
-      localStorage.removeItem("refreshToken")
-      localStorage.removeItem("userId")
+      console.error("Token refresh failed:", error);
+      setUserSignIn(false);
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("userId");
       setNotification(
         lang === "uz"
           ? "Sessiya tugadi, iltimos qayta kiring"
           : lang === "en"
-            ? "Session expired, please log in again"
-            : lang === "ru"
-              ? "Сессия истекла, пожалуйста, войдите снова"
-              : "Sessiya tugadi, iltimos qayta kiring",
-      )
-      setIsNotificationVisible(true)
-      setTimeout(() => setIsNotificationVisible(false), 3000)
-      return null
+          ? "Session expired, please log in again"
+          : lang === "ru"
+          ? "Сессия истекла, пожалуйста, войдите снова"
+          : "Sessiya tugadi, iltimos qayta kiring"
+      );
+      setIsNotificationVisible(true);
+      setTimeout(() => setIsNotificationVisible(false), 3000);
+      return null;
     }
-  }
+  };
 
   const processPayment = async (orderId) => {
     try {
-      console.log("[v0] processPayment called with orderId:", orderId)
-      console.log("[v0] selectedMethod:", selectedMethod)
+      console.log("[v0] processPayment called with orderId:", orderId);
+      console.log("[v0] selectedMethod:", selectedMethod);
 
       const paymentMethodMap = {
         click: "click",
         payme: "payme",
-      }
+      };
 
-      const paymentMethod = paymentMethodMap[selectedMethod]
-      console.log("[v0] paymentMethod mapped to:", paymentMethod)
+      const paymentMethod = paymentMethodMap[selectedMethod];
+      console.log("[v0] paymentMethod mapped to:", paymentMethod);
 
       if (!paymentMethod) {
-        console.log("[v0] No payment method found, skipping payment processing")
-        return // Only process payment for payme and click
+        console.log(
+          "[v0] No payment method found, skipping payment processing"
+        );
+        return; // Only process payment for payme and click
       }
 
-      console.log("[v0] Making payment API call...")
+      console.log("[v0] Making payment API call...");
       const response = await axios.put(
         `https://backkk.stroybazan1.uz/pay/api/orders/${orderId}/payment/`,
         {
@@ -185,94 +213,145 @@ const Formalization_main = ({
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
             "Content-Type": "application/json",
           },
-        },
-      )
+        }
+      );
 
-      console.log("[v0] Payment API response:", response.data)
+      console.log("[v0] Payment API response:", response.data);
 
       if (response.data && response.data.payment_link) {
-        console.log("[v0] Redirecting to payment link:", response.data.payment_link)
+        console.log(
+          "[v0] Redirecting to payment link:",
+          response.data.payment_link
+        );
         // Redirect to payment link
-        window.location.href = response.data.payment_link
+        window.location.href = response.data.payment_link;
       } else {
-        console.log("[v0] No payment_link found in response")
+        console.log("[v0] No payment_link found in response");
       }
     } catch (error) {
-      console.error("[v0] Payment processing error:", error)
-      console.error("[v0] Error response:", error.response?.data)
+      console.error("[v0] Payment processing error:", error);
+      console.error("[v0] Error response:", error.response?.data);
       setNotification(
         lang === "uz"
           ? "To'lov jarayonida xatolik yuz berdi"
           : lang === "en"
-            ? "Error occurred during payment"
-            : lang === "ru"
-              ? "Ошибка при обработке платежа"
-              : "To'lov jarayonida xatolik yuz berdi",
-      )
-      setIsNotificationVisible(true)
-      setTimeout(() => setIsNotificationVisible(false), 3000)
+          ? "Error occurred during payment"
+          : lang === "ru"
+          ? "Ошибка при обработке платежа"
+          : "To'lov jarayonida xatolik yuz berdi"
+      );
+      setIsNotificationVisible(true);
+      setTimeout(() => setIsNotificationVisible(false), 3000);
     }
-  }
+  };
 
   const handleOrderCreation = async () => {
     try {
-      console.log("[v0] handleOrderCreation called")
-      console.log("[v0] selectedMethod:", selectedMethod)
+      if (!userSignIn) {
+        setNotification(
+          lang === "uz"
+            ? "Iltimos tizimdan ro'yxatdan o'ting"
+            : lang === "en"
+            ? "Please log in"
+            : lang === "ru"
+            ? "Пожалуйста, войдите в систему"
+            : "Iltimos tizimdan ro'yxatdan o'ting"
+        );
+        setIsNotificationVisible(true);
+        setTimeout(() => setIsNotificationVisible(false), 4000);
+        return;
+      }
+      if (!address_inform) {
+        setNotification(
+          lang === "uz"
+            ? "Iltimos yetkazib berish manzilini tanlang"
+            : lang === "en"
+            ? "Please select a delivery address"
+            : lang === "ru"
+            ? "Пожалуйста, выберите адрес доставки"
+            : "Iltimos yetkazib berish manzilini tanlang"
+        );
+        setIsNotificationVisible(true);
+        setTimeout(() => setIsNotificationVisible(false), 4000);
+        return;
+      }
+      console.log("[v0] handleOrderCreation called");
+      console.log("[v0] selectedMethod:", selectedMethod);
 
-      set_is_modal_open(true)
+      set_is_modal_open(true);
 
       // Call existing order creation function
-      console.log("[v0] Calling order_create...")
-      const orderResult = await order_create(localStorage.getItem("accessToken"), {
-        basket,
-        address_inform,
-        selectedMethod,
-        cashback_is_using,
-        sl_option_id,
-        deliver_type,
-      })
+      console.log("[v0] Calling order_create...");
+      const orderResult = await order_create(
+        localStorage.getItem("accessToken"),
+        {
+          basket,
+          address_inform,
+          selectedMethod,
+          cashback_is_using,
+          sl_option_id,
+          deliver_type,
+        }
+      );
 
-      console.log("[v0] order_create result:", orderResult)
-      console.log("[v0] orderResult keys:", Object.keys(orderResult || {}))
-      console.log("[v0] orderResult type:", typeof orderResult)
-      console.log("[v0] orderResult stringified:", JSON.stringify(orderResult, null, 2))
-
-      const orderId = orderResult?.id || orderResult?.order_id || orderResult?.orderId || orderResult?.pk
-      console.log("[v0] Extracted orderId:", orderId)
+      const orderId =
+        orderResult?.id ||
+        orderResult?.order_id ||
+        orderResult?.orderId ||
+        orderResult?.pk;
 
       // If order was created successfully and payment method is payme or click
-      if (orderId && (selectedMethod === "payme" || selectedMethod === "click")) {
-        console.log("[v0] Order created successfully, processing payment...")
-        await processPayment(orderId)
+      if (
+        orderId &&
+        (selectedMethod === "payme" || selectedMethod === "click")
+      ) {
+        console.log("[v0] Order created successfully, processing payment...");
+        await processPayment(orderId);
       } else {
-        console.log("[v0] Order creation failed or payment method is not payme/click")
-        console.log("[v0] orderId:", orderId)
-        console.log("[v0] selectedMethod:", selectedMethod)
-        console.log("[v0] Payment methods check:", selectedMethod === "payme", selectedMethod === "click")
+        console.log(
+          "[v0] Order creation failed or payment method is not payme/click"
+        );
+        console.log("[v0] orderId:", orderId);
+        console.log("[v0] selectedMethod:", selectedMethod);
+        console.log(
+          "[v0] Payment methods check:",
+          selectedMethod === "payme",
+          selectedMethod === "click"
+        );
       }
     } catch (error) {
-      console.error("[v0] Order creation error:", error)
+      console.error("[v0] Order creation error:", error);
       setNotification(
         lang === "uz"
           ? "Buyurtma yaratishda xatolik"
           : lang === "en"
-            ? "Error creating order"
-            : lang === "ru"
-              ? "Ошибка при создании заказа"
-              : "Buyurtma yaratishda xatolik",
-      )
-      setIsNotificationVisible(true)
-      setTimeout(() => setIsNotificationVisible(false), 3000)
+          ? "Error creating order"
+          : lang === "ru"
+          ? "Ошибка при создании заказа"
+          : "Buyurtma yaratishda xatolik"
+      );
+      setIsNotificationVisible(true);
+      setTimeout(() => setIsNotificationVisible(false), 3000);
     }
-  }
+  };
+
+  const handleInstallment = () => {
+    set_is_SI(true);
+    localStorage.setItem("is_SI", true);
+  };
 
   return (
     <div className="flex flex-col w-full h-full mb-17 sm:mb-0">
       {/* Notification Popup */}
       {isNotificationVisible && notification && (
-        <div className="absolute z-50 top-10 left-1/2 transform -translate-x-1/2 w-[90%] sm:w-[400px] bg-white rounded-lg shadow-lg p-4 flex items-center justify-between">
-          <span className="font-inter font-[500] text-[16px] text-black">{notification}</span>
-          <button onClick={() => setIsNotificationVisible(false)} className="text-black">
+        <div className="absolute z-50 top-15 left-1/2 transform border-[2px] border-red-500 bg-red-100 -translate-x-1/2 w-[90%] sm:w-[400px] scale-[130%] text-red-800 rounded-lg shadow-lg p-4 flex items-center justify-between">
+          <span className="font-inter font-[500] text-[16px] text-black">
+            {notification}
+          </span>
+          <button
+            onClick={() => setIsNotificationVisible(false)}
+            className="text-black"
+          >
             ✕
           </button>
         </div>
@@ -286,7 +365,13 @@ const Formalization_main = ({
         >
           <ChevronLeft className="scale-110" />
           <h1 className="font-inter font-[500] text-[17px] leading-[22px] text-black">
-            {lang === "uz" ? "Buyurtma" : lang === "en" ? "Order" : lang === "ru" ? "Заказ" : "Buyurtma"}
+            {lang === "uz"
+              ? "Buyurtma"
+              : lang === "en"
+              ? "Order"
+              : lang === "ru"
+              ? "Заказ"
+              : "Buyurtma"}
           </h1>
         </Link>
       </div>
@@ -296,14 +381,14 @@ const Formalization_main = ({
         } mx-auto bg-white mb-[20px]`}
       >
         <div className="p-6 pt-[35px]">
-          <h2 className="font-inter font-[600] text-[15px] leading-[22px] text-black">
+          <h2 className="font-inter font-[600] text-[16px] leading-[22px] text-black">
             {lang === "uz"
               ? "Qabul qiluvchi"
               : lang === "en"
-                ? "Receiver"
-                : lang === "ru"
-                  ? "Получатель"
-                  : "Qabul qiluvchi"}
+              ? "Receiver"
+              : lang === "ru"
+              ? "Получатель"
+              : "Qabul qiluvchi"}
           </h2>
           {userSignIn ? (
             <div className="border border-[#D5D5D5] rounded-lg p-4 mt-[15px] sm:mt-[20px] mb-6 w-full sm:w-[40%] h-[70px] flex items-center justify-start">
@@ -312,8 +397,12 @@ const Formalization_main = ({
                   <User className="h-[23px] w-[23px] text-gray-600" />
                 </div>
                 <div>
-                  <p className="font-inter font-[600] text-[15px] leading-[22px] text-black">{userData.name}</p>
-                  <p className="font-inter font-[500] text-[13px] leading-[22px] text-black">{userData.phone}</p>
+                  <p className="font-inter font-[600] text-[16px] leading-[22px] text-black">
+                    {userData.name}
+                  </p>
+                  <p className="font-inter font-[500] text-[13px] leading-[22px] text-black">
+                    {userData.phone}
+                  </p>
                 </div>
               </div>
             </div>
@@ -321,7 +410,13 @@ const Formalization_main = ({
             <Link to="/login">
               <div className="border bg-[#FFDF02] border-[#D5D5D5] rounded-lg p-4 mt-[20px] mb-6 w-[40%] h-[70px] flex items-center justify-center hover:scale-[101%] active:scale-[99%] duration-300">
                 <p className="font-inter font-[600] text-[24px] leading-[22px] text-black">
-                  {lang === "uz" ? "Kirish" : lang === "en" ? "Login" : lang === "ru" ? "Входить" : "Kirish"}
+                  {lang === "uz"
+                    ? "Kirish"
+                    : lang === "en"
+                    ? "Login"
+                    : lang === "ru"
+                    ? "Входить"
+                    : "Kirish"}
                 </p>
               </div>
             </Link>
@@ -330,7 +425,10 @@ const Formalization_main = ({
             {basket.map(
               (item) =>
                 item.selected && (
-                  <div key={item.id} className="flex gap-[15px] sm:gap-[35px] mb-6 mt-[20px]">
+                  <div
+                    key={item.id}
+                    className="flex gap-[15px] sm:gap-[35px] mb-6 mt-[20px]"
+                  >
                     <div className="bg-gray-100 rounded-lg w-[100px] h-[100px] sm:w-[150px] sm:h-[150px] flex items-center justify-center">
                       <img
                         src={item.img || "/placeholder.svg"}
@@ -338,7 +436,7 @@ const Formalization_main = ({
                         className="object-contain w-full h-full"
                       />
                     </div>
-                    <div className="flex flex-col gap-[10px] sm:gap-[50px] font-inter font-[600] text-[15px] sm:text-[24px] leading-[22px] text-black">
+                    <div className="flex flex-col gap-[10px] sm:gap-[50px] font-inter font-[600] text-[16px] sm:text-[24px] leading-[22px] text-black">
                       <div>
                         <h3>{item.name[lang]}</h3>
                         <p className="mt-[15px] sm:mt-[25px]">
@@ -347,40 +445,60 @@ const Formalization_main = ({
                       </div>
                       <p>
                         {item.quantity}{" "}
-                        {lang === "uz" ? "dona" : lang === "en" ? "piece" : lang === "ru" ? "шт" : "dona"}
+                        {lang === "uz"
+                          ? "dona"
+                          : lang === "en"
+                          ? "piece"
+                          : lang === "ru"
+                          ? "шт"
+                          : "dona"}
                       </p>
                     </div>
                   </div>
-                ),
+                )
             )}
           </div>
           <div className="relative flex p-1 bg-gray-100 rounded-xl mt-[20px] sm:mt-[35px] mb-4 h-[40px] sm:h-[60px] w-full sm:w-[95%] mx-auto font-inter font-[500] text-[13px] sm:text-[18px] leading-[22px] text-black">
             <button
               onClick={() => set_deliver_type("pickup")}
               className={`flex-1 py-1 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
-                deliver_type === "pickup" ? "bg-white shadow-sm duration-500" : "text-gray-500"
+                deliver_type === "pickup"
+                  ? "bg-white shadow-sm duration-500"
+                  : "text-gray-500"
               }`}
             >
-              {lang === "uz" ? "Olib ketish" : lang === "en" ? "Pickup" : lang === "ru" ? "Забрать" : "Olib ketish"}
+              {lang === "uz"
+                ? "Olib ketish"
+                : lang === "en"
+                ? "Pickup"
+                : lang === "ru"
+                ? "Забрать"
+                : "Olib ketish"}
             </button>
             <button
               onClick={() => set_deliver_type("delivery")}
               className={`flex-1 py-1 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
-                deliver_type === "delivery" ? "bg-white shadow-sm duration-500" : "text-gray-500"
+                deliver_type === "delivery"
+                  ? "bg-white shadow-sm duration-500"
+                  : "text-gray-500"
               }`}
             >
               {lang === "uz"
                 ? "Yetkazib berish"
                 : lang === "en"
-                  ? "Delivery"
-                  : lang === "ru"
-                    ? "Доставить"
-                    : "Yetkazib berish"}
+                ? "Delivery"
+                : lang === "ru"
+                ? "Доставить"
+                : "Yetkazib berish"}
             </button>
           </div>
           <div className="border border-[#D5D5D5] rounded-lg mb-4 mt-[25px] sm:mt-[35px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300">
             <div
-              onClick={() => (deliver_type === "pickup" ? set_is_delivery(true) : set_is_pickup(true))}
+              onClick={() =>
+                deliver_type === "pickup"
+                  ? set_is_delivery(true)
+                  : set_is_pickup(true)
+              }
               className="flex items-center justify-between w-full p-2 cursor-pointer sm:p-4"
             >
               <div className="flex items-center w-full pr-[40px] gap-2 justify-between sm:gap-3">
@@ -390,9 +508,15 @@ const Formalization_main = ({
                     alt="arrive"
                     className="h-[21px] w-[21px] sm:h-[25px] sm:w-[25px] object-contain"
                   />
-                  <span className="text-[13px] sm:text-[18px] sm:font-medium">{label_delivery}</span>
+                  <span className="text-[13px] sm:text-[18px] sm:font-medium">
+                    {label_delivery}
+                  </span>
                 </div>
-                <h1>{address_inform ? address_inform[`address_${lang}`] : "Manzil tanlash"}</h1>
+                <h1>
+                  {address_inform
+                    ? address_inform[`address_${lang}`]
+                    : "Manzil tanlash"}
+                </h1>
               </div>
               <ChevronRight className="w-5 h-5 text-gray-400" />
             </div>
@@ -400,10 +524,10 @@ const Formalization_main = ({
           <div
             onClick={() => {
               if (cashbackAmount < 1000) {
-                setIsVibrating(true)
-                setTimeout(() => setIsVibrating(false), 300)
+                setIsVibrating(true);
+                setTimeout(() => setIsVibrating(false), 300);
               } else {
-                set_cashback_is_using(!cashback_is_using)
+                set_cashback_is_using(!cashback_is_using);
               }
             }}
             className={`border overflow-hidden border-[#D5D5D5] rounded-lg mb-4 mt-[20px] sm:mt-[30px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300 ${
@@ -444,16 +568,16 @@ const Formalization_main = ({
                   {lang === "uz"
                     ? "Keshbekni ishlatish"
                     : lang === "en"
-                      ? "Use cashback"
-                      : lang === "ru"
-                        ? "Использовать кешбек"
-                        : "Keshbekni ishlatish"}
+                    ? "Use cashback"
+                    : lang === "ru"
+                    ? "Использовать кешбек"
+                    : "Keshbekni ishlatish"}
                 </span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-[13px]">
                 <span
                   className={`${
-                    cashback_is_using ? "translate-x-0" : "translate-x-10"
+                    cashback_is_using ? "translate-x-0" : "translate-x-11"
                   } text-[13px] duration-200 sm:text-[18px] sm:font-medium ${
                     cashbackAmount < 1000 ? "text-red-500 font-bold" : ""
                   }`}
@@ -461,8 +585,10 @@ const Formalization_main = ({
                   {cashbackAmount.toLocaleString()} {uzs_lang}
                 </span>
                 <div
-                  className={`${cashback_is_using ? "translate-x-0" : "translate-x-10"} p-1 duration-200 ${
-                    cashbackAmount < 1000 ? "bg-red-500" : "bg-green-500"
+                  className={`${
+                    cashback_is_using ? "translate-x-0" : "translate-x-11"
+                  } p-1 duration-200 ${
+                    cashbackAmount < 1000 ? "bg-white" : "bg-green-500"
                   } rounded-full`}
                 >
                   <Check className="w-3 h-3 text-white sm:h-4 sm:w-4" />
@@ -472,14 +598,14 @@ const Formalization_main = ({
           </div>
         </div>
         <div className="w-full sm:w-[95%] mx-auto p-7 sm:p-4 -mt-[20px]">
-          <h1 className="font-inter font-[600] text-[15px] leading-[22px] text-black mb-4">
+          <h1 className="font-inter font-[600] text-[16px] leading-[22px] text-black mb-4">
             {lang === "uz"
               ? "To'lov usuli"
               : lang === "en"
-                ? "Payment method"
-                : lang === "ru"
-                  ? "Способ оплаты"
-                  : "To'lov usuli"}
+              ? "Payment method"
+              : lang === "ru"
+              ? "Способ оплаты"
+              : "To'lov usuli"}
           </h1>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="border border-[#D5D5D5] w-full sm:w-[90%] rounded-lg p-4 bg-white">
@@ -494,14 +620,18 @@ const Formalization_main = ({
                       alt="Click"
                       className="object-contain w-7 h-7 sm:w-8 sm:h-8"
                     />
-                    <span className="font-inter font-[600] text-[15px] leading-[22px] text-black">Click</span>
+                    <span className="font-inter font-[600] text-[16px] leading-[22px] text-black">
+                      Click
+                    </span>
                   </div>
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
                       selectedMethod === "click" ? "bg-[#BEA086]" : ""
                     }`}
                   >
-                    {selectedMethod === "click" && <Check className="w-4 h-4 text-white" />}
+                    {selectedMethod === "click" && (
+                      <Check className="w-4 h-4 text-white" />
+                    )}
                   </div>
                 </div>
                 <div
@@ -514,14 +644,18 @@ const Formalization_main = ({
                       className="object-contain w-7 h-7 sm:w-8 sm:h-8"
                       alt="Payme"
                     />
-                    <span className="font-inter font-[600] text-[15px] leading-[22px] text-black">Pay me</span>
+                    <span className="font-inter font-[600] text-[16px] leading-[22px] text-black">
+                      Pay me
+                    </span>
                   </div>
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
                       selectedMethod === "payme" ? "bg-[#BEA086]" : ""
                     }`}
                   >
-                    {selectedMethod === "payme" && <Check className="w-4 h-4 text-white" />}
+                    {selectedMethod === "payme" && (
+                      <Check className="w-4 h-4 text-white" />
+                    )}
                   </div>
                 </div>
                 <div
@@ -534,14 +668,14 @@ const Formalization_main = ({
                       alt="Qabul qilinganda"
                       className="object-contain w-7 h-7 sm:w-8 sm:h-8"
                     />
-                    <span className="font-inter font-[600] text-[15px] leading-[22px] text-black">
+                    <span className="font-inter font-[600] text-[16px] leading-[22px] text-black">
                       {lang === "uz"
                         ? "Qabul qilinganda"
                         : lang === "en"
-                          ? "On arrive"
-                          : lang === "ru"
-                            ? "При прибытии"
-                            : "Qabul qilinganda"}
+                        ? "On arrive"
+                        : lang === "ru"
+                        ? "При прибытии"
+                        : "Qabul qilinganda"}
                     </span>
                   </div>
                   <div
@@ -549,23 +683,29 @@ const Formalization_main = ({
                       selectedMethod === "qabul" ? "bg-[#BEA086]" : ""
                     }`}
                   >
-                    {selectedMethod === "qabul" && <Check className="w-4 h-4 text-white" />}
+                    {selectedMethod === "qabul" && (
+                      <Check className="w-4 h-4 text-white" />
+                    )}
                   </div>
                 </div>
                 <div
-                  className="flex items-center justify-between p-2 rounded-md cursor-pointer "
+                  className="flex items-center justify-between p-2 rounded-md cursor-pointer"
                   onClick={() => setSelectedMethod("installment")}
                 >
                   <div className="flex items-center gap-3 ">
-                    <img src={payment_time || "/placeholder.svg"} alt="Muddatli to'lov" className="w-8 h-8" />
+                    <img
+                      src={payment_time || "/placeholder.svg"}
+                      alt="Muddatli to'lov"
+                      className="w-8 h-8"
+                    />
                     <span className="font-inter font-[600] text-[16px] leading-[22px] text-black">
                       {lang === "uz"
                         ? "Muddatli to'lov"
                         : lang === "en"
-                          ? "Installment"
-                          : lang === "ru"
-                            ? "Рассрочка"
-                            : "Muddatli to'lov"}
+                        ? "Installment"
+                        : lang === "ru"
+                        ? "Рассрочка"
+                        : "Muddatli to'lov"}
                     </span>
                   </div>
                   <div
@@ -573,7 +713,9 @@ const Formalization_main = ({
                       selectedMethod === "installment" ? "bg-[#BEA086]" : ""
                     }`}
                   >
-                    {selectedMethod === "installment" && <Check className="w-4 h-4 text-white" />}
+                    {selectedMethod === "installment" && (
+                      <Check className="w-4 h-4 text-white" />
+                    )}
                   </div>
                 </div>
               </div>
@@ -592,10 +734,10 @@ const Formalization_main = ({
                         {lang === "uz"
                           ? "Muddatli to'lov turi"
                           : lang === "en"
-                            ? "Installment type"
-                            : lang === "ru"
-                              ? "Тип рассрочки"
-                              : "Muddatli to'lov turi"}
+                          ? "Installment type"
+                          : lang === "ru"
+                          ? "Тип рассрочки"
+                          : "Muddatli to'lov turi"}
                       </span>
                       <span className="font-inter font-[600] text-[14px] sm:text-[16px] leading-[22px] text-black">
                         Alif
@@ -609,10 +751,10 @@ const Formalization_main = ({
                     {lang === "uz"
                       ? "Taxrirlash"
                       : lang === "en"
-                        ? "Edit"
-                        : lang === "ru"
-                          ? "Редактировать"
-                          : "Taxrirlash"}
+                      ? "Edit"
+                      : lang === "ru"
+                      ? "Редактировать"
+                      : "Taxrirlash"}
                   </div>
                 </div>
                 <hr className="border-[#D5D5D5]" />
@@ -622,10 +764,10 @@ const Formalization_main = ({
                       {lang === "uz"
                         ? "Oylik to'lov"
                         : lang === "en"
-                          ? "Monthly payment"
-                          : lang === "ru"
-                            ? "Ежемесячный платеж"
-                            : "Oylik to'lov"}
+                        ? "Monthly payment"
+                        : lang === "ru"
+                        ? "Ежемесячный платеж"
+                        : "Oylik to'lov"}
                     </span>
                     <span>119.250 {uzs_lang}</span>
                   </div>
@@ -634,13 +776,19 @@ const Formalization_main = ({
                       {lang === "uz"
                         ? "Muddatli to'lov"
                         : lang === "en"
-                          ? "Installment"
-                          : lang === "ru"
-                            ? "Рассрочка"
-                            : "Muddatli to'lov"}
+                        ? "Installment"
+                        : lang === "ru"
+                        ? "Рассрочка"
+                        : "Muddatli to'lov"}
                     </span>
                     <span>
-                      {lang === "uz" ? "12 oy" : lang === "en" ? "12 months" : lang === "ru" ? "12 месяцев" : "12 oy"}
+                      {lang === "uz"
+                        ? "12 oy"
+                        : lang === "en"
+                        ? "12 months"
+                        : lang === "ru"
+                        ? "12 месяцев"
+                        : "12 oy"}
                     </span>
                   </div>
                 </div>
@@ -654,10 +802,10 @@ const Formalization_main = ({
               {lang === "uz"
                 ? "Sizning buyurtmangiz"
                 : lang === "en"
-                  ? "Your order"
-                  : lang === "ru"
-                    ? "Ваш заказ"
-                    : "Sizning buyurtmangiz"}
+                ? "Your order"
+                : lang === "ru"
+                ? "Ваш заказ"
+                : "Sizning buyurtmangiz"}
             </h2>
             <div className="space-y-5 w-[100%] text-[#000000BF] font-inter font-[500] text-[14px] sm:text-[20px] leading-[22px]">
               <div className="flex items-center justify-between">
@@ -665,10 +813,10 @@ const Formalization_main = ({
                   {lang === "uz"
                     ? "Maxsulotlar narxi"
                     : lang === "en"
-                      ? "Products price"
-                      : lang === "ru"
-                        ? "Стоимость товаров"
-                        : "Maxsulotlar narxi"}
+                    ? "Products price"
+                    : lang === "ru"
+                    ? "Стоимость товаров"
+                    : "Maxsulotlar narxi"}
                 </span>
                 <span>
                   {basket
@@ -681,6 +829,21 @@ const Formalization_main = ({
               <div className="flex items-center justify-between">
                 <span>
                   {lang === "uz"
+                    ? "Ishlatilayotgan keshbek"
+                    : lang === "en"
+                    ? "Used cashback"
+                    : lang === "ru"
+                    ? "Использованный кешбек"
+                    : "Ishlatilayotgan keshbek"}
+                </span>
+                <span>
+                  {(cashback_is_using && cashbackAmount) || 0}
+                  {` `} {uzs_lang}
+                </span>
+              </div>
+              {/* <div className="flex items-center justify-between">
+                <span>
+                  {lang === "uz"
                     ? "Muddatli to'lov"
                     : lang === "en"
                       ? "Installment"
@@ -691,8 +854,8 @@ const Formalization_main = ({
                 <span>
                   {lang === "uz" ? "12 oy" : lang === "en" ? "12 months" : lang === "ru" ? "12 месяцев" : "12 oy"}
                 </span>
-              </div>
-              <div className="flex items-center justify-between">
+              </div> */}
+              {/* <div className="flex items-center justify-between">
                 <span>
                   {lang === "uz"
                     ? "Muddatli to'lov"
@@ -703,11 +866,19 @@ const Formalization_main = ({
                         : "Muddatli to'lov"}
                 </span>
                 <span>0 {uzs_lang}</span>
-              </div>
+              </div> */}
               <hr className="border-[#D5D5D5] border-[1.5px] my-[23px]" />
               <div className="flex sm:text-[20px] font-[700] text-[16px] justify-between items-center">
-                <span>{lang === "uz" ? "Jami" : lang === "en" ? "Total" : lang === "ru" ? "Итого" : "Jami"}</span>
                 <span>
+                  {lang === "uz"
+                    ? "Jami"
+                    : lang === "en"
+                    ? "Total"
+                    : lang === "ru"
+                    ? "Итого"
+                    : "Jami"}
+                </span>
+                {/* <span>
                   {selectedMethod === "installment"
                     ? (
                         basket
@@ -719,49 +890,68 @@ const Formalization_main = ({
                         .reduce((sum, item) => sum + item.price * item.quantity, 0)
                         .toLocaleString()}{" "}
                   {uzs_lang}
+                </span> */}
+                <span>
+                  {(cashback_is_using && payable.toLocaleString()) ||
+                    totalPrice}{" "}
+                  {uzs_lang}
                 </span>
               </div>
             </div>
-            <button
-              onClick={handleOrderCreation}
-              className="w-full py-4 sm:py-6 bg-[#DCC38B] font-inter mt-8 sm:mt-5 font-[600] text-[16px] sm:text-[22px] leading-[22px] text-black rounded-[10px] cursor-pointer hover:scale-[101%] active:scale-[99%] duration-300"
+            <div className="flex flex-row gap-3 bg-blue-100 text-[19px] items-center rounded-xl py-3 px-5 w-full text-blue-950">
+              <Info />
+              Operator etkazib berish sanasi va manzilini aniqlashtirish uchun
+              siz bilan bog'lanadi
+            </div>
+            <Link
+              to={selectedMethod == "installment" ? "/installment" : ""}
+              onClick={
+                selectedMethod == "installment"
+                  ? handleInstallment
+                  : handleOrderCreation
+              }
             >
-              {lang === "uz"
-                ? "Xaridni rasmiylashtirish"
-                : lang === "en"
+              <button className="w-[100%] py-4 sm:py-6 bg-[#DCC38B] font-inter mt-5 sm:mt-2 font-[600] text-[16px] sm:text-[22px] leading-[22px] text-black rounded-[10px] cursor-pointer hover:scale-[101%] active:scale-[99%] duration-300">
+                {lang === "uz"
+                  ? "Xaridni rasmiylashtirish"
+                  : lang === "en"
                   ? "Purchase clearance"
                   : lang === "ru"
-                    ? "Подтверждение покупки"
-                    : "Xaridni rasmiylashtirish"}
-            </button>
-            <div className="text-center font-inter font-[400] text-[13px] sm:text-[18px] leading-[19px] sm:leading-[33px]">
+                  ? "Подтверждение покупки"
+                  : "Xaridni rasmiylashtirish"}
+              </button>
+            </Link>
+            <div className="text-center font-inter font-[400] mt-8 text-[13px] sm:text-[18px] leading-[19px] sm:leading-[33px]">
               {lang === "uz"
                 ? "Buyurtmani tasdiqlash orqali men "
                 : lang === "en"
-                  ? "By confirming the order, I accept the "
-                  : lang === "ru"
-                    ? "Подтверждая заказ, я принимаю "
-                    : ""}
+                ? "By confirming the order, I accept the "
+                : lang === "ru"
+                ? "Подтверждая заказ, я принимаю "
+                : ""}
               <Link to="/terms" className="text-purple-600 hover:underline">
                 {lang === "uz"
                   ? "foydalanuvchi shartnomasini"
                   : lang === "en"
-                    ? "the user agreement"
-                    : lang === "ru"
-                      ? "пользовательское соглашение"
-                      : "foydalanuvchi shartnomasini"}
+                  ? "the user agreement"
+                  : lang === "ru"
+                  ? "пользовательское соглашение"
+                  : "foydalanuvchi shartnomasini"}
               </Link>{" "}
               {lang === "uz"
                 ? "shartlarini qabul qilaman."
                 : lang === "en"
-                  ? "terms."
-                  : lang === "ru"
-                    ? "и условия."
-                    : "shartlarini qabul qilaman."}
+                ? "terms."
+                : lang === "ru"
+                ? "и условия."
+                : "shartlarini qabul qilaman."}
             </div>
           </div>
         </div>
-        <Modal is_modal_open={is_modal_open} set_is_modal_open={set_is_modal_open} />
+        <Modal
+          is_modal_open={is_modal_open}
+          set_is_modal_open={set_is_modal_open}
+        />
       </div>
       <Delivery
         setSelectedLocation={setSelectedLocation}
@@ -775,9 +965,13 @@ const Formalization_main = ({
         set_is_payment_variant={set_is_payment_variant}
         set_address_inform={set_address_inform}
       />
-      <Pickup_address is_pickup={is_pickup} set_is_pickup={set_is_pickup} set_address_inform={set_address_inform} />
+      <Pickup_address
+        is_pickup={is_pickup}
+        set_is_pickup={set_is_pickup}
+        set_address_inform={set_address_inform}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default Formalization_main
+export default Formalization_main;
