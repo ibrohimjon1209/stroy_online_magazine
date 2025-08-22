@@ -52,6 +52,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
   const [search_topics, setSearchTopics] = useState(getStoredTopics());
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [basket, set_basket] = useState([]);
   const sl_option_id =
     localStorage.getItem("sl_option_nav") == "Stroy Baza №1"
       ? 0
@@ -81,6 +82,10 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
 
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    set_basket(JSON.parse(localStorage.getItem("basket")));
+  }, [localStorage.getItem("basket")]);
 
   const handleDeleteTopic = (index) => {
     const updatedTopics = [...search_topics];
@@ -195,7 +200,6 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
     }, 300);
   };
 
-
   return (
     <>
       <div className="hidden sm:block">
@@ -230,11 +234,16 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
             }
           `}</style>
 
-          {/* Mobile menu button */}
           <div className="flex items-center justify-between w-full md:hidden">
             <div className="flex items-center gap-[5px]">
               <img
-                src={sl_option == "Stroy Baza №1" ? logo1 : sl_option == "Giaz Mebel" ? logo2 : logo3}
+                src={
+                  sl_option == "Stroy Baza №1"
+                    ? logo1
+                    : sl_option == "Giaz Mebel"
+                    ? logo2
+                    : logo3
+                }
                 alt="Logo"
                 className="cursor-pointer w-7 h-7"
                 onClick={to_home}
@@ -256,7 +265,13 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
 
           <div className="w-full md:w-[247px] h-full hidden md:flex items-center gap-[5px]">
             <img
-              src={sl_option == "Stroy Baza №1" ? logo1 : sl_option == "Giaz Mebel" ? logo2 : logo3}
+              src={
+                sl_option == "Stroy Baza №1"
+                  ? logo1
+                  : sl_option == "Giaz Mebel"
+                  ? logo2
+                  : logo3
+              }
               alt="Logo"
               className="cursor-pointer"
               onClick={to_home}
@@ -525,27 +540,44 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
               />
             </Link>
             <Link to="/orders">
-              <img
-                className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
-                src={location == "orders" || is_orders_hovered ? cube_a : cube}
-                onMouseEnter={() => set_is_orders_hovered(true)}
-                onMouseLeave={() => set_is_orders_hovered(false)}
-                alt="orders"
-              />
+              <div className="relative">
+                <img
+                  className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
+                  src={
+                    location == "orders" || is_orders_hovered ? cube_a : cube
+                  }
+                  onMouseEnter={() => set_is_orders_hovered(true)}
+                  onMouseLeave={() => set_is_orders_hovered(false)}
+                  alt="orders"
+                />
+                {localStorage.getItem("order_created") == "true" && (
+                  <span className="absolute flex items-center justify-center w-4.5 h-4.5 text-xs font-bold text-white bg-red-500 rounded-full -top-2 -right-2">
+                   1 
+                  </span>
+                )}
+              </div>
             </Link>
             <Link to="/basket">
-              <img
-                className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
-                src={
-                  location == "basket" || is_basket_hovered
-                    ? basket_a
-                    : basket_i
-                }
-                onMouseEnter={() => set_is_basket_hovered(true)}
-                onMouseLeave={() => set_is_basket_hovered(false)}
-                alt="basket"
-              />
+              <div className="relative">
+                <img
+                  className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
+                  src={
+                    location == "basket" || is_basket_hovered
+                      ? basket_a
+                      : basket_i
+                  }
+                  onMouseEnter={() => set_is_basket_hovered(true)}
+                  onMouseLeave={() => set_is_basket_hovered(false)}
+                  alt="basket"
+                />
+                {basket.length > 0 && (
+                  <span className="absolute flex items-center justify-center w-4.5 h-4.5 text-xs font-bold text-white bg-red-500 rounded-full -top-2 -right-2">
+                    {basket.length}
+                  </span>
+                )}
+              </div>
             </Link>
+
             <Link to="/profile/orders">
               <img
                 className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"

@@ -121,6 +121,7 @@ export default function Basket_main({
     setContentHeight(`${Math.max(immediateHeight, installmentHeight)}px`);
   }, [totalPrice]);
 
+  const hasSelectedProducts = products.some((p) => p.selected);
   return (
     <div className="flex flex-col w-full sm:mb-0 mb-21">
       <div className="w-full fixed z-50 h-[65px] bg-[#DCC38B] sm:hidden block">
@@ -225,7 +226,7 @@ export default function Basket_main({
                   <div className="flex-1">
                     <div className="flex justify-between">
                       <h2
-                        className="font-inter font-[600] text-[14px] sm:mt-0 mt-2 sm:text-[15px] leading-[18px] sm:leading-[22px] text-black cursor-pointer hover:underline"
+                        className="font-inter font-[600] text-[14px] sm:mt-0 mt-2 sm:text-[17px] leading-[18px] sm:leading-[22px] text-black cursor-pointer hover:underline"
                         onClick={() => {
                           window.location.href = `/product/${product.id}`;
                         }}
@@ -249,10 +250,13 @@ export default function Basket_main({
                         )}
                       </button>
                     </div>
-                    <p className="font-inter font-[600] text-[15px] leading-[22px] text-black mt-2">
+                    <p className="font-inter font-[600] text-[16px] mt-2">
+                      O'lchami: {product.size[lang]}
+                    </p>
+                    <p className="font-inter font-[600] text-[16px] leading-[22px] text-black mt-2">
                       {product.price.toLocaleString()} {uzs_lang}
                     </p>
-                    <div className="flex items-center mt-4 sm:mt-15">
+                    <div className="flex items-center mt-4 sm:mt-10">
                       <button
                         onClick={() =>
                           decreaseQuantity(
@@ -284,7 +288,6 @@ export default function Basket_main({
               ))}
             </div>
 
-            {/* Pay now / Installment block */}
             {products.length > 0 && (
               <div className="w-full relative h-[370px] sm:w-[350px] sm:h-[450px] bg-white border border-[#D5D5D5] rounded-2xl p-4 sm:p-6 flex flex-col justify-between">
                 <div>
@@ -377,9 +380,9 @@ export default function Basket_main({
                         {lang == "uz"
                           ? "Siz buyurtmani 6 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."
                           : lang == "en"
-                          ? "You can purchase an order for a period of 3 to 24 months for a fixed fee."
+                          ? "You can purchase an order for a period of 6 to 24 months for a fixed fee."
                           : lang == "ru"
-                          ? "Вы можете приобрести заказ на срок от 3 до 24 месяцев за фиксированную плату."
+                          ? "Вы можете приобрести заказ на срок от 6 до 24 месяцев за фиксированную плату."
                           : "Siz buyurtmani 6 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."}
                       </p>
                       {/* <div className="flex justify-between items-center font-inter font-[700] text-[16px] leading-[22px] text-black mt-[20%] sm:mt-[50%]">
@@ -406,14 +409,18 @@ export default function Basket_main({
                   </div>
 
                   <Link
-                    to={products.length > 0 ? "/formalization" : ""}
-                    onClick={() =>
-                      products.length > 0 && set_formalization_open(true)
-                    }
+                    to={hasSelectedProducts ? "/formalization" : "#"}
+                    onClick={(e) => {
+                      if (hasSelectedProducts) {
+                        set_formalization_open(true);
+                      } else {
+                        e.preventDefault();
+                      }
+                    }}
                     className={`sm:w-[87%] w-[90%] absolute flex items-center justify-center py-4 sm:mt-[35%] mt-[28%] ${
-                      products.length > 0
+                      hasSelectedProducts
                         ? "bg-[#E6D1A7] hover:bg-[#dac59b] cursor-pointer"
-                        : "bg-[#c9bb9d] hover:bg-[#cdc2aa] cursor-not-allowed"
+                        : "bg-[#c9bb9d] cursor-not-allowed"
                     } rounded-xl font-inter font-[600] text-[15px] leading-[22px] text-black transition-colors duration-300`}
                   >
                     {lang === "uz"

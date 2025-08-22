@@ -66,22 +66,22 @@ export default function KitchenCarousel() {
   const extendedSlides = [slides[slides.length - 1], ...slides, slides[0]];
 
   return (
-    <div className="relative w-full h-auto mx-auto mt-[20px] sm:h-[425px]">
-      <div className="relative w-full h-auto mx-auto overflow-hidden mt-[20px] sm:h-[425px]">
+    <div className="relative w-full h-auto mx-auto mt-[20px] sm:h-[525px]">
+      <div className="relative w-full h-auto mx-auto overflow-hidden mt-[20px] sm:h-[525px]">
         <div
           className="flex transition-transform duration-500 ease-in-out"
           style={{
             transform: smallScreen
               ? `translateX(calc(-${(currentSlide + 1) * 100.5}% + 4.5%))`
-              : `translateX(calc(-${(currentSlide + 1) * 80}% + 10%))`,
+              : `translateX(calc(-${(currentSlide + 1) * 79.15}% + 10%))`,
           }}
         >
           {extendedSlides.map((item, index) => (
             <div
               key={index}
-              className="relative flex-shrink-0 w-full px-1 sm:w-4/5 sm:px-2"
+              className="relative flex-shrink-0 w-full sm:w-4/5"
             >
-              <div className="relative w-[94%] h-[190px] sm:w-[92%] sm:h-[490px]">
+              <div className="relative w-[94%] h-[190px] sm:w-[97%] sm:h-[530px]">
                 <div
                   className={`absolute inset-0 bg-gray-200 rounded-[10px] sm:rounded-[0px] transition-opacity duration-300 ${loadedImages[index] ? "opacity-0" : "opacity-100"
                     }`}
