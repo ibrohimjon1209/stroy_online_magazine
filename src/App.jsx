@@ -31,6 +31,11 @@ const Category = lazy(() => import("./Pages/Category/Category"))
 
 const App = () => {
   const navigate = useNavigate()
+  const location = useLocation()
+
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [displayLocation, setDisplayLocation] = useState(location)
+
   const [userSignIn, setUserSignIn] = useState(false)
   const [lang, set_lang] = useState("uz")
   const [city, set_city] = useState("andijan city")
@@ -44,29 +49,17 @@ const App = () => {
   const [server_response, set_server_response] = useState(null)
 
   useEffect(() => {
-    localStorage.setItem("is_PM", is_PM)
-  }, [is_PM])
+    if (location.pathname !== displayLocation.pathname) {
+      setIsTransitioning(true)
 
-  useEffect(() => {
-    if (pay_id) {
-      const interval = setInterval(async () => {
-        try {
-          const response = await fetch(`https://backkk.stroybazan1.uz/pay/api/goldhouse/status/${pay_id}`)
-          const data = await response.json()
-          console.log("Status:", data)
+      const timer = setTimeout(() => {
+        setDisplayLocation(location)
+        setIsTransitioning(false)
+      }, 150)
 
-          // Agar serverdan kerakli ma'lumot kelsa intervalni to'xtatamiz
-          if (data && data.success) {
-            clearInterval(interval)
-            set_pay_id(0)
-          }
-        } catch (err) {}
-      }, 1000)
-
-      // Komponent unmount bo‘lganda intervalni tozalash
-      return () => clearInterval(interval)
+      return () => clearTimeout(timer)
     }
-  }, [pay_id])
+  }, [location, displayLocation])
 
   useEffect(() => {
     setUserSignIn(localStorage.getItem("userId") ? true : false)
@@ -102,6 +95,31 @@ const App = () => {
     }
   }, [userSignIn])
 
+  useEffect(() => {
+    localStorage.setItem("is_PM", is_PM)
+  }, [is_PM])
+
+  useEffect(() => {
+    if (pay_id) {
+      const interval = setInterval(async () => {
+        try {
+          const response = await fetch(`https://backkk.stroybazan1.uz/pay/api/goldhouse/status/${pay_id}`)
+          const data = await response.json()
+          console.log("Status:", data)
+
+          // Agar serverdan kerakli ma'lumot kelsa intervalni to'xtatamiz
+          if (data && data.success) {
+            clearInterval(interval)
+            set_pay_id(0)
+          }
+        } catch (err) {}
+      }, 1000)
+
+      // Komponent unmount bo‘lganda intervalni tozalash
+      return () => clearInterval(interval)
+    }
+  }, [pay_id])
+
   const [is_found, set_is_found] = useState(true)
   const [is_another_nav, set_is_another_nav] = useState(false)
   const [is_online, set_is_online] = useState(navigator.onLine)
@@ -109,8 +127,6 @@ const App = () => {
   const [selectedLocation, setSelectedLocation] = useState(null)
   const [formalization_open, set_formalization_open] = useState(false)
   const [searchText, setSearchText] = useState("")
-
-  const location = useLocation().pathname.split("/")[1]
 
   useEffect(() => {
     const updateOnlineStatus = () => {
@@ -129,33 +145,22 @@ const App = () => {
   }, [basket])
 
   useEffect(() => {
-    if ((location == "login" || location == "register") && userSignIn) {
+    const currentLocation = location.pathname.split("/")[1]
+
+    if ((currentLocation == "login" || currentLocation == "register") && userSignIn) {
       navigate("/")
     }
-    if (userSignIn) if (location == "login" || location == "register") navigate("/")
 
-    if (location == "") set_is_found(true)
-    if (location == "installment" && is_SI) set_is_found(false)
+    if (currentLocation == "") set_is_found(true)
+    if (currentLocation == "installment" && is_SI) set_is_found(false)
     if (
-      location == "delivery" ||
-      (location == "terms" && formalization_open) ||
-      location == "payment-variant" ||
-      location == "login" ||
-      location == "register"
+      currentLocation == "delivery" ||
+      (currentLocation == "terms" && formalization_open) ||
+      currentLocation == "payment-variant" ||
+      currentLocation == "login" ||
+      currentLocation == "register"
     ) {
-      if (
-        location === "delivery" ||
-        location === "terms" ||
-        location === "payment-variant" ||
-        location == "login" ||
-        location == "register"
-      ) {
-        set_is_another_nav(true)
-      } else {
-        set_is_another_nav(false)
-      }
-    }
-    if (location == "formalization" || location == "terms" || location == "login" || location == "register") {
+      set_is_another_nav(true)
     } else {
       set_is_another_nav(false)
     }
@@ -209,6 +214,12 @@ const App = () => {
     return null
   }
 
+  const transitionStyles = {
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+    opacity: isTransitioning ? 0.7 : 1,
+    transform: isTransitioning ? "translateY(10px)" : "translateY(0px)",
+  }
+
   if (!is_online) {
     return <InternetChecker lang={lang} />
   } else {
@@ -225,8 +236,8 @@ const App = () => {
               scrollbarColor: "rgba(244,244,244,1) rgba(255, 255, 255, 1)",
             }}
           >
-            <div>
-              <Routes>
+            <div style={transitionStyles}>
+              <Routes location={displayLocation}>
                 <Route path="/" element={<Home lang={lang} setSearchText={setSearchText} searchText={searchText} />} />
                 <Route path="/likes" element={<Likes lang={lang} />} />
                 <Route
