@@ -32,7 +32,7 @@ const Modal = ({ is_modal_open, set_is_modal_open }) => {
 
           <p className="mb-6 font-inter font-[600] text-[15px] leading-[26px]">
             Tanlovingiz uchun rahmat, tez orada operator siz bilan bog'lanadi!
-          </p>  
+          </p>
 
           <button
             onClick={() => set_is_modal_open(false)}
