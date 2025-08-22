@@ -131,9 +131,9 @@ function RegionSelectionForm({ set_address_inform, set_is_pickup }) {
   }
 
   set_address_inform({
-    address_uz: `${regionObj?.name_uz} viloyati, ${cityObj?.name_uz}, ${street}`,
-    address_ru: `${regionObj?.name_ru} регион, ${cityObj?.name_ru}, ${street}`,
-    address_en: `${regionObj?.name_en} region, ${cityObj?.name_en}, ${street}`,
+    address_uz: `${regionObj?.name_uz}, ${cityObj?.name_uz}, ${street}`,
+    address_ru: `${regionObj?.name_ru}, ${cityObj?.name_ru}, ${street}`,
+    address_en: `${regionObj?.name_en}, ${cityObj?.name_en}, ${street}`,
   });
 
     set_is_pickup(false);
