@@ -17,6 +17,7 @@ import Pickup_address from "../pickup_address/pickup_address_main";
 import { get_user } from "../../Services/auth/get_user";
 import axios from "axios";
 import { order_create } from "../../Services/auth/create_order";
+import BasketGrid from "./basket_grid";
 
 const Formalization_main = ({
   basket,
@@ -289,10 +290,6 @@ const Formalization_main = ({
         setTimeout(() => setIsNotificationVisible(false), 4000);
         return;
       }
-      console.log("[v0] handleOrderCreation called");
-      console.log("[v0] selectedMethod:", selectedMethod);
-
-      console.log("[v0] Calling order_create...");
       const orderResult = await order_create(
         localStorage.getItem("accessToken"),
         {
@@ -315,30 +312,19 @@ const Formalization_main = ({
         orderId &&
         (selectedMethod === "payme" || selectedMethod === "click")
       ) {
-        console.log("[v0] Order created successfully, processing payment...");
         await processPayment(orderId);
       } else {
         if (orderId) {
           const updatedProducts = basket.filter((item) => !item.selected);
           set_basket(updatedProducts);
+          localStorage.setItem("order_created", "true");
           localStorage.setItem("basket", JSON.stringify(updatedProducts));
 
           set_modal_method(selectedMethod == "qabul" ? "cash" : selectedMethod);
           set_is_modal_open(true);
         }
-        console.log(
-          "[v0] Order creation failed or payment method is not payme/click"
-        );
-        console.log("[v0] orderId:", orderId);
-        console.log("[v0] selectedMethod:", selectedMethod);
-        console.log(
-          "[v0] Payment methods check:",
-          selectedMethod === "payme",
-          selectedMethod === "click"
-        );
       }
     } catch (error) {
-      console.error("[v0] Order creation error:", error);
       setNotification(
         lang === "uz"
           ? "Buyurtma yaratishda xatolik"
@@ -438,54 +424,11 @@ const Formalization_main = ({
               </div>
             </Link>
           )}
-          <div className="flex flex-col gap-8 mx-5 my-20">
-            {basket.map(
-              (item) =>
-                item.selected && (
-                  <div
-                    key={item.id}
-                    className="flex gap-[15px] sm:gap-[35px] mb-6 mt-[20px]"
-                  >
-                    <div className="bg-gray-100 rounded-lg w-[100px] h-[100px] sm:w-[150px] sm:h-[150px] flex items-center justify-center">
-                      <img
-                        src={item.img || "/placeholder.svg"}
-                        alt={item.name[lang]}
-                        className="object-contain w-full h-full"
-                      />
-                    </div>
-                    <div className="flex flex-col gap-[10px] sm:gap-[50px] font-inter font-[600] text-[16px] sm:text-[24px] leading-[22px] text-black">
-                      <div>
-                        <h3>{item.name[lang]}</h3>
-                        <p className="mt-[15px] sm:mt-[25px]">
-                          {item.price}{" "}
-                          {lang === "uz"
-                            ? "so'm"
-                            : lang === "en"
-                            ? "uzs"
-                            : lang === "ru"
-                            ? "сум"
-                            : "so'm"}
-                        </p>
-                      </div>
-                      <p>
-                        {item.quantity}{" "}
-                        {lang === "uz"
-                          ? "dona"
-                          : lang === "en"
-                          ? "piece"
-                          : lang === "ru"
-                          ? "шт"
-                          : "dona"}
-                      </p>
-                    </div>
-                  </div>
-                )
-            )}
-          </div>
-          <div className="relative flex p-1 bg-gray-100 rounded-xl mt-[20px] sm:mt-[35px] mb-4 h-[40px] sm:h-[60px] w-full sm:w-[95%] mx-auto font-inter font-[500] text-[13px] sm:text-[18px] leading-[22px] text-black">
+          <BasketGrid basket={basket} lang={lang} />
+          <div className="relative flex p-1 bg-gray-100 rounded-xl mt-[20px] sm:mt-[35px] mb-4 h-[50px] sm:h-[60px] w-full sm:w-[95%] mx-auto font-inter font-[500] text-[14px] sm:text-[18px] leading-[22px] text-black">
             <button
               onClick={() => set_deliver_type("pickup")}
-              className={`flex-1 py-1 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
+              className={`flex-1 py-2 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
                 deliver_type === "pickup"
                   ? "bg-white shadow-sm duration-500"
                   : "text-gray-500"
@@ -501,7 +444,7 @@ const Formalization_main = ({
             </button>
             <button
               onClick={() => set_deliver_type("delivery")}
-              className={`flex-1 py-1 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
+              className={`flex-1 py-2 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
                 deliver_type === "delivery"
                   ? "bg-white shadow-sm duration-500"
                   : "text-gray-500"
@@ -549,26 +492,45 @@ const Formalization_main = ({
                   ? set_is_delivery(true)
                   : set_is_pickup(true)
               }
-              className="flex items-center justify-between w-full p-2 cursor-pointer sm:p-4"
+              className="flex flex-col justify-between w-full gap-2 p-3 cursor-pointer h-18 sm:h-auto sm:items-center sm:p-4"
             >
-              <div className="flex items-center w-full pr-[40px] gap-2 justify-between sm:gap-3">
+              <div className="flex items-center w-full sm:pr-[40px] gap-2 justify-between sm:gap-3">
                 <div className="flex items-center gap-2 sm:gap-3">
                   <img
                     src={arrive_icon || "/placeholder.svg"}
                     alt="arrive"
                     className="h-[21px] w-[21px] sm:h-[25px] sm:w-[25px] object-contain"
                   />
-                  <span className="text-[13px] sm:text-[18px] sm:font-medium">
+                  <span className="text-[14px] sm:text-[18px] sm:font-medium whitespace-nowrap">
                     {label_delivery}
                   </span>
                 </div>
-                <h1>
+                <h1 className="text-[12px] whitespace-nowrap sm:block hidden sm:text-[18px] sm:font-medium">
                   {address_inform
                     ? address_inform[`address_${lang}`]
+                    : lang == "uz"
+                    ? "Manzil tanlash"
+                    : lang == "en"
+                    ? "Address"
+                    : lang == "ru"
+                    ? "Адрес"
                     : "Manzil tanlash"}
                 </h1>
               </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
+              <div className="flex flex-row pl-7.5 items-center w-full">
+                <h1 className="text-[12px] whitespace-nowrap sm:hidden block truncate">
+                  {address_inform
+                    ? address_inform[`address_${lang}`]
+                    : lang == "uz"
+                    ? "Manzil tanlash"
+                    : lang == "en"
+                    ? "Address"
+                    : lang == "ru"
+                    ? "Адрес"
+                    : "Manzil tanlash"}
+                </h1>
+                <ChevronRight className="w-4 h-4 mt-0.5 text-gray-400 sm:h-5 sm:w-5" />
+              </div>
             </div>
           </div>
           <div
@@ -606,14 +568,14 @@ const Formalization_main = ({
                 }
               }
             `}</style>
-            <div className="flex items-center justify-between w-full p-2 cursor-pointer sm:p-4">
+            <div className="flex items-center justify-between w-full p-3 cursor-pointer sm:p-4">
               <div className="flex items-center gap-2 sm:gap-3">
                 <img
                   src={cash_icon || "/placeholder.svg"}
                   alt="cash"
                   className="h-[21px] w-[21px] sm:h-[25px] sm:w-[25px] object-contain"
                 />
-                <span className="text-[13px] sm:text-[18px] sm:font-medium">
+                <span className="text-[14px] sm:text-[18px] sm:font-medium">
                   {lang === "uz"
                     ? "Keshbekni ishlatish"
                     : lang === "en"
@@ -623,7 +585,7 @@ const Formalization_main = ({
                     : "Keshbekni ishlatish"}
                 </span>
               </div>
-              <div className="flex items-center gap-[13px]">
+              <div className="flex items-center gap-[25px] sm:gap-[13px]">
                 <span
                   className={`${
                     cashback_is_using ? "translate-x-0" : "translate-x-11"
@@ -663,7 +625,7 @@ const Formalization_main = ({
               ? "Способ оплаты"
               : "To'lov usuli"}
           </h1>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid w-full gap-4 md:grid-cols-2">
             <div className="border border-[#D5D5D5] w-full sm:w-[90%] rounded-lg p-4 bg-white">
               <div className="space-y-3.5 sm:space-y-4">
                 <div
@@ -777,7 +739,7 @@ const Formalization_main = ({
               </div>
             </div>
             {selectedMethod === "installment" && (
-              <div className="border border-[#D5D5D5] rounded-lg w-full sm:w-[90%] p-[20px] sm:p-[27px] bg-white">
+              <div className="border border-[#D5D5D5] rounded-lg w-[75%] sm:w-[90%] p-[20px] sm:p-[27px] bg-white">
                 <div className="flex items-center justify-between mb-5 sm:mb-6">
                   <div className="flex flex-row gap-3">
                     <div className="w-10 h-10 object-contain rounded-[5px]">
@@ -798,22 +760,9 @@ const Formalization_main = ({
                       </span>
                     </div>
                   </div>
-                  {/* <div
-                    onClick={() => set_is_payment_variant(true)}
-                    className="cursor-pointer hover:underline font-inter font-[600] text-[14px] sm:text-[16px] leading-[22px] text-[#000000BF]"
-                  >
-                    {lang === "uz"
-                      ? "Taxrirlash"
-                      : lang === "en"
-                      ? "Edit"
-                      : lang === "ru"
-                      ? "Редактировать"
-                      : "Taxrirlash"}
-                  </div> */}
                 </div>
                 <hr className="border-[#D5D5D5] border-[1.5px] rounded-full" />
-                <div className="flex flex-col mt-8 justify-between w-full py-[10px] px-[12px] h-[87px] rounded-[8px] border-[1px] border-[rgba(213,213,213,1)] bg-[rgba(242,242,241,1)]">
-                  {/* Payment options */}
+                <div className="flex flex-col mt-8 justify-between w-[100%] py-[10px] px-[12px] h-[87px] rounded-[8px] border-[1px] border-[rgba(213,213,213,1)] bg-[rgba(242,242,241,1)]">
                   <div className="w-full h-[26px] rounded-[5px] flex justify-between gap-[3.75px] bg-[rgba(213,213,213,1)]">
                     {paymentOptions[lang].map((option, index) => (
                       <div
@@ -832,11 +781,7 @@ const Formalization_main = ({
                     ))}
                   </div>
 
-                  {/* Calculation */}
                   <div className="flex gap-[10px] items-center">
-                    <h1 className="font-inter font-[500] text-[12px] text-black">
-                      {totalPrice} + {plans[selectedPaymentIndex].percent}%
-                    </h1>
                     <h1 className="w-[89px] h-[28px] rounded-[2.5px] bg-[rgba(254,242,157,1)] font-inter font-[500] text-[13px] leading-[22px] flex justify-center items-center">
                       {monthlyPayments[selectedPaymentIndex]} {uzs_lang}
                     </h1>

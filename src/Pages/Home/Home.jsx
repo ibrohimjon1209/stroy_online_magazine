@@ -11,7 +11,6 @@ import { products_get } from "../../Services/products_get";
 import create_favorites from "../../Services/favorites/create_favorites";
 import delete_favorites from "../../Services/favorites/delete_favorites";
 
-
 const getStoredTopics = () => {
   try {
     const item = localStorage.getItem("searchTopics");
@@ -20,7 +19,6 @@ const getStoredTopics = () => {
     return [];
   }
 };
-
 
 function Home({ lang, setSearchText, searchText }) {
   const inputRef = useRef(null);
@@ -43,22 +41,21 @@ function Home({ lang, setSearchText, searchText }) {
     }
   });
 
-
   const uzs_lang =
     lang === "uz"
       ? "so'm"
       : lang === "en"
-        ? "uzs"
-        : lang === "ru"
-          ? "сум"
-          : "so'm";
+      ? "uzs"
+      : lang === "ru"
+      ? "сум"
+      : "so'm";
 
   const sl_option_id =
     localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
-        ? 1
-        : 2;
+      ? 1
+      : 2;
 
   useEffect(() => {
     const getProducts = async () => {
@@ -136,7 +133,7 @@ function Home({ lang, setSearchText, searchText }) {
         { user: parseInt(userId), product: productId },
       ];
       try {
-        const newFav = await create_favorites(productId, userId);
+        const newFav = await create_favorites(productId, userId, localStorage.getItem("accessToken"));
         if (!newFav || !newFav.product) {
           console.error("POST xatosi: Yangi like qo'shishda xatolik");
           return;
@@ -147,7 +144,9 @@ function Home({ lang, setSearchText, searchText }) {
           error.response?.status === 400 &&
           errMsg === "The fields user, product must make a unique set."
         ) {
-          console.warn("Bu mahsulot allaqachon like qilingan, frontendda like sifatida saqlayapmiz.");
+          console.warn(
+            "Bu mahsulot allaqachon like qilingan, frontendda like sifatida saqlayapmiz."
+          );
         } else {
           console.error("POST xatosi:", error);
           return;
@@ -204,7 +203,9 @@ function Home({ lang, setSearchText, searchText }) {
               ref={inputRef}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
-              onKeyDown={(e) => { e.key == "Enter" && handleSearchClick() }}
+              onKeyDown={(e) => {
+                e.key == "Enter" && handleSearchClick();
+              }}
             />
             {searchText && (
               <CirclePlus
@@ -220,8 +221,9 @@ function Home({ lang, setSearchText, searchText }) {
               onClick={handleClickOutside_search}
             >
               <div
-                className={`search_modal w-[520px] h-fit ml-[160px] bg-white border-[1px] overflow-hidden border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${searchAnimation ? "dropdown-enter-active" : "dropdown-enter"
-                  }`}
+                className={`search_modal w-[520px] h-fit ml-[160px] bg-white border-[1px] overflow-hidden border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${
+                  searchAnimation ? "dropdown-enter-active" : "dropdown-enter"
+                }`}
                 onClick={(e) => e.stopPropagation()}
               >
                 {search_topics.length > 0 ? (
@@ -253,10 +255,10 @@ function Home({ lang, setSearchText, searchText }) {
                       {lang == "uz"
                         ? "Qidiruv tarixi bo'm bo'sh"
                         : lang == "en"
-                          ? "Search history is empty"
-                          : lang == "ru"
-                            ? "История поиска пуста"
-                            : "Qidiruv tarixi bo'm bo'sh"}
+                        ? "Search history is empty"
+                        : lang == "ru"
+                        ? "История поиска пуста"
+                        : "Qidiruv tarixi bo'm bo'sh"}
                     </h1>
                   </div>
                 )}
@@ -272,10 +274,11 @@ function Home({ lang, setSearchText, searchText }) {
                 <div
                   key={idx}
                   onClick={() => handleBranchClick(branch)}
-                  className={`font-inter font-[500] text-[13px] leading-[22px] cursor-pointer ${selectedBranch === branch
-                    ? "text-[#DA9700]"
-                    : "text-[#0D1218]"
-                    }`}
+                  className={`font-inter font-[500] text-[13px] leading-[22px] cursor-pointer ${
+                    selectedBranch === branch
+                      ? "text-[#DA9700]"
+                      : "text-[#0D1218]"
+                  }`}
                 >
                   {branch}
                 </div>
@@ -287,15 +290,15 @@ function Home({ lang, setSearchText, searchText }) {
 
       <Carusel />
 
-      <div className="popular mt-[60px] w-full px-[15px] sm:px-[77px] mb-[50px]">
+      <div className="popular mt-[40px] w-full px-[15px] sm:px-[77px] mb-[50px]">
         <h1 className="text-[17px] sm:text-[22px] font-semibold mt-3">
           {lang === "uz"
             ? "Ommabop tavarlar"
             : lang === "en"
-              ? "Popular products"
-              : lang === "ru"
-                ? "Популярные товары"
-                : "Ommabop tavarlar"}
+            ? "Popular products"
+            : lang === "ru"
+            ? "Популярные товары"
+            : "Ommabop tavarlar"}
         </h1>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-[10px] gap-y-[20px] mt-3">
           {loading ? (
@@ -309,7 +312,7 @@ function Home({ lang, setSearchText, searchText }) {
                   <div className=" pt-[312px]rounded-[10px] w-[160px] h-[160px] sm:w-[245px] sm:h-[245px] bg-[#F2F2F1] overflow-hidden group">
                     <img
                       src={`https://backkk.stroybazan1.uz/${product.image}`}
-                      className="object-cover w-full h-full transition-transform max group-hover:scale-105"
+                      className="object-cover w-full h-full transition-transform max group-hover:scale-105 rounded-[15px]"
                       alt={product[`name_${lang}`]}
                     />
                   </div>
@@ -320,23 +323,24 @@ function Home({ lang, setSearchText, searchText }) {
                       </h1>
                       <p className="text-black text-[12px] sm:text-[14px]">
                         {product.variants?.[0]?.price
-                          ? `${lang === "uz"
-                            ? "Narxi"
-                            : lang === "en"
-                              ? "Price"
-                              : lang === "ru"
+                          ? `${
+                              lang === "uz"
+                                ? "Narxi"
+                                : lang === "en"
+                                ? "Price"
+                                : lang === "ru"
                                 ? "Цена"
                                 : "Narxi"
-                          }: ${parseFloat(product.variants[0].price).toFixed(
-                            2
-                          )} ${uzs_lang}`
+                            }: ${parseFloat(product.variants[0].price).toFixed(
+                              2
+                            )} ${uzs_lang}`
                           : lang === "uz"
-                            ? "Narxi mavjud emas"
-                            : lang === "en"
-                              ? "Price not available"
-                              : lang === "ru"
-                                ? "Цена не доступна"
-                                : "Narxi mavjud emas"}
+                          ? "Narxi mavjud emas"
+                          : lang === "en"
+                          ? "Price not available"
+                          : lang === "ru"
+                          ? "Цена не доступна"
+                          : "Narxi mavjud emas"}
                       </p>
                     </div>
                     <Heart
@@ -356,15 +360,9 @@ function Home({ lang, setSearchText, searchText }) {
               </div>
             ))
           ) : (
-            <p className="text-center text-gray-500">
-              {lang === "uz"
-                ? "Ma'lumot topilmadi."
-                : lang === "en"
-                  ? "No data found."
-                  : lang === "ru"
-                    ? "Данные не найдены."
-                    : "Ma'lumot topilmadi."}
-            </p>
+            <div className="flex justify-center mx-auto items-center scale-[70%] sm:scale-[100%] w-[200%] h-[130px] sm:w-[500%] sm:h-[400px]">
+              <div className="loader"></div>
+            </div>
           )}
         </div>
       </div>

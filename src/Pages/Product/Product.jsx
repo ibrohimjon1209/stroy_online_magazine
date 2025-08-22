@@ -1,37 +1,44 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef } from "react"
-import product_1 from "./Images/product_1.svg"
-import product_2 from "./Images/product_2.webp"
-import product_3 from "./Images/product_3.png"
-import { X, ChevronLeft, ChevronRight } from "lucide-react"
-import { Link, useNavigate } from "react-router-dom"
+import { useState, useEffect, useRef } from "react";
+import product_1 from "./Images/product_1.svg";
+import product_2 from "./Images/product_2.webp";
+import product_3 from "./Images/product_3.png";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Product = ({ lang, basket, set_basket, userSignIn }) => {
-  const navigate = useNavigate()
-  const [productData, setProductData] = useState(null)
-  const [selectedSize, setSelectedSize] = useState("4x6")
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  const [selectedColorIndex, setSelectedColorIndex] = useState(0)
-  const [selectedPaymentIndex, setSelectedPaymentIndex] = useState(3)
-  const [isAdded, setIsAdded] = useState(false)
-  const [isAnimating, setIsAnimating] = useState(false)
-  const [notification, setNotification] = useState("")
-  const [isVisible, setIsVisible] = useState(false)
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
-  const [selectedImage, setSelectedImage] = useState(product_1)
-  const [slideDirection, setSlideDirection] = useState("")
-  const [isTransitioning, setIsTransitioning] = useState(false)
-  const [uniqueSizes, setUniqueSizes] = useState([])
-  const [sizeVariants, setSizeVariants] = useState({})
-  const uzs_lang = lang == "uz" ? "so'm" : lang == "en" ? "uzs" : lang == "ru" ? "сум" : "so'm"
-  const productImages = [product_1, product_2, product_3]
+  const navigate = useNavigate();
+  const [productData, setProductData] = useState(null);
+  const [selectedSize, setSelectedSize] = useState("4x6");
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedColorIndex, setSelectedColorIndex] = useState(0);
+  const [selectedPaymentIndex, setSelectedPaymentIndex] = useState(3);
+  const [isAdded, setIsAdded] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [notification, setNotification] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedImage, setSelectedImage] = useState(product_1);
+  const [slideDirection, setSlideDirection] = useState("");
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [uniqueSizes, setUniqueSizes] = useState([]);
+  const [sizeVariants, setSizeVariants] = useState({});
+  const uzs_lang =
+    lang == "uz"
+      ? "so'm"
+      : lang == "en"
+      ? "uzs"
+      : lang == "ru"
+      ? "сум"
+      : "so'm";
+  const productImages = [product_1, product_2, product_3];
   const paymentOptions = {
-    uz: ["3 oy", "6 oy", "12 oy", "24 oy"],
-    en: ["3 months", "6 months", "12 months", "24 months"],
-    ru: ["3 месяца", "6 месяцев", "12 месяцев", "24 месяца"],
-  }
-  const productImagesRef = useRef(productImages)
+    uz: ["6 oy", "12 oy", "15 oy", "18 oy", "24 oy"],
+    en: ["6 months", "12 months", "15 months", "18 months", "24 months"],
+    ru: ["6 месяцев", "12 месяцев", "15 месяцев", "18 месяцев", "24 месяцев"],
+  };
+  const productImagesRef = useRef(productImages);
 
   useEffect(() => {
     if (isVisible && notification) {
@@ -39,13 +46,13 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
         (item) =>
           item.id === productData.id &&
           item.size.en === productData.variants[selectedColorIndex].size_en &&
-          item.color.en === productData.variants[selectedColorIndex].color_en,
-      )
+          item.color.en === productData.variants[selectedColorIndex].color_en
+      );
 
-      const updatedBasket = [...basket]
+      const updatedBasket = [...basket];
 
       if (existingIndex !== -1) {
-        updatedBasket[existingIndex].quantity += 1
+        updatedBasket[existingIndex].quantity += 1;
         if (userSignIn) {
           const new_order = async () => {
             fetch("https://backkk.stroybazan1.uz/api/api/orders/create/", {
@@ -58,14 +65,14 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
               }),
             })
               .then((res) => {
-                console.log(res)
-                console.log(localStorage.getItem("userId"))
+                console.log(res);
+                console.log(localStorage.getItem("userId"));
               })
               .catch((res) => {
-                console.log(res)
-              })
-          }
-          new_order()
+                console.log(res);
+              });
+          };
+          new_order();
         }
       } else {
         const newItem = {
@@ -88,242 +95,283 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
           },
           price: productData.variants[selectedColorIndex].price,
           quantity: 1,
-        }
+        };
 
-        updatedBasket.push(newItem)
+        updatedBasket.push(newItem);
       }
-      set_basket(updatedBasket)
-      localStorage.setItem("basket", JSON.stringify(updatedBasket))
+      set_basket(updatedBasket);
+      localStorage.setItem("basket", JSON.stringify(updatedBasket));
     }
-  }, [isVisible, notification])
+  }, [isVisible, notification]);
 
   useEffect(() => {
-    setSelectedImage(productImagesRef.current[selectedImageIndex])
-  }, [selectedImageIndex])
+    setSelectedImage(productImagesRef.current[selectedImageIndex]);
+  }, [selectedImageIndex]);
 
   const fetchProduct = async () => {
     try {
-      const url = window.location.href
-      const id = url.split("/").pop()
-      const response = await fetch(`https://backkk.stroybazan1.uz/api/api/products/${id}/`)
-      const data = await response.json()
-      setProductData(data)
-      setSelectedSize(data.variants[0][`size_${lang}`])
+      const url = window.location.href;
+      const id = url.split("/").pop();
+      const response = await fetch(
+        `https://backkk.stroybazan1.uz/api/api/products/${id}/`
+      );
+      const data = await response.json();
+      setProductData(data);
+      setSelectedSize(data.variants[0][`size_${lang}`]);
 
-      const uniqueSizesMap = new Map()
-      const sizeVariantsMap = {}
+      const uniqueSizesMap = new Map();
+      const sizeVariantsMap = {};
       data.variants.forEach((variant, index) => {
-        const size = variant[`size_${lang}`]
+        const size = variant[`size_${lang}`];
 
         if (size) {
-          const sizeLower = size.toLowerCase().trim()
+          const sizeLower = size.toLowerCase().trim();
 
           if (!sizeVariantsMap[sizeLower]) {
-            sizeVariantsMap[sizeLower] = []
+            sizeVariantsMap[sizeLower] = [];
           }
-          sizeVariantsMap[sizeLower].push(index)
+          sizeVariantsMap[sizeLower].push(index);
 
           if (!uniqueSizesMap.has(sizeLower)) {
             uniqueSizesMap.set(sizeLower, {
               size: size,
               variantIndex: index,
-            })
+            });
           }
         } else {
-          console.warn(`No size available for variant ${index}`)
+          console.warn(`No size available for variant ${index}`);
         }
-      })
+      });
 
-      const uniqueSizesArray = Array.from(uniqueSizesMap.values())
-      setUniqueSizes(uniqueSizesArray)
-      setSizeVariants(sizeVariantsMap)
+      const uniqueSizesArray = Array.from(uniqueSizesMap.values());
+      setUniqueSizes(uniqueSizesArray);
+      setSizeVariants(sizeVariantsMap);
     } catch (error) {
-      console.error("Xatolik yuz berdi:", error)
+      console.error("Xatolik yuz berdi:", error);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchProduct()
-  }, [])
+    fetchProduct();
+  }, []);
 
   const handleThumbnailClick = (index) => {
     if (index > selectedColorIndex) {
-      setSlideDirection("slide-left")
+      setSlideDirection("slide-left");
     } else if (index < selectedColorIndex) {
-      setSlideDirection("slide-right")
+      setSlideDirection("slide-right");
     }
-    setIsTransitioning(true)
+    setIsTransitioning(true);
     setTimeout(() => {
-      setSelectedColorIndex(index)
+      setSelectedColorIndex(index);
       setTimeout(() => {
-        setIsTransitioning(false)
-        setSlideDirection("")
-      }, 300)
-    }, 50)
-  }
+        setIsTransitioning(false);
+        setSlideDirection("");
+      }, 300);
+    }, 50);
+  };
 
   const handlePrevImage = () => {
-    if (!productData || !productData.variants || productData.variants.length === 0) return
+    if (
+      !productData ||
+      !productData.variants ||
+      productData.variants.length === 0
+    )
+      return;
 
-    const totalVariants = productData.variants.length
-    if (totalVariants <= 1) return
+    const totalVariants = productData.variants.length;
+    if (totalVariants <= 1) return;
 
-    const newIndex = selectedColorIndex > 0 ? selectedColorIndex - 1 : totalVariants - 1
+    const newIndex =
+      selectedColorIndex > 0 ? selectedColorIndex - 1 : totalVariants - 1;
 
-    setSlideDirection("slide-right")
-    setIsTransitioning(true)
+    setSlideDirection("slide-right");
+    setIsTransitioning(true);
 
     setTimeout(() => {
-      setSelectedColorIndex(newIndex)
+      setSelectedColorIndex(newIndex);
 
-      const newSize = productData.variants[newIndex][`size_${lang}`]
-      setSelectedSize(newSize)
+      const newSize = productData.variants[newIndex][`size_${lang}`];
+      setSelectedSize(newSize);
 
-      const sizeIndex = uniqueSizes.findIndex((item) => item.size.toLowerCase() === newSize.toLowerCase())
+      const sizeIndex = uniqueSizes.findIndex(
+        (item) => item.size.toLowerCase() === newSize.toLowerCase()
+      );
 
       if (sizeIndex !== -1) {
-        setSelectedIndex(sizeIndex)
+        setSelectedIndex(sizeIndex);
       }
 
       setTimeout(() => {
-        setIsTransitioning(false)
-        setSlideDirection("")
-      }, 300)
-    }, 50)
-  }
+        setIsTransitioning(false);
+        setSlideDirection("");
+      }, 300);
+    }, 50);
+  };
 
   const handleNextImage = () => {
-    if (!productData || !productData.variants || productData.variants.length === 0) return
+    if (
+      !productData ||
+      !productData.variants ||
+      productData.variants.length === 0
+    )
+      return;
 
-    const totalVariants = productData.variants.length
-    if (totalVariants <= 1) return
+    const totalVariants = productData.variants.length;
+    if (totalVariants <= 1) return;
 
-    const newIndex = selectedColorIndex < totalVariants - 1 ? selectedColorIndex + 1 : 0
+    const newIndex =
+      selectedColorIndex < totalVariants - 1 ? selectedColorIndex + 1 : 0;
 
-    setSlideDirection("slide-left")
-    setIsTransitioning(true)
+    setSlideDirection("slide-left");
+    setIsTransitioning(true);
 
     setTimeout(() => {
-      setSelectedColorIndex(newIndex)
+      setSelectedColorIndex(newIndex);
 
-      const newSize = productData.variants[newIndex][`size_${lang}`]
-      setSelectedSize(newSize)
+      const newSize = productData.variants[newIndex][`size_${lang}`];
+      setSelectedSize(newSize);
 
-      const sizeIndex = uniqueSizes.findIndex((item) => item.size.toLowerCase() === newSize.toLowerCase())
+      const sizeIndex = uniqueSizes.findIndex(
+        (item) => item.size.toLowerCase() === newSize.toLowerCase()
+      );
 
       if (sizeIndex !== -1) {
-        setSelectedIndex(sizeIndex)
+        setSelectedIndex(sizeIndex);
       }
 
       setTimeout(() => {
-        setIsTransitioning(false)
-        setSlideDirection("")
-      }, 300)
-    }, 50)
-  }
+        setIsTransitioning(false);
+        setSlideDirection("");
+      }, 300);
+    }, 50);
+  };
 
   const handleColorClick = (index) => {
-    setSelectedColorIndex(index)
-    setSelectedSize(productData.variants[index][`size_${lang}`])
+    setSelectedColorIndex(index);
+    setSelectedSize(productData.variants[index][`size_${lang}`]);
 
     const sizeIndex = uniqueSizes.findIndex(
-      (item) => item.size.toLowerCase() === productData.variants[index][`size_${lang}`].toLowerCase(),
-    )
+      (item) =>
+        item.size.toLowerCase() ===
+        productData.variants[index][`size_${lang}`].toLowerCase()
+    );
 
     if (sizeIndex !== -1) {
-      setSelectedIndex(sizeIndex)
+      setSelectedIndex(sizeIndex);
     }
-  }
+  };
 
   const handleSizeClick = (size, index) => {
-    setSelectedSize(size)
-    setSelectedIndex(index)
+    setSelectedSize(size);
+    setSelectedIndex(index);
 
     const variantIndex = productData.variants.findIndex(
-      (variant) => variant[`size_${lang}`].toLowerCase() === size.toLowerCase(),
-    )
+      (variant) => variant[`size_${lang}`].toLowerCase() === size.toLowerCase()
+    );
 
     if (variantIndex !== -1) {
-      setSelectedColorIndex(variantIndex)
+      setSelectedColorIndex(variantIndex);
     }
-  }
+  };
 
   const handlePaymentClick = (index) => {
-    setSelectedPaymentIndex(index)
-  }
+    setSelectedPaymentIndex(index);
+  };
 
   const handleClick = () => {
-    setIsAnimating(true)
+    setIsAnimating(true);
     setTimeout(() => {
-      setIsAdded(true)
-      setIsAnimating(false)
-      handleAddToCart()
+      setIsAdded(true);
+      setIsAnimating(false);
+      handleAddToCart();
 
       // Navigate to basket page after a short delay
-      setTimeout(() => {}, 800)
-    }, 600)
-  }
+      setTimeout(() => {}, 800);
+    }, 600);
+  };
 
   const handleAddToCart = () => {
-    setNotification("Mahsulot savatga qo'shildi")
+    setNotification("Mahsulot savatga qo'shildi");
 
-    setIsVisible(true)
+    setIsVisible(true);
     setTimeout(() => {
-      setIsVisible(false)
-    }, 3000)
-  }
+      setIsVisible(false);
+    }, 3000);
+  };
 
   const isCurrentSizeVariant = (index) => {
-    if (!productData || !productData.variants || !productData.variants[index]) return false
+    if (!productData || !productData.variants || !productData.variants[index])
+      return false;
 
-    const currentSize = productData.variants[selectedColorIndex]?.[`size_${lang}`]?.toLowerCase()?.trim()
-    const variantSize = productData.variants[index]?.[`size_${lang}`]?.toLowerCase()?.trim()
+    const currentSize = productData.variants[selectedColorIndex]?.[
+      `size_${lang}`
+    ]
+      ?.toLowerCase()
+      ?.trim();
+    const variantSize = productData.variants[index]?.[`size_${lang}`]
+      ?.toLowerCase()
+      ?.trim();
 
-    return currentSize && variantSize && currentSize === variantSize
-  }
+    return currentSize && variantSize && currentSize === variantSize;
+  };
 
   if (!productData) {
-    return <div></div>
+    return <div></div>;
   }
 
-  const monthlyPayments = [
-    productData.variants[selectedColorIndex].monthly_payment_3,
-    productData.variants[selectedColorIndex].monthly_payment_6,
-    productData.variants[selectedColorIndex].monthly_payment_12,
-    productData.variants[selectedColorIndex].monthly_payment_24,
-  ]
-  const selectedVariant = productData?.variants?.[selectedColorIndex]
+  const plans = [
+    { months: 6, percent: 26 },
+    { months: 12, percent: 42 },
+    { months: 15, percent: 50 },
+    { months: 18, percent: 56 },
+    { months: 24, percent: 75 },
+  ];
 
-  const currentSize = selectedVariant?.[`size_${lang}`] ? selectedVariant[`size_${lang}`].toLowerCase().trim() : ""
+  const monthlyPayments = plans.map(({ months, percent }) => {
+    const priceWithPercent =
+      productData.variants[selectedColorIndex].price +
+      (productData.variants[selectedColorIndex].price * percent) / 100;
+    return Math.ceil(priceWithPercent / months);
+  });
+  const selectedVariant = productData?.variants?.[selectedColorIndex];
 
-  const currentSizeVariants = sizeVariants[currentSize] || []
-  const hasMultipleVariants = productData?.variants?.length > 1
+  const currentSize = selectedVariant?.[`size_${lang}`]
+    ? selectedVariant[`size_${lang}`].toLowerCase().trim()
+    : "";
+
+  const currentSizeVariants = sizeVariants[currentSize] || [];
+  const hasMultipleVariants = productData?.variants?.length > 1;
 
   // Get the unit in the current language
-  const unit = productData[`units_${lang}`] || ""
+  const unit = productData[`units_${lang}`] || "";
 
   const translations_term = {
     uz: {
       deliveryTitle: "Yetkazib berish",
       deliveryHighlight1: "1 kun",
-      deliveryHighlight2: "5mln so'mdan ortiq mahsulotga buyurtma bersangiz yetkazib berish VODIY bo'ylab be'pul.",
+      deliveryHighlight2:
+        "5mln so'mdan ortiq mahsulotga buyurtma bersangiz yetkazib berish VODIY bo'ylab be'pul.",
       installmentText:
         "Muddatli to'lovni rasmiylashtirayotganingizda bizdan va hamkorlarimizdan eng ma'qul takliflarga ega bo'lishingiz mumkin.",
     },
     en: {
       deliveryTitle: "Delivery",
       deliveryHighlight1: "within 1 day",
-      deliveryHighlight2: "If you order products over 5 million UZS, delivery is free across the valley.",
+      deliveryHighlight2:
+        "If you order products over 5 million UZS, delivery is free across the valley.",
       installmentText:
         "When applying for an installment plan, you may receive the best offers from us and our partners.",
     },
     ru: {
       deliveryTitle: "Доставка",
       deliveryHighlight1: "в течение 1 дня",
-      deliveryHighlight2: "Если вы закажете товары на сумму более 5 миллионов сумов, доставка по долине бесплатна.",
-      installmentText: "Оформляя рассрочку, вы можете получить лучшие предложения от нас и наших партнеров.",
+      deliveryHighlight2:
+        "Если вы закажете товары на сумму более 5 миллионов сумов, доставка по долине бесплатна.",
+      installmentText:
+        "Оформляя рассрочку, вы можете получить лучшие предложения от нас и наших партнеров.",
     },
-  }
+  };
 
   // Translation for units
   const unitTranslations = {
@@ -339,16 +387,16 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
       dona: "штука",
       litr: "литр",
     },
-  }
+  };
 
   // Get translated unit
   const getTranslatedUnit = (unitName) => {
-    if (!unitName) return ""
-    const lowerUnit = unitName.toLowerCase()
-    return unitTranslations[lang]?.[lowerUnit] || unitName
-  }
+    if (!unitName) return "";
+    const lowerUnit = unitName.toLowerCase();
+    return unitTranslations[lang]?.[lowerUnit] || unitName;
+  };
 
-  const t_term = translations_term[lang] || translations_term["uz"]
+  const t_term = translations_term[lang] || translations_term["uz"];
 
   return (
     <div className="w-full h-auto mt-[0px] sm:mt-[50px] px-[22px] sm:px-[190px] mb-[111px]">
@@ -439,17 +487,20 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
           pointer-events: none;
         }
         .hide-scrollbar {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
         }
         .hide-scrollbar::-webkit-scrollbar {
-          display: none;  /* Chrome, Safari and Opera */
+          display: none; /* Chrome, Safari and Opera */
         }
       `}</style>
 
       <div className="mx-[-22px] sticky top-0 z-50 block sm:hidden">
         <div className="w-full h-[65px] bg-[#DCC38B]">
-          <Link className="w-full h-full flex items-center gap-[10px] pl-[13px]" to={"/"}>
+          <Link
+            className="w-full h-full flex items-center gap-[10px] pl-[13px]"
+            to={"/"}
+          >
             <ChevronLeft className="scale-110" />
             <h1 className="font-inter font-[500] text-[15px] leading-[22px] text-black">
               {productData[`name_${lang}`]}
@@ -459,13 +510,17 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
       </div>
 
       {isVisible && notification && (
-        <div className={`absolute z-50 left-1 scale-70 w-full h-auto flex justify-center items-center notification`}>
+        <div
+          className={`absolute z-50 left-1 scale-70 w-full h-auto flex justify-center items-center notification`}
+        >
           <div className="bg-[#fefdfd] relative drop-shadow-lg w-[450px] sm:w-[750px] h-[100px] flex items-center rounded-md transition-opacity duration-500 ease-in-out opacity-100">
             <div className="ml-[20px] rounded-[5px] overflow-hidden border-[1px] absolute sm:static w-[80px] sm:w-[120px] h-[80px] flex justify-center items-center">
               <img
                 src={
-                  `https://backkk.stroybazan1.uz${productData.variants[selectedColorIndex].image || "/placeholder.svg"}` ||
-                  "/placeholder.svg"
+                  `https://backkk.stroybazan1.uz${
+                    productData.variants[selectedColorIndex].image ||
+                    "/placeholder.svg"
+                  }` || "/placeholder.svg"
                 }
                 className="w-[80px] h-[80px] object-contain"
               />
@@ -475,26 +530,29 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
                 {lang == "uz"
                   ? "Mahsulot savatga qo'shildi"
                   : lang == "en"
-                    ? "Product added to cart"
-                    : lang == "ru"
-                      ? "Товар добавлен в корзину"
-                      : "Mahsulot savatga qo'shildi"}
+                  ? "Product added to cart"
+                  : lang == "ru"
+                  ? "Товар добавлен в корзину"
+                  : "Mahsulot savatga qo'shildi"}
               </h1>
               <h1 className="w-[360px] font-inter font-[400] text-[16px] leading-[22px] text-black">
                 {productData[`name_${lang}`]} {selectedSize}
               </h1>
             </div>
             <div className="w-[500px] sm:w-[250px] flex flex-col items-end gap-[25px] h-full mt-[30px] pr-[20px]">
-              <X onClick={() => setIsVisible(false)} className="cursor-pointer"></X>
+              <X
+                onClick={() => setIsVisible(false)}
+                className="cursor-pointer"
+              ></X>
               <Link to={"/basket"}>
                 <h1 className="uppercase font-inter font-[600] text-[16px] leading-[22px] text-[#FFDF02] whitespace-nowrap">
                   {lang == "uz"
                     ? "Savatga o'tish"
                     : lang == "en"
-                      ? "Go to cart"
-                      : lang == "ru"
-                        ? "Перейти в корзину"
-                        : "Savatga o'tish"}
+                    ? "Go to cart"
+                    : lang == "ru"
+                    ? "Перейти в корзину"
+                    : "Savatga o'tish"}
                 </h1>
               </Link>
             </div>
@@ -513,12 +571,18 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
                 <div
                   key={index}
                   className={`border-[3px] ${
-                    selectedColorIndex === index ? "border-[rgba(190,160,134,1)]" : "border-transparent"
+                    selectedColorIndex === index
+                      ? "border-[rgba(190,160,134,1)]"
+                      : "border-transparent"
                   } overflow-hidden w-[158px] h-[156px] bg-[rgba(242,242,241,1)] rounded-[15px] flex justify-center items-center cursor-pointer`}
                   onClick={() => handleColorClick(index)}
                 >
                   <img
-                    src={`https://backkk.stroybazan1.uz${variant.image || "/placeholder.svg"}` || "/placeholder.svg"}
+                    src={
+                      `https://backkk.stroybazan1.uz${
+                        variant.image || "/placeholder.svg"
+                      }` || "/placeholder.svg"
+                    }
                     className="w-[158px] h-[156px] object-fill"
                   />
                 </div>
@@ -526,30 +590,36 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
             </div>
             <div className="flex justify-center items-center big-selected-image relative w-full sm:w-[504px] h-[330px] sm:h-[504px] overflow-hidden bg-[rgba(242,242,241,1)] rounded-[15px]">
               <div
-                className={`nav-button cursor-pointer nav-button-left ${!hasMultipleVariants ? "disabled-nav" : ""}`}
+                className={`nav-button cursor-pointer nav-button-left ${
+                  !hasMultipleVariants ? "disabled-nav" : ""
+                }`}
                 onClick={handlePrevImage}
               >
                 <ChevronLeft size={24} />
               </div>
               <div
-                className={`nav-button cursor-pointer nav-button-right ${!hasMultipleVariants ? "disabled-nav" : ""}`}
+                className={`nav-button cursor-pointer nav-button-right ${
+                  !hasMultipleVariants ? "disabled-nav" : ""
+                }`}
                 onClick={handleNextImage}
               >
                 <ChevronRight size={24} />
               </div>
               <img
                 src={
-                  `https://backkk.stroybazan1.uz${productData.variants[selectedColorIndex].image || "/placeholder.svg"}` ||
-                  "/placeholder.svg"
+                  `https://backkk.stroybazan1.uz${
+                    productData.variants[selectedColorIndex].image ||
+                    "/placeholder.svg"
+                  }` || "/placeholder.svg"
                 }
                 className={`w-[162px] sm:w-[504px] h-[188px] sm:h-[504px] object-fill ${
                   isTransitioning
                     ? slideDirection
                     : slideDirection
-                      ? slideDirection === "slide-left"
-                        ? "slide-in-right"
-                        : "slide-in-left"
-                      : ""
+                    ? slideDirection === "slide-left"
+                      ? "slide-in-right"
+                      : "slide-in-left"
+                    : ""
                 }`}
               />
             </div>
@@ -557,7 +627,13 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
           <div className="hidden sm:block">
             <div className="mt-[40px] flex flex-col gap-[15px] w-[681px]">
               <h1 className="font-inter font-[600] text-[28px] leading-[22px] text-black">
-                {lang == "uz" ? "Tasnif" : lang == "en" ? "Description" : lang == "ru" ? "Описание" : "Tasnif"}
+                {lang == "uz"
+                  ? "Tasnif"
+                  : lang == "en"
+                  ? "Description"
+                  : lang == "ru"
+                  ? "Описание"
+                  : "Tasnif"}
               </h1>
               <p className="font-inter font-[500] text-[16px] leading-[22px] text-black">
                 {productData[`description_${lang}`]}
@@ -573,35 +649,51 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
                 ? lang == "uz"
                   ? "Mavjud"
                   : lang == "en"
-                    ? "Available"
-                    : lang == "ru"
-                      ? "Доступно"
-                      : "Mavjud"
+                  ? "Available"
+                  : lang == "ru"
+                  ? "Доступно"
+                  : "Mavjud"
                 : lang == "uz"
-                  ? "Mavjud emas"
-                  : lang == "en"
-                    ? "Not available"
-                    : lang == "ru"
-                      ? "Недоступно"
-                      : "Mavjud emas"}
+                ? "Mavjud emas"
+                : lang == "en"
+                ? "Not available"
+                : lang == "ru"
+                ? "Недоступно"
+                : "Mavjud emas"}
             </h5>
             <h1 className="font-inter font-[600] text-[24px] leading-[22px] text-black">
               {productData[`name_${lang}`]}
             </h1>
           </div>
-          {productData?.variants?.some((v) => v.color_uz || v.color_ru || v.color_en) && (
+          {productData?.variants?.some(
+            (v) => v.color_uz || v.color_ru || v.color_en
+          ) && (
             <div className="color-div mt-[7px] flex flex-col gap-[6px] max-w-full">
               <h1 className="font-inter font-[400] text-[13px] leading-[22px] text-black">
-                {lang == "uz" ? "Rang" : lang == "en" ? "Color" : lang == "ru" ? "Цвет" : "Rang"} :{" "}
+                {lang == "uz"
+                  ? "Rang"
+                  : lang == "en"
+                  ? "Color"
+                  : lang == "ru"
+                  ? "Цвет"
+                  : "Rang"}{" "}
+                :{" "}
                 <span className="font-[500]">
-                  {productData?.variants?.[selectedColorIndex]?.[`color_${lang}`] || ""}{" "}
+                  {productData?.variants?.[selectedColorIndex]?.[
+                    `color_${lang}`
+                  ] || ""}{" "}
                 </span>
               </h1>
               <div className="select-color flex flex-wrap gap-[10px] max-w-full">
                 {productData?.variants
-                  ?.filter((variant) => variant.color_uz || variant.color_ru || variant.color_en)
+                  ?.filter(
+                    (variant) =>
+                      variant.color_uz || variant.color_ru || variant.color_en
+                  )
                   .map((variant, index) => {
-                    const originalIndex = productData.variants.findIndex((v) => v.id === variant.id)
+                    const originalIndex = productData.variants.findIndex(
+                      (v) => v.id === variant.id
+                    );
 
                     return (
                       <div
@@ -612,16 +704,20 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
                         ? "border-[1.5px] border-[rgba(190,160,134,1)]"
                         : "border-transparent"
                     } 
-                    bg-[rgba(247,247,246,1)] cursor-pointer ${!isCurrentSizeVariant(originalIndex) ? "dimmed" : ""}`}
+                    bg-[rgba(247,247,246,1)] cursor-pointer ${
+                      !isCurrentSizeVariant(originalIndex) ? "dimmed" : ""
+                    }`}
                         onClick={() => handleColorClick(originalIndex)}
                       >
                         <img
-                          src={`https://backkk.stroybazan1.uz${variant.image || productData.image}`}
+                          src={`https://backkk.stroybazan1.uz${
+                            variant.image || productData.image
+                          }`}
                           alt={variant.color_uz}
                           className="object-contain w-full h-full"
                         />
                       </div>
-                    )
+                    );
                   })}
               </div>
             </div>
@@ -629,14 +725,19 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
 
           <div className="size-div mt-[20px] max-w-full">
             <h1 className="font-inter font-[400] text-[13px] leading-[22px] text-black">
-              {getTranslatedUnit(productData[`units_${lang}`])}: <span className="font-[500]">{selectedSize}</span>
+              {getTranslatedUnit(productData[`units_${lang}`])}:{" "}
+              <span className="font-[500]">{selectedSize}</span>
             </h1>
             <div className="sizes flex flex-wrap gap-[10px] mt-[7px] transition-all duration-300 cursor-pointer max-w-full">
               {uniqueSizes.map((sizeObj, index) => (
                 <div
                   key={index}
                   className={`active:scale-[99%] transition-all duration-200 flex justify-center items-center px-2 min-w-[62px] flex-shrink-0 h-[62px] rounded-[5px] 
-        ${selectedIndex === index ? "border-[rgba(190,160,134,1)] border-[1.5px]" : "border-transparent"} 
+        ${
+          selectedIndex === index
+            ? "border-[rgba(190,160,134,1)] border-[1.5px]"
+            : "border-transparent"
+        } 
         bg-[rgba(247,247,246,1)]`}
                   onClick={() => handleSizeClick(sizeObj.size, index)}
                 >
@@ -655,43 +756,58 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
           </div>
 
           <div className="term-payment mt-[20px]">
-            <div className="flex flex-col justify-between w-full py-[10px] px-[12px] h-[87px] rounded-[8px] border-[1px] border-[rgba(213,213,213,1)] bg-[rgba(242,242,241,1)]">
-              <div className="w-full h-[26px] rounded-[5px] flex justify-between gap-[3.75px] bg-[rgba(213,213,213,1)]">
+            <div className="flex flex-col mt-8 justify-between w-full py-[11px] px-[14px] h-[94px] rounded-[8px] border-[1px] border-[rgba(213,213,213,1)] bg-[rgba(242,242,241,1)]">
+              <div className="w-full h-[30px] rounded-[5px] flex justify-between gap-[3.75px] bg-[rgba(213,213,213,1)]">
                 {paymentOptions[lang].map((option, index) => (
                   <div
                     key={index}
-                    className={`transition-all duration-100 flex justify-center items-center w-[80px] h-[26px] rounded-[5px] cursor-pointer ${
-                      selectedPaymentIndex === index ? "bg-white border-[1.5px] border-[rgba(190,160,134,1)]" : ""
+                    className={`transition-all duration-100 flex justify-center items-center w-[80px] h-[30px] rounded-[5px] cursor-pointer ${
+                      selectedPaymentIndex === index
+                        ? "bg-white border-[1.5px] border-[rgba(190,160,134,1)]"
+                        : ""
                     }`}
                     onClick={() => handlePaymentClick(index)}
                   >
-                    <h1 className="font-inter font-[500] text-[10px] text-black">{option}</h1>
+                    <h1 className="font-inter font-[500] text-[14px] text-black">
+                      {option}
+                    </h1>
                   </div>
                 ))}
               </div>
+
               <div className="flex gap-[10px] items-center">
-                <h1 className="w-[89px] h-[28px] rounded-[2.5px] bg-[rgba(254,242,157,1)] font-inter font-[500] text-[13px] leading-[22px] flex justify-center items-center">
+                <h1 className="w-auto h-[28px] px-3 rounded-[4px] bg-[rgba(254,242,157,1)] font-inter font-[500] text-[14px] leading-[22px] flex justify-center items-center">
                   {monthlyPayments[selectedPaymentIndex]} {uzs_lang}
                 </h1>
-                <h1 className="font-inter font-[500] text-[10px] leading-[22px] text-black">
-                  x {paymentOptions[lang][selectedPaymentIndex]}
+                <h1 className="font-inter font-[500] text-[14px] leading-[22px] text-black">
+                  x {plans[selectedPaymentIndex].months}{" "}
+                  {lang === "uz"
+                    ? "oy"
+                    : lang === "en"
+                    ? "month"
+                    : lang === "ru"
+                    ? "мес."
+                    : "oy"}
                 </h1>
               </div>
             </div>
 
-            <p className="mt-[10px] w-[318px] font-inter font-[400] text-[15px] leading-[22px] text-[rgba(0,0,0,0.75)]">
+            <p className="mt-[10px] w-[318px] font-inter font-[400] sm:ml-3 text-[15px] leading-[22px] text-[rgba(0,0,0,0.75)]">
               {lang == "uz"
-                ? "Siz buyurtmani 3 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."
+                ? "Siz buyurtmani 6 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."
                 : lang == "en"
-                  ? "You can pay for your order for 3 months to 24 months."
-                  : lang == "ru"
-                    ? "Вы можете оплатить заказ на 3 месяца до 24 месяцев."
-                    : "Siz buyurtmani 3 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."}
+                ? "You can pay for your order for 6 months to 24 months."
+                : lang == "ru"
+                ? "Вы можете оплатить заказ на 6 месяца до 24 месяцев."
+                : "Siz buyurtmani 6 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."}
             </p>
 
             <div className="payment-options p-[20px] mt-[20px] w-full h-fit rounded-[10px] border-[1px] border-[rgba(213,213,213,1)]">
               <h1 className="font-inter font-[400] text-[15px] leading-[22px] text-[rgba(0,0,0,0.75)]">
-                {t_term.deliveryTitle} <span className="font-inter font-[700]">{t_term.deliveryHighlight1}</span>{" "}
+                {t_term.deliveryTitle}{" "}
+                <span className="font-inter font-[700]">
+                  {t_term.deliveryHighlight1}
+                </span>{" "}
                 {lang == "uz" ? "ichida." : "."} {t_term.deliveryHighlight2}
               </h1>
 
@@ -714,17 +830,17 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
                     ? lang == "uz"
                       ? "Qo'shildi ✅"
                       : lang == "en"
-                        ? "Added ✅"
-                        : lang == "ru"
-                          ? "Добавлено ✅"
-                          : "Qo'shildi ✅"
+                      ? "Added ✅"
+                      : lang == "ru"
+                      ? "Добавлено ✅"
+                      : "Qo'shildi ✅"
                     : lang == "uz"
-                      ? "Savatchaga qo'shish"
-                      : lang == "en"
-                        ? "Add to cart"
-                        : lang == "ru"
-                          ? "Добавить в корзину"
-                          : "Savatchaga qo'shish"
+                    ? "Savatchaga qo'shish"
+                    : lang == "en"
+                    ? "Add to cart"
+                    : lang == "ru"
+                    ? "Добавить в корзину"
+                    : "Savatchaga qo'shish"
                   : ""}
               </button>
               {isAnimating && (
@@ -737,7 +853,7 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Product
+export default Product;

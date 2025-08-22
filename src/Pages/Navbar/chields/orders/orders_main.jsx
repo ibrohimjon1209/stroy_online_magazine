@@ -29,6 +29,10 @@ const Orders_main = ({ lang }) => {
     } catch (err) {}
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem("order_created", "false");
+  }, []);
+
   const get_product = async (id) => {
     try {
       const res = await fetch(
