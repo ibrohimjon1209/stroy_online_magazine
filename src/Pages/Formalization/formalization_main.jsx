@@ -1,14 +1,14 @@
 "use client";
 
-import { Check, ChevronLeft, ChevronRight, Info, User } from "lucide-react";
-import { Link, Navigate } from "react-router-dom";
+import { Check, ChevronLeft, ChevronRight, User } from "lucide-react";
+import { Link } from "react-router-dom";
 import arrive_icon from "./imgs/arrive_icon.png";
 import cash_icon from "./imgs/cash_icon.png";
-import payment_time from "./imgs/payment_time.png";
+import payment_time from "./imgs/open.png";
 import on_arrive from "./imgs/on_arrive.png";
 import pay_me from "./imgs/pay_me.png";
 import click from "./imgs/click.png";
-import alif_icon from "./imgs/alif.png";
+import open_icon from "./imgs/open.png";
 import Modal from "./modal";
 import { useEffect, useState } from "react";
 import Delivery from "../Map/map_main";
@@ -17,19 +17,6 @@ import Pickup_address from "../pickup_address/pickup_address_main";
 import { get_user } from "../../Services/auth/get_user";
 import axios from "axios";
 import { order_create } from "../../Services/auth/create_order";
-
-// CSS for vibration animation
-const vibrateAnimation = {
-  animation: "vibrate 0.3s linear",
-  "@keyframes vibrate": {
-    "0%": { transform: "translateX(0)" },
-    "20%": { transform: "translateX(-2px)" },
-    "40%": { transform: "translateX(2px)" },
-    "60%": { transform: "translateX(-2px)" },
-    "80%": { transform: "translateX(2px)" },
-    "100%": { transform: "translateX(0)" },
-  },
-};
 
 const Formalization_main = ({
   basket,
@@ -42,6 +29,7 @@ const Formalization_main = ({
   set_formalization_open,
   setUserSignIn,
   set_is_SI,
+  set_basket,
 }) => {
   const [userData, setUserData] = useState({ name: "...", phone: "..." });
   const [deliver_type, set_deliver_type] = useState("pickup");
@@ -54,20 +42,25 @@ const Formalization_main = ({
   const [address_inform, set_address_inform] = useState(null);
   const [cashbackAmount, setCashbackAmount] = useState(0);
   const [isVibrating, setIsVibrating] = useState(false);
+  const [selectedPaymentIndex, setSelectedPaymentIndex] = useState(3);
   const [notification, setNotification] = useState("");
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
+  const [modal_method, set_modal_method] = useState("cash");
+  const paymentOptions = {
+    uz: ["6 oy", "12 oy", "15 oy", "18 oy", "24 oy"],
+    en: ["6 months", "12 months", "15 months", "18 months", "24 months"],
+    ru: ["6 месяцев", "12 месяцев", "15 месяцев", "18 месяцев", "24 месяцев"],
+  };
   const totalPrice = basket
     .filter((item) => item.selected)
     .reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   let payable = totalPrice - cashbackAmount;
 
-  // Agar cashback jami narxni qoplab yuborsa
   if (payable <= 0) {
     payable = 0;
   }
 
-  // Agar cashback ishlatganda < 1000 qolib ketayotgan bo‘lsa
   if (payable > 0 && payable < 1000) {
     payable = 1000;
   }
@@ -146,12 +139,28 @@ const Formalization_main = ({
       ? "Выберите адрес доставки"
       : "Yetkazib berish manzilini tanlang";
 
+  const handlePaymentClick = (index) => {
+    setSelectedPaymentIndex(index);
+  };
+
+  const plans = [
+    { months: 6, percent: 26 },
+    { months: 12, percent: 42 },
+    { months: 15, percent: 50 },
+    { months: 18, percent: 56 },
+    { months: 24, percent: 75 },
+  ];
+
+  const monthlyPayments = plans.map(({ months, percent }) => {
+    const priceWithPercent = totalPrice + (totalPrice * percent) / 100;
+    return Math.ceil(priceWithPercent / months);
+  });
+
   const refreshToken = async () => {
     try {
       const refreshToken = localStorage.getItem("refreshToken");
       if (!refreshToken) throw new Error("No refresh token available");
 
-      // Replace with your actual refresh endpoint
       const response = await axios.post(
         "https://backkk.stroybazan1.uz/api/token/refresh/",
         {
@@ -219,11 +228,16 @@ const Formalization_main = ({
       console.log("[v0] Payment API response:", response.data);
 
       if (response.data && response.data.payment_link) {
+        const paymentToken = `payment_${Date.now()}_${Math.random()
+          .toString(36)
+          .substr(2, 9)}`;
+        localStorage.setItem("online_payment", "true");
+        localStorage.setItem("payment_token", paymentToken);
+
         console.log(
           "[v0] Redirecting to payment link:",
           response.data.payment_link
         );
-        // Redirect to payment link
         window.location.href = response.data.payment_link;
       } else {
         console.log("[v0] No payment_link found in response");
@@ -278,9 +292,6 @@ const Formalization_main = ({
       console.log("[v0] handleOrderCreation called");
       console.log("[v0] selectedMethod:", selectedMethod);
 
-      set_is_modal_open(true);
-
-      // Call existing order creation function
       console.log("[v0] Calling order_create...");
       const orderResult = await order_create(
         localStorage.getItem("accessToken"),
@@ -300,7 +311,6 @@ const Formalization_main = ({
         orderResult?.orderId ||
         orderResult?.pk;
 
-      // If order was created successfully and payment method is payme or click
       if (
         orderId &&
         (selectedMethod === "payme" || selectedMethod === "click")
@@ -308,6 +318,14 @@ const Formalization_main = ({
         console.log("[v0] Order created successfully, processing payment...");
         await processPayment(orderId);
       } else {
+        if (orderId) {
+          const updatedProducts = basket.filter((item) => !item.selected);
+          set_basket(updatedProducts);
+          localStorage.setItem("basket", JSON.stringify(updatedProducts));
+
+          set_modal_method(selectedMethod == "qabul" ? "cash" : selectedMethod);
+          set_is_modal_open(true);
+        }
         console.log(
           "[v0] Order creation failed or payment method is not payme/click"
         );
@@ -342,7 +360,6 @@ const Formalization_main = ({
 
   return (
     <div className="flex flex-col w-full h-full mb-17 sm:mb-0">
-      {/* Notification Popup */}
       {isNotificationVisible && notification && (
         <div className="absolute z-50 top-15 left-1/2 transform border-[2px] border-red-500 bg-red-100 -translate-x-1/2 w-[90%] sm:w-[400px] scale-[130%] text-red-800 rounded-lg shadow-lg p-4 flex items-center justify-between">
           <span className="font-inter font-[500] text-[16px] text-black">
@@ -440,7 +457,14 @@ const Formalization_main = ({
                       <div>
                         <h3>{item.name[lang]}</h3>
                         <p className="mt-[15px] sm:mt-[25px]">
-                          {item.price} {uzs_lang}
+                          {item.price}{" "}
+                          {lang === "uz"
+                            ? "so'm"
+                            : lang === "en"
+                            ? "uzs"
+                            : lang === "ru"
+                            ? "сум"
+                            : "so'm"}
                         </p>
                       </div>
                       <p>
@@ -492,7 +516,33 @@ const Formalization_main = ({
                 : "Yetkazib berish"}
             </button>
           </div>
-          <div className="border border-[#D5D5D5] rounded-lg mb-4 mt-[25px] sm:mt-[35px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300">
+          <div
+            className={`border border-[#D5D5D5] rounded-lg mb-4 mt-[25px] sm:mt-[35px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300 ${
+              isVibrating ? "animate-[vibrate_0.3s_linear]" : ""
+            }`}
+          >
+            <style jsx>{`
+              @keyframes vibrate {
+                0% {
+                  transform: translateX(0);
+                }
+                20% {
+                  transform: translateX(-2px);
+                }
+                40% {
+                  transform: translateX(2px);
+                }
+                60% {
+                  transform: translateX(-2px);
+                }
+                80% {
+                  transform: translateX(2px);
+                }
+                100% {
+                  transform: translateX(0);
+                }
+              }
+            `}</style>
             <div
               onClick={() =>
                 deliver_type === "pickup"
@@ -533,7 +583,6 @@ const Formalization_main = ({
             className={`border overflow-hidden border-[#D5D5D5] rounded-lg mb-4 mt-[20px] sm:mt-[30px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300 ${
               isVibrating ? "animate-[vibrate_0.3s_linear]" : ""
             }`}
-            style={isVibrating ? { animation: "vibrate 0.3s linear" } : {}}
           >
             <style jsx>{`
               @keyframes vibrate {
@@ -582,7 +631,14 @@ const Formalization_main = ({
                     cashbackAmount < 1000 ? "text-red-500 font-bold" : ""
                   }`}
                 >
-                  {cashbackAmount.toLocaleString()} {uzs_lang}
+                  {cashbackAmount.toLocaleString()}{" "}
+                  {lang === "uz"
+                    ? "so'm"
+                    : lang === "en"
+                    ? "uzs"
+                    : lang === "ru"
+                    ? "сум"
+                    : "so'm"}
                 </span>
                 <div
                   className={`${
@@ -641,8 +697,8 @@ const Formalization_main = ({
                   <div className="flex items-center gap-3">
                     <img
                       src={pay_me || "/placeholder.svg"}
-                      className="object-contain w-7 h-7 sm:w-8 sm:h-8"
                       alt="Payme"
+                      className="object-contain w-7 h-7 sm:w-8 sm:h-8"
                     />
                     <span className="font-inter font-[600] text-[16px] leading-[22px] text-black">
                       Pay me
@@ -724,11 +780,9 @@ const Formalization_main = ({
               <div className="border border-[#D5D5D5] rounded-lg w-full sm:w-[90%] p-[20px] sm:p-[27px] bg-white">
                 <div className="flex items-center justify-between mb-5 sm:mb-6">
                   <div className="flex flex-row gap-3">
-                    <img
-                      src={alif_icon || "/placeholder.svg"}
-                      className="w-10 h-10 object-contain rounded-[5px]"
-                      alt=""
-                    />
+                    <div className="w-10 h-10 object-contain rounded-[5px]">
+                      <img src={open_icon} alt="open" />
+                    </div>
                     <div className="flex flex-col h-[30px] -mt-[2px]">
                       <span className="font-inter font-[500] text-[14px] sm:text-[16px] leading-[22px] text-black">
                         {lang === "uz"
@@ -740,11 +794,11 @@ const Formalization_main = ({
                           : "Muddatli to'lov turi"}
                       </span>
                       <span className="font-inter font-[600] text-[14px] sm:text-[16px] leading-[22px] text-black">
-                        Alif
+                        Open
                       </span>
                     </div>
                   </div>
-                  <div
+                  {/* <div
                     onClick={() => set_is_payment_variant(true)}
                     className="cursor-pointer hover:underline font-inter font-[600] text-[14px] sm:text-[16px] leading-[22px] text-[#000000BF]"
                   >
@@ -755,41 +809,47 @@ const Formalization_main = ({
                       : lang === "ru"
                       ? "Редактировать"
                       : "Taxrirlash"}
-                  </div>
+                  </div> */}
                 </div>
-                <hr className="border-[#D5D5D5]" />
-                <div className="mt-4 sm:mt-5 flex flex-col gap-5 sm:gap-[46px] font-inter font-[600] text-[16px] leading-[22px] text-[#000000BF]">
-                  <div className="flex items-center justify-between">
-                    <span>
-                      {lang === "uz"
-                        ? "Oylik to'lov"
-                        : lang === "en"
-                        ? "Monthly payment"
-                        : lang === "ru"
-                        ? "Ежемесячный платеж"
-                        : "Oylik to'lov"}
-                    </span>
-                    <span>119.250 {uzs_lang}</span>
+                <hr className="border-[#D5D5D5] border-[1.5px] rounded-full" />
+                <div className="flex flex-col mt-8 justify-between w-full py-[10px] px-[12px] h-[87px] rounded-[8px] border-[1px] border-[rgba(213,213,213,1)] bg-[rgba(242,242,241,1)]">
+                  {/* Payment options */}
+                  <div className="w-full h-[26px] rounded-[5px] flex justify-between gap-[3.75px] bg-[rgba(213,213,213,1)]">
+                    {paymentOptions[lang].map((option, index) => (
+                      <div
+                        key={index}
+                        className={`transition-all duration-100 flex justify-center items-center w-[80px] h-[26px] rounded-[5px] cursor-pointer ${
+                          selectedPaymentIndex === index
+                            ? "bg-white border-[1.5px] border-[rgba(190,160,134,1)]"
+                            : ""
+                        }`}
+                        onClick={() => handlePaymentClick(index)}
+                      >
+                        <h1 className="font-inter font-[500] text-[10px] text-black">
+                          {option}
+                        </h1>
+                      </div>
+                    ))}
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span>
+
+                  {/* Calculation */}
+                  <div className="flex gap-[10px] items-center">
+                    <h1 className="font-inter font-[500] text-[12px] text-black">
+                      {totalPrice} + {plans[selectedPaymentIndex].percent}%
+                    </h1>
+                    <h1 className="w-[89px] h-[28px] rounded-[2.5px] bg-[rgba(254,242,157,1)] font-inter font-[500] text-[13px] leading-[22px] flex justify-center items-center">
+                      {monthlyPayments[selectedPaymentIndex]} {uzs_lang}
+                    </h1>
+                    <h1 className="font-inter font-[500] text-[10px] leading-[22px] text-black">
+                      x {plans[selectedPaymentIndex].months}{" "}
                       {lang === "uz"
-                        ? "Muddatli to'lov"
+                        ? "oy"
                         : lang === "en"
-                        ? "Installment"
+                        ? "month"
                         : lang === "ru"
-                        ? "Рассрочка"
-                        : "Muddatli to'lov"}
-                    </span>
-                    <span>
-                      {lang === "uz"
-                        ? "12 oy"
-                        : lang === "en"
-                        ? "12 months"
-                        : lang === "ru"
-                        ? "12 месяцев"
-                        : "12 oy"}
-                    </span>
+                        ? "мес."
+                        : "oy"}
+                    </h1>
                   </div>
                 </div>
               </div>
@@ -823,7 +883,13 @@ const Formalization_main = ({
                     .filter((item) => item.selected)
                     .reduce((sum, item) => sum + item.price * item.quantity, 0)
                     .toLocaleString()}{" "}
-                  {uzs_lang}
+                  {lang === "uz"
+                    ? "so'm"
+                    : lang === "en"
+                    ? "uzs"
+                    : lang === "ru"
+                    ? "сум"
+                    : "so'm"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -838,35 +904,16 @@ const Formalization_main = ({
                 </span>
                 <span>
                   {(cashback_is_using && cashbackAmount) || 0}
-                  {` `} {uzs_lang}
+                  {` `}{" "}
+                  {lang === "uz"
+                    ? "so'm"
+                    : lang === "en"
+                    ? "uzs"
+                    : lang === "ru"
+                    ? "сум"
+                    : "so'm"}
                 </span>
               </div>
-              {/* <div className="flex items-center justify-between">
-                <span>
-                  {lang === "uz"
-                    ? "Muddatli to'lov"
-                    : lang === "en"
-                      ? "Installment"
-                      : lang === "ru"
-                        ? "Рассрочка"
-                        : "Muddatli to'lov"}
-                </span>
-                <span>
-                  {lang === "uz" ? "12 oy" : lang === "en" ? "12 months" : lang === "ru" ? "12 месяцев" : "12 oy"}
-                </span>
-              </div> */}
-              {/* <div className="flex items-center justify-between">
-                <span>
-                  {lang === "uz"
-                    ? "Muddatli to'lov"
-                    : lang === "en"
-                      ? "Installment"
-                      : lang === "ru"
-                        ? "Рассрочка"
-                        : "Muddatli to'lov"}
-                </span>
-                <span>0 {uzs_lang}</span>
-              </div> */}
               <hr className="border-[#D5D5D5] border-[1.5px] my-[23px]" />
               <div className="flex sm:text-[20px] font-[700] text-[16px] justify-between items-center">
                 <span>
@@ -878,35 +925,23 @@ const Formalization_main = ({
                     ? "Итого"
                     : "Jami"}
                 </span>
-                {/* <span>
-                  {selectedMethod === "installment"
-                    ? (
-                        basket
-                          .filter((item) => item.selected)
-                          .reduce((sum, item) => sum + item.price * item.quantity, 0) * 1
-                      ).toLocaleString()
-                    : basket
-                        .filter((item) => item.selected)
-                        .reduce((sum, item) => sum + item.price * item.quantity, 0)
-                        .toLocaleString()}{" "}
-                  {uzs_lang}
-                </span> */}
                 <span>
                   {(cashback_is_using && payable.toLocaleString()) ||
                     totalPrice}{" "}
-                  {uzs_lang}
+                  {lang === "uz"
+                    ? "so'm"
+                    : lang === "en"
+                    ? "uzs"
+                    : lang === "ru"
+                    ? "сум"
+                    : "so'm"}
                 </span>
               </div>
             </div>
-            <div className="flex flex-row gap-3 bg-blue-100 text-[19px] items-center rounded-xl py-3 px-5 w-full text-blue-950">
-              <Info />
-              Operator etkazib berish sanasi va manzilini aniqlashtirish uchun
-              siz bilan bog'lanadi
-            </div>
             <Link
-              to={selectedMethod == "installment" ? "/installment" : ""}
+              to={selectedMethod === "installment" ? "/installment" : ""}
               onClick={
-                selectedMethod == "installment"
+                selectedMethod === "installment"
                   ? handleInstallment
                   : handleOrderCreation
               }
@@ -951,6 +986,7 @@ const Formalization_main = ({
         <Modal
           is_modal_open={is_modal_open}
           set_is_modal_open={set_is_modal_open}
+          method={modal_method}
         />
       </div>
       <Delivery
