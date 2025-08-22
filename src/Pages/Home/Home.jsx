@@ -287,7 +287,7 @@ function Home({ lang, setSearchText, searchText }) {
 
       <Carusel />
 
-      <div className="popular w-full px-[15px] sm:px-[77px] mb-[50px]">
+      <div className="popular mt-[60px] w-full px-[15px] sm:px-[77px] mb-[50px]">
         <h1 className="text-[17px] sm:text-[22px] font-semibold mt-3">
           {lang === "uz"
             ? "Ommabop tavarlar"
@@ -306,7 +306,7 @@ function Home({ lang, setSearchText, searchText }) {
             filteredProducts.map((product, index) => (
               <div key={index} className="cursor-pointer">
                 <Link to={`/product/${product.id}`}>
-                  <div className="rounded-[10px] w-[160px] h-[160px] sm:w-[245px] sm:h-[245px] bg-[#F2F2F1] overflow-hidden group">
+                  <div className=" pt-[312px]rounded-[10px] w-[160px] h-[160px] sm:w-[245px] sm:h-[245px] bg-[#F2F2F1] overflow-hidden group">
                     <img
                       src={`https://backkk.stroybazan1.uz/${product.image}`}
                       className="object-cover w-full h-full transition-transform group-hover:scale-105"

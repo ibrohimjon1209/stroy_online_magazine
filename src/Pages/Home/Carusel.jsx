@@ -16,8 +16,8 @@ export default function KitchenCarousel() {
     localStorage.getItem("sl_option_nav") == "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") == "Giaz Mebel"
-      ? 1
-      : 2;
+        ? 1
+        : 2;
 
   useEffect(() => {
     const handleResize = () => setSmallScreen(window.innerWidth < 768);
@@ -33,7 +33,7 @@ export default function KitchenCarousel() {
           setSlides(res.filter((item) => {
             return item.branch == sl_option_id;
           }));
-          
+
         } else {
           console.error("Invalid data format", res);
         }
@@ -66,40 +66,44 @@ export default function KitchenCarousel() {
   const extendedSlides = [slides[slides.length - 1], ...slides, slides[0]];
 
   return (
-    <div className="relative w-full h-auto mx-auto overflow-hidden mt-[20px] sm:h-[425px]">
-      <div
-        className="flex transition-transform duration-500 ease-in-out"
-        style={{
-          transform: smallScreen
-            ? `translateX(calc(-${(currentSlide + 1) * 100.5}% + 4.5%))`
-            : `translateX(calc(-${(currentSlide + 1) * 80}% + 10%))`,
-        }}
-      >
-        {extendedSlides.map((item, index) => (
-          <div
-            key={index}
-            className="relative flex-shrink-0 w-full px-1 sm:w-4/5 sm:px-2"
-          >
-            <div className="relative w-[94%] h-[190px] sm:w-[100%] sm:h-[390px]">
-              <div
-                className={`absolute inset-0 bg-gray-200 rounded-[10px] sm:rounded-[0px] transition-opacity duration-300 ${
-                  loadedImages[index] ? "opacity-0" : "opacity-100"
-                }`}
-              />
+    <div className="relative w-full h-auto mx-auto mt-[20px] sm:h-[425px]">
+      <div className="relative w-full h-auto mx-auto overflow-hidden mt-[20px] sm:h-[425px]">
+        <div
+          className="flex transition-transform duration-500 ease-in-out"
+          style={{
+            transform: smallScreen
+              ? `translateX(calc(-${(currentSlide + 1) * 100.5}% + 4.5%))`
+              : `translateX(calc(-${(currentSlide + 1) * 80}% + 10%))`,
+          }}
+        >
+          {extendedSlides.map((item, index) => (
+            <div
+              key={index}
+              className="relative flex-shrink-0 w-full px-1 sm:w-4/5 sm:px-2"
+            >
+              <div className="relative w-[94%] h-[190px] sm:w-[92%] sm:h-[490px]">
+                <div
+                  className={`absolute inset-0 bg-gray-200 rounded-[10px] sm:rounded-[0px] transition-opacity duration-300 ${loadedImages[index] ? "opacity-0" : "opacity-100"
+                    }`}
+                />
 
-              <img
-                src={`https://backkk.stroybazan1.uz${item.image}`}
-                className="w-full h-full object-fill rounded-[10px] sm:rounded-[0px]"
-                alt=""
-                onLoad={() => handleImageLoad(index)}
-                style={{ opacity: loadedImages[index] ? 1 : 0 }}
-              />
+                <img
+                  src={`https://backkk.stroybazan1.uz${item.image}`}
+                  className="w-full h-full object-fill rounded-[10px] sm:rounded-[0px]"
+                  alt=""
+                  onLoad={() => handleImageLoad(index)}
+                  style={{ opacity: loadedImages[index] ? 1 : 0 }}
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+
+
       </div>
 
-      <div className="absolute hidden space-x-1 -translate-x-1/2 bottom-2 left-1/2 sm:flex sm:bottom-1 sm:space-x-2">
+
+      <div className="absolute hidden space-x-2 -translate-x-1/2 bottom-2 left-1/2 sm:flex sm:-bottom-6 sm:space-x-2">
         {slides.map((_, index) => (
           <button
             key={index}
@@ -113,6 +117,7 @@ export default function KitchenCarousel() {
           />
         ))}
       </div>
+
     </div>
   );
 }
