@@ -73,7 +73,7 @@ export default function KitchenCarousel() {
           style={{
             transform: smallScreen
               ? `translateX(calc(-${(currentSlide + 1) * 100.5}% + 4.5%))`
-              : `translateX(calc(-${(currentSlide + 1) * 80}% + 10%))`,
+              : `translateX(calc(-${(currentSlide + 1) * 78.5}% + 10%))`,
           }}
         >
           {extendedSlides.map((item, index) => (

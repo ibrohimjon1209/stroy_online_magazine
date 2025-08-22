@@ -309,13 +309,13 @@ function Home({ lang, setSearchText, searchText }) {
                   <div className=" pt-[312px]rounded-[10px] w-[160px] h-[160px] sm:w-[245px] sm:h-[245px] bg-[#F2F2F1] overflow-hidden group">
                     <img
                       src={`https://backkk.stroybazan1.uz/${product.image}`}
-                      className="object-cover w-full h-full transition-transform group-hover:scale-105"
+                      className="object-cover w-full h-full transition-transform max group-hover:scale-105"
                       alt={product[`name_${lang}`]}
                     />
                   </div>
                   <div className="flex flex-row items-end w-[165px] sm:w-[245px] justify-between mt-1.5 px-3">
                     <div className="flex flex-col sm:gap-1">
-                      <h1 className="text-black truncate font-semibold text-[14px] sm:text-[16px]">
+                      <h1 className="text-black truncate max-w-[170px] font-semibold text-[14px] sm:text-[16px]">
                         {product[`name_${lang}`]}
                       </h1>
                       <p className="text-black text-[12px] sm:text-[14px]">
