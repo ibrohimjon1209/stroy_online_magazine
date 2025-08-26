@@ -57,8 +57,8 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
     localStorage.getItem("sl_option_nav") == "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") == "Giaz Mebel"
-      ? 1
-      : 2;
+        ? 1
+        : 2;
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -241,8 +241,8 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                   sl_option == "Stroy Baza №1"
                     ? logo1
                     : sl_option == "Giaz Mebel"
-                    ? logo2
-                    : logo3
+                      ? logo2
+                      : logo3
                 }
                 alt="Logo"
                 className="cursor-pointer w-7 h-7"
@@ -269,25 +269,27 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                 sl_option == "Stroy Baza №1"
                   ? logo1
                   : sl_option == "Giaz Mebel"
-                  ? logo2
-                  : logo3
+                    ? logo2
+                    : logo3
               }
               alt="Logo"
               className="cursor-pointer"
               onClick={to_home}
             />
-            <h1
-              className="font-inter font-[600] text-[20px] cursor-pointer leading-[22px] text-black"
-              onClick={to_home}
-            >
-              {sl_option}
-            </h1>
+            {(sl_option === "Stroy Baza №1" || sl_option === "Giaz Mebel") && (
+              <h1
+                className="font-inter font-[600] text-[20px] cursor-pointer leading-[22px] text-black"
+                onClick={to_home}
+              >
+                {sl_option}
+              </h1>
+            )}
+
           </div>
 
           <div
-            className={`${
-              isMobileMenuOpen ? "flex" : "hidden"
-            } md:hidden flex-col w-full gap-4 mt-4`}
+            className={`${isMobileMenuOpen ? "flex" : "hidden"
+              } md:hidden flex-col w-full gap-4 mt-4`}
           >
             <div className="flex items-center justify-between gap-2">
               <div
@@ -302,16 +304,14 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
 
               <div className="relative w-[calc(100%-120px)]">
                 <div
-                  className={`w-full h-[40px] bg-white ${
-                    isOpen ? "rounded-t-[5px]" : "rounded-[5px]"
-                  } flex items-center justify-between pl-2 pr-2 cursor-pointer`}
+                  className={`w-full h-[40px] bg-white ${isOpen ? "rounded-t-[5px]" : "rounded-[5px]"
+                    } flex items-center justify-between pl-2 pr-2 cursor-pointer`}
                   onClick={toggleDropdown}
                 >
                   <span className="truncate">{selectedOption.name}</span>
                   <ChevronDown
-                    className={`transition-transform duration-300 ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
+                    className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""
+                      }`}
                   />
                 </div>
                 {isOpen && (
@@ -338,10 +338,10 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                   lang == "uz"
                     ? "Qidiruv"
                     : lang == "en"
-                    ? "Search"
-                    : lang == "ru"
-                    ? "Поиск"
-                    : "Qidiruv"
+                      ? "Search"
+                      : lang == "ru"
+                        ? "Поиск"
+                        : "Qidiruv"
                 }
                 className="w-full placeholder:font-inter placeholder:font-[500] placeholder:text-[15px] placeholder:text-[#737373] border-none pl-[15px] pr-[20px] focus:outline-none focus:ring-0 font-inter font-[500] text-[15px]"
                 ref={inputRef}
@@ -369,7 +369,15 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
               >
                 <Menu strokeWidth={1.5} color="white" />
                 <h1 className="font-inter font-[500] text-[13px] text-white uppercase">
-                  Katolog
+                  {
+                    lang == "uz"
+                      ? "Katalog"
+                      : lang == "en"
+                        ? "Category"
+                        : lang == "ru"
+                          ? "Каталог" 
+                          : "Katalog"
+                  }
                 </h1>
               </div>
 
@@ -379,11 +387,10 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                   onClick={handleClickOutside_category}
                 >
                   <div
-                    className={`search_modal w-[600px] h-[450px] bg-white border-[1px] overflow-auto border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${
-                      categoryAnimation
-                        ? "dropdown-enter-active"
-                        : "dropdown-enter"
-                    }`}
+                    className={`search_modal w-[600px] h-[450px] bg-white border-[1px] overflow-auto border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${categoryAnimation
+                      ? "dropdown-enter-active"
+                      : "dropdown-enter"
+                      }`}
                     onClick={(e) => e.stopPropagation()}
                   >
                     {isLoading ? (
@@ -426,10 +433,10 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                   lang == "uz"
                     ? "Qidiruv"
                     : lang == "en"
-                    ? "Search"
-                    : lang == "ru"
-                    ? "Поиск"
-                    : "Qidiruv"
+                      ? "Search"
+                      : lang == "ru"
+                        ? "Поиск"
+                        : "Qidiruv"
                 }
                 className="w-full placeholder:font-inter placeholder:font-[500] placeholder:text-[15px] placeholder:text-[#737373] border-none pl-[15px] pr-[20px] focus:outline-none focus:ring-0 font-inter font-[500] text-[15px]"
                 ref={inputRef}
@@ -456,9 +463,8 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                 onClick={handleClickOutside_search}
               >
                 <div
-                  className={`search_modal w-[520px] h-fit ml-[160px] bg-white border-[1px] overflow-hidden border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${
-                    searchAnimation ? "dropdown-enter-active" : "dropdown-enter"
-                  }`}
+                  className={`search_modal w-[520px] h-fit ml-[160px] bg-white border-[1px] overflow-hidden border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${searchAnimation ? "dropdown-enter-active" : "dropdown-enter"
+                    }`}
                   onClick={(e) => e.stopPropagation()}
                 >
                   {search_topics.length > 0 ? (
@@ -490,10 +496,10 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                         {lang == "uz"
                           ? "Qidiruv tarixi bo'm bo'sh"
                           : lang == "en"
-                          ? "Search history is empty"
-                          : lang == "ru"
-                          ? "История поиска пуста"
-                          : "Qidiruv tarixi bo'm bo'sh"}
+                            ? "Search history is empty"
+                            : lang == "ru"
+                              ? "История поиска пуста"
+                              : "Qidiruv tarixi bo'm bo'sh"}
                       </h1>
                     </div>
                   )}
@@ -502,16 +508,14 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
             )}
             <div className="relative w-[206px]">
               <div
-                className={`w-full h-[40px] bg-white ${
-                  isOpen ? "rounded-t-[5px]" : "rounded-[5px]"
-                } flex items-center justify-between pl-2 pr-2 cursor-pointer`}
+                className={`w-full h-[40px] bg-white ${isOpen ? "rounded-t-[5px]" : "rounded-[5px]"
+                  } flex items-center justify-between pl-2 pr-2 cursor-pointer`}
                 onClick={toggleDropdown}
               >
                 <span>{selectedOption.name}</span>
                 <ChevronDown
-                  className={`transition-transform duration-300 ${
-                    isOpen ? "rotate-180" : ""
-                  }`}
+                  className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""
+                    }`}
                 />
               </div>
               {isOpen && (
@@ -552,7 +556,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                 />
                 {localStorage.getItem("order_created") == "true" && (
                   <span className="absolute flex items-center justify-center w-4.5 h-4.5 text-xs font-bold text-white bg-red-500 rounded-full -top-2 -right-2">
-                   1 
+                    1
                   </span>
                 )}
               </div>

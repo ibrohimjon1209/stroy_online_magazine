@@ -78,7 +78,7 @@ function Home({ lang, setSearchText, searchText }) {
   const [loading, setLoading] = useState(true)
   const [search_topics, setSearchTopics] = useState(getStoredTopics())
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(5)
+  const [itemsPerPage] = useState(10)
   const [likedProducts, setLikedProducts] = useState(() => {
     try {
       const savedLikes = localStorage.getItem("likedProducts")

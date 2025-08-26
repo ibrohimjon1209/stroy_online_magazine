@@ -1,9 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import product_1 from "./Images/product_1.svg";
-import product_2 from "./Images/product_2.webp";
-import product_3 from "./Images/product_3.png";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -19,7 +16,6 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
   const [notification, setNotification] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [selectedImage, setSelectedImage] = useState(product_1);
   const [slideDirection, setSlideDirection] = useState("");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [uniqueSizes, setUniqueSizes] = useState([]);
@@ -32,13 +28,11 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
       : lang == "ru"
       ? "сум"
       : "so'm";
-  const productImages = [product_1, product_2, product_3];
   const paymentOptions = {
     uz: ["6 oy", "12 oy", "15 oy", "18 oy", "24 oy"],
     en: ["6 months", "12 months", "15 months", "18 months", "24 months"],
     ru: ["6 месяцев", "12 месяцев", "15 месяцев", "18 месяцев", "24 месяцев"],
   };
-  const productImagesRef = useRef(productImages);
 
   useEffect(() => {
     if (isVisible && notification) {
@@ -76,7 +70,9 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
         }
       } else {
         const newItem = {
-          img: `https://backkk.stroybazan1.uz${productData.variants[selectedColorIndex].image}`,
+          img: productData.variants[selectedColorIndex].image
+            ? `https://backkk.stroybazan1.uz${productData.variants[selectedColorIndex].image}`
+            : `https://backkk.stroybazan1.uz${productData.image}`,
           id: productData.id,
           name: {
             uz: productData.name_uz,
@@ -103,10 +99,6 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
       localStorage.setItem("basket", JSON.stringify(updatedBasket));
     }
   }, [isVisible, notification]);
-
-  useEffect(() => {
-    setSelectedImage(productImagesRef.current[selectedImageIndex]);
-  }, [selectedImageIndex]);
 
   const fetchProduct = async () => {
     try {
@@ -300,6 +292,11 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
     }, 3000);
   };
 
+  const handleImageError = (e) => {
+    // If the variant image fails, use the product image
+    e.target.src = `https://backkk.stroybazan1.uz${productData.image}`;
+  };
+
   const isCurrentSizeVariant = (index) => {
     if (!productData || !productData.variants || !productData.variants[index])
       return false;
@@ -397,6 +394,13 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
   };
 
   const t_term = translations_term[lang] || translations_term["uz"];
+
+  // Determine the image source for the selected variant
+  const getImageSource = (variant) => {
+    return variant.image
+      ? `https://backkk.stroybazan1.uz${variant.image}`
+      : `https://backkk.stroybazan1.uz${productData.image}`;
+  };
 
   return (
     <div className="w-full h-auto mt-[0px] sm:mt-[50px] px-[22px] sm:px-[190px] mb-[111px]">
@@ -516,12 +520,8 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
           <div className="bg-[#fefdfd] relative drop-shadow-lg w-[450px] sm:w-[750px] h-[100px] flex items-center rounded-md transition-opacity duration-500 ease-in-out opacity-100">
             <div className="ml-[20px] rounded-[5px] overflow-hidden border-[1px] absolute sm:static w-[80px] sm:w-[120px] h-[80px] flex justify-center items-center">
               <img
-                src={
-                  `https://backkk.stroybazan1.uz${
-                    productData.variants[selectedColorIndex].image ||
-                    "/placeholder.svg"
-                  }` || "/placeholder.svg"
-                }
+                src={getImageSource(productData.variants[selectedColorIndex])}
+                onError={handleImageError}
                 className="w-[80px] h-[80px] object-contain"
               />
             </div>
@@ -578,11 +578,8 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
                   onClick={() => handleColorClick(index)}
                 >
                   <img
-                    src={
-                      `https://backkk.stroybazan1.uz${
-                        variant.image || "/placeholder.svg"
-                      }` || "/placeholder.svg"
-                    }
+                    src={getImageSource(variant)}
+                    onError={handleImageError}
                     className="w-[158px] h-[156px] object-fill"
                   />
                 </div>
@@ -606,12 +603,8 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
                 <ChevronRight size={24} />
               </div>
               <img
-                src={
-                  `https://backkk.stroybazan1.uz${
-                    productData.variants[selectedColorIndex].image ||
-                    "/placeholder.svg"
-                  }` || "/placeholder.svg"
-                }
+                src={getImageSource(productData.variants[selectedColorIndex])}
+                onError={handleImageError}
                 className={`w-[162px] sm:w-[504px] h-[188px] sm:h-[504px] object-fill ${
                   isTransitioning
                     ? slideDirection
@@ -710,10 +703,9 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
                         onClick={() => handleColorClick(originalIndex)}
                       >
                         <img
-                          src={`https://backkk.stroybazan1.uz${
-                            variant.image || productData.image
-                          }`}
-                          alt={variant.color_uz}
+                          src={getImageSource(variant)}
+                          onError={handleImageError}
+                          alt={variant.color_uz || productData[`name_${lang}`]}
                           className="object-contain w-full h-full"
                         />
                       </div>
