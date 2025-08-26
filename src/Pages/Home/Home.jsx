@@ -245,7 +245,7 @@ function Home({ lang, setSearchText, searchText }) {
         <div className="w-full h-[150px] flex flex-col items-center bg-[#DCC38B] sm:hidden">
           <img
             src={sl_option_id == 0 ? logo : sl_option_id == 1 ? logo2 : logo3}
-            className="w-[77px] h-[71px] mt-[10px]"
+            className={sl_option_id == 2 ? "h-[71px] mt-[10px]" : "w-[77px] h-[71px] mt-[10px]"}
             alt="Logo"
           />
           <div className="w-[90%] h-[40px] pl-[23.5px] bg-[#FFFFFF] rounded-[10px] flex items-center mt-4">
@@ -352,7 +352,7 @@ function Home({ lang, setSearchText, searchText }) {
         </h1>
 
         <div className="relative overflow-hidden mb-1 mt-[10px]">
-          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 snap-x snap-mandatory">
+          <div className="flex gap-4 pb-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory">
             {loading ? (
               <div className="flex justify-center mx-auto items-center scale-[70%] sm:scale-[100%] w-[200%] h-[130px] sm:w-[500%] sm:h-[400px]">
                 <div style={styles.loader}></div>
@@ -422,7 +422,7 @@ function Home({ lang, setSearchText, searchText }) {
                     />
                   </div>
                   <div className="flex flex-row items-end w-full justify-between mt-1.5 px-1">
-                    <div className="flex flex-col sm:gap-1 flex-1 min-w-0 pr-2">
+                    <div className="flex flex-col flex-1 min-w-0 pr-2 sm:gap-1">
                       <h1 className="text-black truncate font-semibold text-[14px] sm:text-[16px] w-full">
                         {product[`name_${lang}`]}
                       </h1>
@@ -453,15 +453,9 @@ function Home({ lang, setSearchText, searchText }) {
               </div>
             ))
           ) : (
-            <p className="text-center text-gray-500 col-span-full">
-              {lang === "uz"
-                ? "Ma'lumot topilmadi."
-                : lang === "en"
-                  ? "No data found."
-                  : lang === "ru"
-                    ? "Данные не найдены."
-                    : "Ma'lumot topilmadi."}
-            </p>
+            <div className="flex justify-center mx-auto items-center scale-[70%] sm:scale-[100%] w-[200%] h-[130px] sm:w-[500%] sm:h-[400px]">
+                <div style={styles.loader}></div>
+            </div>
           )}
         </div>
 
@@ -469,7 +463,7 @@ function Home({ lang, setSearchText, searchText }) {
           <div className="flex justify-center mt-8">
             <button
               onClick={handleLoadMore}
-              className="bg-[#DCC38B] hover:bg-[#c9b077] text-black font-semibold py-3 px-8 rounded-[10px] transition-colors duration-200"
+              className="bg-[#DCC38B] cursor-pointer hover:bg-[#c9b077] text-black font-semibold py-3 px-8 rounded-[10px] transition-colors duration-200"
             >
               {lang === "uz"
                 ? "Yana ko'rsatish"

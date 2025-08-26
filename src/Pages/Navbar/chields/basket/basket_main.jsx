@@ -121,6 +121,16 @@ export default function Basket_main({
     setContentHeight(`${Math.max(immediateHeight, installmentHeight)}px`);
   }, [totalPrice]);
 
+  const handleQuantityChange = (id, size, color, newQuantity) => {
+    setProducts((prevProducts) =>
+      prevProducts.map((p) =>
+        p.id === id && p.size[lang] === size && p.color[lang] === color
+          ? { ...p, quantity: Number(newQuantity ? newQuantity : 1) }
+          : p
+      )
+    );
+  };
+
   const hasSelectedProducts = products.some((p) => p.selected);
   return (
     <div className="flex flex-col w-full sm:mb-0 mb-21">
@@ -269,7 +279,22 @@ export default function Basket_main({
                       >
                         <Minus className="w-4 h-4" />
                       </button>
-                      <span className="mx-4">{product.quantity}</span>
+
+                      <input
+                        className="w-16 mx-4 text-center border rounded-md"
+                        type="number"
+                        min={1}
+                        value={product.quantity}
+                        onChange={(e) =>
+                          handleQuantityChange(
+                            product.id,
+                            product.size[lang],
+                            product.color[lang],
+                            e.target.value
+                          )
+                        }
+                      />
+
                       <button
                         onClick={() =>
                           increaseQuantity(

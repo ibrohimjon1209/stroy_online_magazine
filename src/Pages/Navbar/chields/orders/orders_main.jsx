@@ -118,15 +118,15 @@ const Orders_main = ({ lang }) => {
           </h1>
         </Link>
       </div>
-      <div className="scale-[150%] container p-4 mx-auto my-4 mt-16">
+      <div className="container p-4 mx-auto my-4 mt-16">
         {filteredOrders.length === 0 ? (
-          <div className="flex flex-col justify-center items-center mt-16">
+          <div className="flex flex-col items-center justify-center mt-16">
             <img
               src={no_order}
               alt="No orders"
               className="w-[250px] hover:scale-105 transition-all duration-300"
             />
-            <h1 className="text-xl font-semibold text-gray-700 mt-6">
+            <h1 className="mt-6 text-xl font-semibold text-gray-700">
               {lang === "uz"
                 ? "Buyurtmalaringiz yo'q"
                 : lang === "en"
