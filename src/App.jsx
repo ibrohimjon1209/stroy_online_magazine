@@ -188,8 +188,6 @@ const App = () => {
     }
   }, [])
 
-  console.log(is_PM, localStorage.getItem("online_payment"))
-
   function PaymentSuccess({ set_is_PM }) {
     const navigate = useNavigate()
 

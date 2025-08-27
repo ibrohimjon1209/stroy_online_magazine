@@ -28,6 +28,7 @@ export default function Basket_main({
     if (savedBasket) {
       setProducts(JSON.parse(savedBasket));
     }
+    console.log(products);
   }, []);
 
   useEffect(() => {

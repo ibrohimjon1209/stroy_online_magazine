@@ -46,18 +46,17 @@ const Formalization_main = ({
   const [selectedPaymentIndex, setSelectedPaymentIndex] = useState(3);
   const [notification, setNotification] = useState("");
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
-
+  const [modal_method, set_modal_method] = useState("cash");
   const paymentOptions = {
     uz: ["6 oy", "12 oy", "15 oy", "18 oy", "24 oy"],
     en: ["6 months", "12 months", "15 months", "18 months", "24 months"],
     ru: ["6 месяцев", "12 месяцев", "15 месяцев", "18 месяцев", "24 месяцев"],
   };
-
   const totalPrice = basket
     .filter((item) => item.selected)
     .reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  let payable = totalPrice - (cashback_is_using ? cashbackAmount : 0);
+  let payable = totalPrice - cashbackAmount;
 
   if (payable <= 0) {
     payable = 0;
@@ -100,7 +99,7 @@ const Formalization_main = ({
           phone: user_data.phone_number || "...",
         });
 
-        setCashbackAmount(user_data.cashback_balance || 0);
+        setCashbackAmount(user_data.cashback_balance);
       } catch (err) {
         console.error("Fetch user error:", err);
       }
@@ -263,7 +262,6 @@ const Formalization_main = ({
 
   const handleOrderCreation = async () => {
     try {
-      // Validate user login
       if (!userSignIn) {
         setNotification(
           lang === "uz"
@@ -278,8 +276,6 @@ const Formalization_main = ({
         setTimeout(() => setIsNotificationVisible(false), 4000);
         return;
       }
-
-      // Validate address
       if (!address_inform) {
         setNotification(
           lang === "uz"
@@ -294,37 +290,10 @@ const Formalization_main = ({
         setTimeout(() => setIsNotificationVisible(false), 4000);
         return;
       }
-
-      // Validate basket
-      const selectedItems = basket.filter((item) => item.selected);
-      if (selectedItems.length === 0) {
-        setNotification(
-          lang === "uz"
-            ? "Iltimos, kamida bitta mahsulot tanlang"
-            : lang === "en"
-            ? "Please select at least one product"
-            : lang === "ru"
-            ? "Пожалуйста, выберите хотя бы один продукт"
-            : "Iltimos, kamida bitta mahsulot tanlang"
-        );
-        setIsNotificationVisible(true);
-        setTimeout(() => setIsNotificationVisible(false), 4000);
-        return;
-      }
-
-      console.log("[handleOrderCreation] Sending order data:", {
-        basket: selectedItems,
-        address_inform,
-        selectedMethod,
-        cashback_is_using,
-        sl_option_id,
-        deliver_type,
-      });
-
       const orderResult = await order_create(
         localStorage.getItem("accessToken"),
         {
-          basket: selectedItems,
+          basket,
           address_inform,
           selectedMethod,
           cashback_is_using,
@@ -339,40 +308,36 @@ const Formalization_main = ({
         orderResult?.orderId ||
         orderResult?.pk;
 
-      if (!orderId) {
-        throw new Error("Order ID not found in response");
-      }
-
-      if (selectedMethod === "payme" || selectedMethod === "click") {
-        await processPayment(orderId);
-      } else {
-        const updatedProducts = basket.filter((item) => !item.selected);
-        set_basket(updatedProducts);
-        localStorage.setItem("order_created", "true");
-        localStorage.setItem("basket", JSON.stringify(updatedProducts));
-
-        set_modal_method(selectedMethod === "qabul" ? "cash" : selectedMethod);
+      if (
+        orderId &&
+        (selectedMethod === "payme" || selectedMethod === "click")
+      ) {
+        // await processPayment(orderId);
+        set_modal_method(selectedMethod);
         set_is_modal_open(true);
+      } else {
+        if (orderId) {
+          const updatedProducts = basket.filter((item) => !item.selected);
+          set_basket(updatedProducts);
+          localStorage.setItem("order_created", "true");
+          localStorage.setItem("basket", JSON.stringify(updatedProducts));
+
+          set_modal_method("cash");
+          set_is_modal_open(true);
+        }
       }
     } catch (error) {
-      console.error("[handleOrderCreation] Error:", error.message);
       setNotification(
         lang === "uz"
-          ? error.message.includes("Session expired")
-            ? "Sessiya tugadi, iltimos qayta kiring"
-            : `Buyurtma yaratishda xatolik: ${error.message}`
+          ? "Buyurtma yaratishda xatolik"
           : lang === "en"
-          ? error.message.includes("Session expired")
-            ? "Session expired, please log in again"
-            : `Error creating order: ${error.message}`
+          ? "Error creating order"
           : lang === "ru"
-          ? error.message.includes("Session expired")
-            ? "Сессия истекла, пожалуйста, войдите снова"
-            : `Ошибка при создании заказа: ${error.message}`
-          : `Buyurtma yaratishda xatolik: ${error.message}`
+          ? "Ошибка при создании заказа"
+          : "Buyurtma yaratishda xatolik"
       );
       setIsNotificationVisible(true);
-      setTimeout(() => setIsNotificationVisible(false), 4000);
+      setTimeout(() => setIsNotificationVisible(false), 3000);
     }
   };
 
@@ -480,9 +445,9 @@ const Formalization_main = ({
                 : "Olib ketish"}
             </button>
             <button
-              onClick={() => set_deliver_type("delivery")}
+              onClick={() => set_deliver_type("deliver")}
               className={`flex-1 py-2 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
-                deliver_type === "delivery"
+                deliver_type === "deliver"
                   ? "bg-white shadow-sm duration-500"
                   : "text-gray-500"
               }`}
@@ -526,8 +491,8 @@ const Formalization_main = ({
             <div
               onClick={() =>
                 deliver_type === "pickup"
-                  ? set_is_pickup(true)
-                  : set_is_delivery(true)
+                  ? set_is_delivery(true)
+                  : set_is_pickup(true)
               }
               className="flex flex-col justify-between w-full gap-2 p-3 cursor-pointer h-18 sm:h-auto sm:items-center sm:p-4"
             >
@@ -700,7 +665,7 @@ const Formalization_main = ({
                       className="object-contain w-7 h-7 sm:w-8 sm:h-8"
                     />
                     <span className="font-inter font-[600] text-[16px] leading-[22px] text-black">
-                      Payme
+                      Pay me
                     </span>
                   </div>
                   <div
@@ -727,9 +692,9 @@ const Formalization_main = ({
                       {lang === "uz"
                         ? "Qabul qilinganda"
                         : lang === "en"
-                        ? "On arrival"
+                        ? "On arrive"
                         : lang === "ru"
-                        ? "При получении"
+                        ? "При прибытии"
                         : "Qabul qilinganda"}
                     </span>
                   </div>
@@ -747,7 +712,7 @@ const Formalization_main = ({
                   className="flex items-center justify-between p-2 rounded-md cursor-pointer"
                   onClick={() => setSelectedMethod("installment")}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 ">
                     <img
                       src={payment_time || "/placeholder.svg"}
                       alt="Muddatli to'lov"
@@ -861,7 +826,10 @@ const Formalization_main = ({
                     : "Maxsulotlar narxi"}
                 </span>
                 <span>
-                  {totalPrice.toLocaleString()}{" "}
+                  {basket
+                    .filter((item) => item.selected)
+                    .reduce((sum, item) => sum + item.price * item.quantity, 0)
+                    .toLocaleString()}{" "}
                   {lang === "uz"
                     ? "so'm"
                     : lang === "en"
@@ -882,7 +850,8 @@ const Formalization_main = ({
                     : "Ishlatilayotgan keshbek"}
                 </span>
                 <span>
-                  {(cashback_is_using ? cashbackAmount : 0).toLocaleString()}{" "}
+                  {(cashback_is_using && cashbackAmount) || 0}
+                  {` `}{" "}
                   {lang === "uz"
                     ? "so'm"
                     : lang === "en"
@@ -904,7 +873,8 @@ const Formalization_main = ({
                     : "Jami"}
                 </span>
                 <span>
-                  {payable.toLocaleString()}{" "}
+                  {(cashback_is_using && payable.toLocaleString()) ||
+                    totalPrice}{" "}
                   {lang === "uz"
                     ? "so'm"
                     : lang === "en"
