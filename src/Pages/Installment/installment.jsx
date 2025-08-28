@@ -57,9 +57,9 @@ const Installment = () => {
       ru: "Успешно создано!",
     },
     success_desc: {
-      uz: "Ma'lumotlaringiz muvaffaqiyatli saqlandi. Tez orada operator siz bilan bog'lanadi.",
-      en: "Your information has been saved successfully. We will contact you soon.",
-      ru: "Ваши данные успешно сохранены. Мы скоро свяжемся с вами.",
+      uz: "Ma'lumotlaringiz muvaffaqiyatli saqlandi. Javobni biz sizga SMS tariqasida yuboramiz",
+      en: "Your information has been successfully saved. We will contact you via SMS.",
+      ru: "Ваши данные успешно сохранены. Мы свяжемся с вами по SMS.",
     },
     close: {
       uz: "Yopish",
@@ -655,7 +655,7 @@ const Installment = () => {
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              backgroundColor: "rgba(0, 0, 0, 0.1)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

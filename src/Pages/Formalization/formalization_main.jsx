@@ -47,8 +47,8 @@ const Formalization_main = ({
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
   const paymentOptions = {
     uz: ["6 oy", "12 oy", "15 oy", "18 oy", "24 oy"],
-    en: ["6 months", "12 months", "15 months", "18 months", "24 months"],
-    ru: ["6 месяцев", "12 месяцев", "15 месяцев", "18 месяцев", "24 месяцев"],
+    en: ["6 mon", "12 mon", "15 mon", "18 mon", "24 mon"],
+    ru: ["6 мес", "12 мес", "15 мес", "18 мес", "24 мес"],
   };
   const totalPrice = basket
     .filter((item) => item.selected)

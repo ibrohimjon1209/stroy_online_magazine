@@ -30,11 +30,11 @@ export default function Basket_main({
       : "so'm";
 
   useEffect(() => {
-      const savedBasket = localStorage.getItem("basket");
-      if (savedBasket) {
-        const parsed_basket = JSON.parse(savedBasket);
-        setProducts(parsed_basket);
-      }
+    const savedBasket = localStorage.getItem("basket");
+    if (savedBasket) {
+      const parsed_basket = JSON.parse(savedBasket);
+      setProducts(parsed_basket);
+    }
     console.log(products);
   }, []);
 
@@ -275,7 +275,12 @@ export default function Basket_main({
                       </button>
                     </div>
                     <p className="font-inter font-[600] text-[16px] mt-2">
-                      O'lchami: {product.size[lang]}
+                      {lang == "uz"
+                        ? "O'lchami"
+                        : lang == "en"
+                        ? "Size"
+                        : "Размер"}
+                      : {product.size[lang]}
                     </p>
                     <p className="font-inter font-[600] text-[16px] leading-[22px] text-black mt-2">
                       {product.price.toLocaleString()} {uzs_lang}
@@ -424,26 +429,6 @@ export default function Basket_main({
                           ? "Вы можете приобрести заказ на срок от 6 до 24 месяцев за фиксированную плату."
                           : "Siz buyurtmani 6 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."}
                       </p>
-                      {/* <div className="flex justify-between items-center font-inter font-[700] text-[16px] leading-[22px] text-black mt-[20%] sm:mt-[50%]">
-                        <span>
-                          {lang === "uz"
-                            ? "Muddatli to'lov"
-                            : lang === "en"
-                            ? "Installment"
-                            : lang === "ru"
-                            ? "Рассрочка"
-                            : "Muddatli to'lov"}
-                        </span>
-                        <span>
-                          {lang === "uz"
-                            ? `${monthlyPayment.toLocaleString()} so'mdan × 24`
-                            : lang === "en"
-                            ? `${monthlyPayment.toLocaleString()} × 24`
-                            : lang === "ru"
-                            ? `От ${monthlyPayment.toLocaleString()} Сум × 24`
-                            : `${monthlyPayment.toLocaleString()} so'mdan × 24`}
-                        </span>
-                      </div> */}
                     </div>
                   </div>
 
