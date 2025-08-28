@@ -12,12 +12,19 @@ const Delivery_main = ({
 }) => {
   const [active, set_active] = useState("address");
   const lang = localStorage.getItem("lang");
+  const sl_option_id =
+    localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
+      ? 0
+      : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
+      ? 1
+      : 2;
   const [addresses_list, set_addresses_list] = useState([]);
   useEffect(() => {
     const fetch_locations = async () => {
       try {
         const locations = await get_locations();
-        set_addresses_list(locations);
+        const allowed_locations = locations.filter((loc) => loc.branch === sl_option_id);
+        set_addresses_list(allowed_locations);
       } catch (error) {
         console.log(error);
       }

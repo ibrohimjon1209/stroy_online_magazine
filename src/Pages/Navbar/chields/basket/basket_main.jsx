@@ -14,6 +14,12 @@ export default function Basket_main({
   const [contentHeight, setContentHeight] = useState("auto");
   const immediateRef = useRef(null);
   const installmentRef = useRef(null);
+  const sl_option_id =
+    localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
+      ? 0
+      : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
+      ? 1
+      : 2;
   const uzs_lang =
     lang == "uz"
       ? "so'm"
@@ -24,10 +30,11 @@ export default function Basket_main({
       : "so'm";
 
   useEffect(() => {
-    const savedBasket = localStorage.getItem("basket");
-    if (savedBasket) {
-      setProducts(JSON.parse(savedBasket));
-    }
+      const savedBasket = localStorage.getItem("basket");
+      if (savedBasket) {
+        const parsed_basket = JSON.parse(savedBasket);
+        setProducts(parsed_basket);
+      }
     console.log(products);
   }, []);
 
@@ -47,13 +54,18 @@ export default function Basket_main({
       localStorage.setItem("basket", JSON.stringify(updatedProducts));
     }
   }, [products, set_basket]);
+  const visibleProducts = products.filter(
+    (item) => item.branch_id == sl_option_id
+  );
 
-  const allSelected = products.every((product) => product.selected);
+  const allSelected = visibleProducts.every((product) => product.selected);
+
   const toggleSelectAll = () => {
-    const updated = products.map((product) => ({
-      ...product,
-      selected: !allSelected,
-    }));
+    const updated = products.map((product) =>
+      product.branch_id == sl_option_id
+        ? { ...product, selected: !allSelected }
+        : product
+    );
     setProducts(updated);
     set_basket(updated);
   };
@@ -110,7 +122,7 @@ export default function Basket_main({
     });
   };
 
-  const totalPrice = products
+  const totalPrice = visibleProducts
     .filter((product) => product.selected)
     .reduce((sum, product) => sum + product.price * product.quantity, 0);
 
@@ -132,7 +144,8 @@ export default function Basket_main({
     );
   };
 
-  const hasSelectedProducts = products.some((p) => p.selected);
+  const hasSelectedProducts = visibleProducts.some((p) => p.selected);
+
   return (
     <div className="flex flex-col w-full sm:mb-0 mb-21">
       <div className="w-full fixed z-50 h-[65px] bg-[#DCC38B] sm:hidden block">
@@ -193,7 +206,7 @@ export default function Basket_main({
                       ? "Выбрать все"
                       : "Hammasini tanlash"}{" "}
                     <span className="hidden sm:inline">
-                      {products.length}{" "}
+                      {visibleProducts.length}{" "}
                       {lang == "uz"
                         ? "ta maxsulot"
                         : lang === "en"
@@ -217,7 +230,7 @@ export default function Basket_main({
                 </button>
               </div>
 
-              {products.map((product) => (
+              {visibleProducts.map((product) => (
                 <div
                   key={`${product.id}-${product.size[lang]}-${product.color[lang]}`}
                   className="flex items-start py-4 my-5 border border-gray-400 sm:py-8 rounded-[15px] sm:px-10 px-4"
@@ -389,7 +402,7 @@ export default function Basket_main({
                     >
                       <div className="flex justify-between">
                         <h1 className="font-inter font-[500] text-[16px] leading-[22px] text-black">
-                          {products.length}{" "}
+                          {visibleProducts.length}{" "}
                           {lang == "uz"
                             ? "ta maxsulot"
                             : lang === "en"

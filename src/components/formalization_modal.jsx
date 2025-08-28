@@ -1,5 +1,5 @@
-import click from "./imgs/click.png";
-import payme from "./imgs/pay_me.png";
+import click from "../Pages/Formalization/imgs/click.png";
+import payme from "../Pages/Formalization/imgs/pay_me.png";
 
 const Modal = ({ is_modal_open, set_is_modal_open, method }) => {
   if (!is_modal_open) return null;
@@ -42,7 +42,6 @@ const Modal = ({ is_modal_open, set_is_modal_open, method }) => {
               onClick={() => {
                 set_is_modal_open(false);
                 localStorage.setItem("online_pay", "false");
-                window.location.reload();
               }}
               className="w-[70%] py-2 bg-[#FFDF02] border border-[#D5D5D5] cursor-pointer rounded hover:scale-[102%] active:scale-[98%] duration-200"
             >
