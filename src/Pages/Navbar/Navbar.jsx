@@ -574,11 +574,17 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                   onMouseLeave={() => set_is_basket_hovered(false)}
                   alt="basket"
                 />
+<<<<<<< HEAD
                 {basket?.length > 0 && (
                   <span className="absolute flex items-center justify-center w-4.5 h-4.5 text-xs font-bold text-white bg-red-500 rounded-full -top-2 -right-2">
                     {basket.length}
+=======
+                  <span className={`absolute ${basket.filter((item) => item.branch_id == sl_option_id).length ? "flex" : "hidden"} items-center justify-center w-4.5 h-4.5 text-xs font-bold text-white bg-red-500 rounded-full -top-2 -right-2`}>
+                {basket.filter((item) => item.branch_id == sl_option_id).length && (
+                    basket.filter((item) => item.branch_id == sl_option_id).length
+                  )}
+>>>>>>> 2fd2d27d9b80338f328862eaa6ea9b54a4638ab5
                   </span>
-                )}
               </div>
             </Link>
 

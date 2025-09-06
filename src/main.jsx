@@ -9,7 +9,9 @@ const sl_option_id =
     ? 0
     : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
     ? 1
-    : 2;
+    : localStorage.getItem("sl_option_nav") === "Gold Klinker"
+    ? 2
+    : 0;
 
 const updateFaviconAndTitle = (value) => {
   let faviconPath = "/photo_2.png";

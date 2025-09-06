@@ -79,6 +79,8 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
             en: productData.name_en,
             ru: productData.name_ru,
           },
+          variant_id: productData.variants[selectedColorIndex].id,
+          branch_id: productData.branch,
           color: {
             uz: productData.variants[selectedColorIndex].color_uz,
             en: productData.variants[selectedColorIndex].color_en,

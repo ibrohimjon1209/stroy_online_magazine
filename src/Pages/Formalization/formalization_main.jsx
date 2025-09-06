@@ -1,5 +1,3 @@
-"use client";
-
 import { Check, ChevronLeft, ChevronRight, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import arrive_icon from "./imgs/arrive_icon.png";
@@ -9,7 +7,7 @@ import on_arrive from "./imgs/on_arrive.png";
 import pay_me from "./imgs/pay_me.png";
 import click from "./imgs/click.png";
 import open_icon from "./imgs/open.png";
-import Modal from "./modal";
+import Modal from "../../components/formalization_modal";
 import { useEffect, useState } from "react";
 import Delivery from "../Map/map_main";
 import Payment_variant from "../payment_variant/payment_main";
@@ -31,11 +29,12 @@ const Formalization_main = ({
   setUserSignIn,
   set_is_SI,
   set_basket,
+  set_modal_method,
+  set_is_modal_open
 }) => {
   const [userData, setUserData] = useState({ name: "...", phone: "..." });
   const [deliver_type, set_deliver_type] = useState("pickup");
   const [selectedMethod, setSelectedMethod] = useState("click");
-  const [is_modal_open, set_is_modal_open] = useState(false);
   const [is_delivery, set_is_delivery] = useState(false);
   const [is_pickup, set_is_pickup] = useState(false);
   const [is_payment_variant, set_is_payment_variant] = useState(false);
@@ -46,18 +45,16 @@ const Formalization_main = ({
   const [selectedPaymentIndex, setSelectedPaymentIndex] = useState(3);
   const [notification, setNotification] = useState("");
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
-
   const paymentOptions = {
     uz: ["6 oy", "12 oy", "15 oy", "18 oy", "24 oy"],
-    en: ["6 months", "12 months", "15 months", "18 months", "24 months"],
-    ru: ["6 месяцев", "12 месяцев", "15 месяцев", "18 месяцев", "24 месяцев"],
+    en: ["6 mon", "12 mon", "15 mon", "18 mon", "24 mon"],
+    ru: ["6 мес", "12 мес", "15 мес", "18 мес", "24 мес"],
   };
-
   const totalPrice = basket
     .filter((item) => item.selected)
     .reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  let payable = totalPrice - (cashback_is_using ? cashbackAmount : 0);
+  let payable = totalPrice - cashbackAmount;
 
   if (payable <= 0) {
     payable = 0;
@@ -100,7 +97,7 @@ const Formalization_main = ({
           phone: user_data.phone_number || "...",
         });
 
-        setCashbackAmount(user_data.cashback_balance || 0);
+        setCashbackAmount(user_data.cashback_balance);
       } catch (err) {
         console.error("Fetch user error:", err);
       }
@@ -263,7 +260,6 @@ const Formalization_main = ({
 
   const handleOrderCreation = async () => {
     try {
-      // Validate user login
       if (!userSignIn) {
         setNotification(
           lang === "uz"
@@ -278,8 +274,6 @@ const Formalization_main = ({
         setTimeout(() => setIsNotificationVisible(false), 4000);
         return;
       }
-
-      // Validate address
       if (!address_inform) {
         setNotification(
           lang === "uz"
@@ -294,37 +288,10 @@ const Formalization_main = ({
         setTimeout(() => setIsNotificationVisible(false), 4000);
         return;
       }
-
-      // Validate basket
-      const selectedItems = basket.filter((item) => item.selected);
-      if (selectedItems.length === 0) {
-        setNotification(
-          lang === "uz"
-            ? "Iltimos, kamida bitta mahsulot tanlang"
-            : lang === "en"
-            ? "Please select at least one product"
-            : lang === "ru"
-            ? "Пожалуйста, выберите хотя бы один продукт"
-            : "Iltimos, kamida bitta mahsulot tanlang"
-        );
-        setIsNotificationVisible(true);
-        setTimeout(() => setIsNotificationVisible(false), 4000);
-        return;
-      }
-
-      console.log("[handleOrderCreation] Sending order data:", {
-        basket: selectedItems,
-        address_inform,
-        selectedMethod,
-        cashback_is_using,
-        sl_option_id,
-        deliver_type,
-      });
-
       const orderResult = await order_create(
         localStorage.getItem("accessToken"),
         {
-          basket: selectedItems,
+          basket,
           address_inform,
           selectedMethod,
           cashback_is_using,
@@ -338,41 +305,37 @@ const Formalization_main = ({
         orderResult?.order_id ||
         orderResult?.orderId ||
         orderResult?.pk;
-
-      if (!orderId) {
-        throw new Error("Order ID not found in response");
-      }
-
-      if (selectedMethod === "payme" || selectedMethod === "click") {
-        await processPayment(orderId);
-      } else {
-        const updatedProducts = basket.filter((item) => !item.selected);
-        set_basket(updatedProducts);
-        localStorage.setItem("order_created", "true");
-        localStorage.setItem("basket", JSON.stringify(updatedProducts));
-
-        set_modal_method(selectedMethod === "qabul" ? "cash" : selectedMethod);
+      if (
+        orderId &&
+        (selectedMethod === "payme" || selectedMethod === "click")
+      ) {
+        set_modal_method(selectedMethod);
         set_is_modal_open(true);
+        processPayment(orderId);
+      } else {
+        if (orderId) {
+          const updatedProducts = basket
+            .filter((item) => item.branch_id == sl_option_id)
+            .filter((item) => !item.selected);
+          set_basket(updatedProducts);
+          localStorage.setItem("order_created", "true");
+          localStorage.setItem("basket", JSON.stringify(updatedProducts));
+          set_modal_method("cash");
+          set_is_modal_open(true);
+        }
       }
     } catch (error) {
-      console.error("[handleOrderCreation] Error:", error.message);
       setNotification(
         lang === "uz"
-          ? error.message.includes("Session expired")
-            ? "Sessiya tugadi, iltimos qayta kiring"
-            : `Buyurtma yaratishda xatolik: ${error.message}`
+          ? "Buyurtma yaratishda xatolik"
           : lang === "en"
-          ? error.message.includes("Session expired")
-            ? "Session expired, please log in again"
-            : `Error creating order: ${error.message}`
+          ? "Error creating order"
           : lang === "ru"
-          ? error.message.includes("Session expired")
-            ? "Сессия истекла, пожалуйста, войдите снова"
-            : `Ошибка при создании заказа: ${error.message}`
-          : `Buyurtma yaratishda xatolik: ${error.message}`
+          ? "Ошибка при создании заказа"
+          : "Buyurtma yaratishda xatolik"
       );
       setIsNotificationVisible(true);
-      setTimeout(() => setIsNotificationVisible(false), 4000);
+      setTimeout(() => setIsNotificationVisible(false), 3000);
     }
   };
 
@@ -382,607 +345,619 @@ const Formalization_main = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-full mb-17 sm:mb-0">
-      {isNotificationVisible && notification && (
-        <div className="absolute z-50 top-15 left-1/2 transform border-[2px] border-red-500 bg-red-100 -translate-x-1/2 w-[90%] sm:w-[400px] scale-[130%] text-red-800 rounded-lg shadow-lg p-4 flex items-center justify-between">
-          <span className="font-inter font-[500] text-[16px] text-black">
-            {notification}
-          </span>
-          <button
-            onClick={() => setIsNotificationVisible(false)}
-            className="text-black"
-          >
-            ✕
-          </button>
-        </div>
-      )}
+    <div>
+      <div className="flex flex-col w-full h-full mb-17 sm:mb-0">
+        {isNotificationVisible && notification && (
+          <div className="absolute z-50 top-15 left-1/2 transform border-[2px] border-red-500 bg-red-100 -translate-x-1/2 w-[90%] sm:w-[400px] scale-[130%] text-red-800 rounded-lg shadow-lg p-4 flex items-center justify-between">
+            <span className="font-inter font-[500] text-[16px] text-black">
+              {notification}
+            </span>
+            <button
+              onClick={() => setIsNotificationVisible(false)}
+              className="text-black"
+            >
+              ✕
+            </button>
+          </div>
+        )}
 
-      <div className="w-full fixed z-50 h-[65px] bg-[#DCC38B] sm:hidden block">
-        <Link
-          onClick={() => set_formalization_open(false)}
-          className="w-full h-full flex items-center gap-[10px] pl-[13px]"
-          to="/basket"
+        <div className="w-full fixed z-50 h-[65px] bg-[#DCC38B] sm:hidden block">
+          <Link
+            onClick={() => set_formalization_open(false)}
+            className="w-full h-full flex items-center gap-[10px] pl-[13px]"
+            to="/basket"
+          >
+            <ChevronLeft className="scale-110" />
+            <h1 className="font-inter font-[500] text-[17px] leading-[22px] text-black">
+              {lang === "uz"
+                ? "Buyurtma"
+                : lang === "en"
+                ? "Order"
+                : lang === "ru"
+                ? "Заказ"
+                : "Buyurtma"}
+            </h1>
+          </Link>
+        </div>
+        <div
+          className={`w-full sm:w-[76%] sm:mt-0 mt-12 ${
+            is_delivery || is_payment_variant || is_pickup ? "hidden" : "block"
+          } mx-auto bg-white mb-[20px]`}
         >
-          <ChevronLeft className="scale-110" />
-          <h1 className="font-inter font-[500] text-[17px] leading-[22px] text-black">
-            {lang === "uz"
-              ? "Buyurtma"
-              : lang === "en"
-              ? "Order"
-              : lang === "ru"
-              ? "Заказ"
-              : "Buyurtma"}
-          </h1>
-        </Link>
-      </div>
-      <div
-        className={`w-full sm:w-[76%] sm:mt-0 mt-12 ${
-          is_delivery || is_payment_variant || is_pickup ? "hidden" : "block"
-        } mx-auto bg-white mb-[20px]`}
-      >
-        <div className="p-6 pt-[35px]">
-          <h2 className="font-inter font-[600] text-[16px] leading-[22px] text-black">
-            {lang === "uz"
-              ? "Qabul qiluvchi"
-              : lang === "en"
-              ? "Receiver"
-              : lang === "ru"
-              ? "Получатель"
-              : "Qabul qiluvchi"}
-          </h2>
-          {userSignIn ? (
-            <div className="border border-[#D5D5D5] rounded-lg p-4 mt-[15px] sm:mt-[20px] mb-6 w-full sm:w-[40%] h-[70px] flex items-center justify-start">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-gray-300 rounded-full">
-                  <User className="h-[23px] w-[23px] text-gray-600" />
+          <div className="p-6 pt-[35px]">
+            <h2 className="font-inter font-[600] text-[16px] leading-[22px] text-black">
+              {lang === "uz"
+                ? "Qabul qiluvchi"
+                : lang === "en"
+                ? "Receiver"
+                : lang === "ru"
+                ? "Получатель"
+                : "Qabul qiluvchi"}
+            </h2>
+            {userSignIn ? (
+              <div className="border border-[#D5D5D5] rounded-lg p-4 mt-[15px] sm:mt-[20px] mb-6 w-full sm:w-[40%] h-[70px] flex items-center justify-start">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gray-300 rounded-full">
+                    <User className="h-[23px] w-[23px] text-gray-600" />
+                  </div>
+                  <div>
+                    <p className="font-inter font-[600] text-[16px] leading-[22px] text-black">
+                      {userData.name}
+                    </p>
+                    <p className="font-inter font-[500] text-[13px] leading-[22px] text-black">
+                      {userData.phone}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-inter font-[600] text-[16px] leading-[22px] text-black">
-                    {userData.name}
+              </div>
+            ) : (
+              <Link to="/login">
+                <div className="border bg-[#FFDF02] border-[#D5D5D5] rounded-lg p-4 mt-[20px] mb-6 w-[40%] h-[70px] flex items-center justify-center hover:scale-[101%] active:scale-[99%] duration-300">
+                  <p className="font-inter font-[600] text-[24px] leading-[22px] text-black">
+                    {lang === "uz"
+                      ? "Kirish"
+                      : lang === "en"
+                      ? "Login"
+                      : lang === "ru"
+                      ? "Входить"
+                      : "Kirish"}
                   </p>
-                  <p className="font-inter font-[500] text-[13px] leading-[22px] text-black">
-                    {userData.phone}
-                  </p>
+                </div>
+              </Link>
+            )}
+            <BasketGrid basket={basket} lang={lang} />
+            <div className="relative flex p-1 bg-gray-100 rounded-xl mt-[20px] sm:mt-[35px] mb-4 h-[50px] sm:h-[60px] w-full sm:w-[95%] mx-auto font-inter font-[500] text-[14px] sm:text-[18px] leading-[22px] text-black">
+              <button
+                onClick={() => set_deliver_type("pickup")}
+                className={`flex-1 py-2 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
+                  deliver_type === "pickup"
+                    ? "bg-white shadow-sm duration-500"
+                    : "text-gray-500"
+                }`}
+              >
+                {lang === "uz"
+                  ? "Olib ketish"
+                  : lang === "en"
+                  ? "Pickup"
+                  : lang === "ru"
+                  ? "Забрать"
+                  : "Olib ketish"}
+              </button>
+              <button
+                onClick={() => set_deliver_type("deliver")}
+                className={`flex-1 py-2 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
+                  deliver_type === "deliver"
+                    ? "bg-white shadow-sm duration-500"
+                    : "text-gray-500"
+                }`}
+              >
+                {lang === "uz"
+                  ? "Yetkazib berish"
+                  : lang === "en"
+                  ? "Delivery"
+                  : lang === "ru"
+                  ? "Доставить"
+                  : "Yetkazib berish"}
+              </button>
+            </div>
+            <div
+              className={`border border-[#D5D5D5] rounded-lg mb-4 mt-[25px] sm:mt-[35px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300 ${
+                isVibrating ? "animate-[vibrate_0.3s_linear]" : ""
+              }`}
+            >
+              <style jsx>{`
+                @keyframes vibrate {
+                  0% {
+                    transform: translateX(0);
+                  }
+                  20% {
+                    transform: translateX(-2px);
+                  }
+                  40% {
+                    transform: translateX(2px);
+                  }
+                  60% {
+                    transform: translateX(-2px);
+                  }
+                  80% {
+                    transform: translateX(2px);
+                  }
+                  100% {
+                    transform: translateX(0);
+                  }
+                }
+              `}</style>
+              <div
+                onClick={() =>
+                  deliver_type === "pickup"
+                    ? set_is_delivery(true)
+                    : set_is_pickup(true)
+                }
+                className="flex flex-col justify-between w-full gap-2 p-3 cursor-pointer h-18 sm:h-auto sm:items-center sm:p-4"
+              >
+                <div className="flex items-center w-full sm:pr-[40px] gap-2 justify-between sm:gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <img
+                      src={arrive_icon || "/placeholder.svg"}
+                      alt="arrive"
+                      className="h-[21px] w-[21px] sm:h-[25px] sm:w-[25px] object-contain"
+                    />
+                    <span className="text-[14px] sm:text-[18px] sm:font-medium whitespace-nowrap">
+                      {label_delivery}
+                    </span>
+                  </div>
+                  <div className="flex-row items-center justify-center hidden gap-1 sm:flex">
+                    <h1
+                      className={`${
+                        address_inform ? "max-w-[60%]" : ""
+                      } text-[12px] whitespace-nowrap truncate sm:block hidden sm:text-[18px] sm:font-medium`}
+                    >
+                      {address_inform
+                        ? address_inform[`address_${lang}`]
+                        : lang == "uz"
+                        ? "Manzil tanlash"
+                        : lang == "en"
+                        ? "Address"
+                        : lang == "ru"
+                        ? "Адрес"
+                        : "Manzil tanlash"}
+                    </h1>
+                    <ChevronRight className="mt-0.5 text-gray-400 h-6 w-6" />
+                  </div>
+                </div>
+                <div className="sm:hidden flex flex-row pl-7.5 items-center w-full">
+                  <h1 className="text-[12px] whitespace-nowrap sm:hidden block truncate">
+                    {address_inform
+                      ? address_inform[`address_${lang}`]
+                      : lang == "uz"
+                      ? "Manzil tanlash"
+                      : lang == "en"
+                      ? "Address"
+                      : lang == "ru"
+                      ? "Адрес"
+                      : "Manzil tanlash"}
+                  </h1>
+                  <ChevronRight className="w-4 h-4 mt-0.5 text-gray-400" />
                 </div>
               </div>
             </div>
-          ) : (
-            <Link to="/login">
-              <div className="border bg-[#FFDF02] border-[#D5D5D5] rounded-lg p-4 mt-[20px] mb-6 w-[40%] h-[70px] flex items-center justify-center hover:scale-[101%] active:scale-[99%] duration-300">
-                <p className="font-inter font-[600] text-[24px] leading-[22px] text-black">
-                  {lang === "uz"
-                    ? "Kirish"
-                    : lang === "en"
-                    ? "Login"
-                    : lang === "ru"
-                    ? "Входить"
-                    : "Kirish"}
-                </p>
-              </div>
-            </Link>
-          )}
-          <BasketGrid basket={basket} lang={lang} />
-          <div className="relative flex p-1 bg-gray-100 rounded-xl mt-[20px] sm:mt-[35px] mb-4 h-[50px] sm:h-[60px] w-full sm:w-[95%] mx-auto font-inter font-[500] text-[14px] sm:text-[18px] leading-[22px] text-black">
-            <button
-              onClick={() => set_deliver_type("pickup")}
-              className={`flex-1 py-2 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
-                deliver_type === "pickup"
-                  ? "bg-white shadow-sm duration-500"
-                  : "text-gray-500"
-              }`}
-            >
-              {lang === "uz"
-                ? "Olib ketish"
-                : lang === "en"
-                ? "Pickup"
-                : lang === "ru"
-                ? "Забрать"
-                : "Olib ketish"}
-            </button>
-            <button
-              onClick={() => set_deliver_type("delivery")}
-              className={`flex-1 py-2 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
-                deliver_type === "delivery"
-                  ? "bg-white shadow-sm duration-500"
-                  : "text-gray-500"
-              }`}
-            >
-              {lang === "uz"
-                ? "Yetkazib berish"
-                : lang === "en"
-                ? "Delivery"
-                : lang === "ru"
-                ? "Доставить"
-                : "Yetkazib berish"}
-            </button>
-          </div>
-          <div
-            className={`border border-[#D5D5D5] rounded-lg mb-4 mt-[25px] sm:mt-[35px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300 ${
-              isVibrating ? "animate-[vibrate_0.3s_linear]" : ""
-            }`}
-          >
-            <style jsx>{`
-              @keyframes vibrate {
-                0% {
-                  transform: translateX(0);
-                }
-                20% {
-                  transform: translateX(-2px);
-                }
-                40% {
-                  transform: translateX(2px);
-                }
-                60% {
-                  transform: translateX(-2px);
-                }
-                80% {
-                  transform: translateX(2px);
-                }
-                100% {
-                  transform: translateX(0);
-                }
-              }
-            `}</style>
             <div
-              onClick={() =>
-                deliver_type === "pickup"
-                  ? set_is_pickup(true)
-                  : set_is_delivery(true)
-              }
-              className="flex flex-col justify-between w-full gap-2 p-3 cursor-pointer h-18 sm:h-auto sm:items-center sm:p-4"
+              onClick={() => {
+                if (cashbackAmount < 1000) {
+                  setIsVibrating(true);
+                  setTimeout(() => setIsVibrating(false), 300);
+                } else {
+                  set_cashback_is_using(!cashback_is_using);
+                }
+              }}
+              className={`border overflow-hidden border-[#D5D5D5] rounded-lg mb-4 mt-[20px] sm:mt-[30px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300 ${
+                isVibrating ? "animate-[vibrate_0.3s_linear]" : ""
+              }`}
             >
-              <div className="flex items-center w-full sm:pr-[40px] gap-2 justify-between sm:gap-3">
+              <style jsx>{`
+                @keyframes vibrate {
+                  0% {
+                    transform: translateX(0);
+                  }
+                  20% {
+                    transform: translateX(-2px);
+                  }
+                  40% {
+                    transform: translateX(2px);
+                  }
+                  60% {
+                    transform: translateX(-2px);
+                  }
+                  80% {
+                    transform: translateX(2px);
+                  }
+                  100% {
+                    transform: translateX(0);
+                  }
+                }
+              `}</style>
+              <div className="flex items-center justify-between w-full p-3 cursor-pointer sm:p-4">
                 <div className="flex items-center gap-2 sm:gap-3">
                   <img
-                    src={arrive_icon || "/placeholder.svg"}
-                    alt="arrive"
+                    src={cash_icon || "/placeholder.svg"}
+                    alt="cash"
                     className="h-[21px] w-[21px] sm:h-[25px] sm:w-[25px] object-contain"
                   />
-                  <span className="text-[14px] sm:text-[18px] sm:font-medium whitespace-nowrap">
-                    {label_delivery}
+                  <span className="text-[14px] sm:text-[18px] sm:font-medium">
+                    {lang === "uz"
+                      ? "Keshbekni ishlatish"
+                      : lang === "en"
+                      ? "Use cashback"
+                      : lang === "ru"
+                      ? "Использовать кешбек"
+                      : "Keshbekni ishlatish"}
                   </span>
                 </div>
-                <h1 className="text-[12px] whitespace-nowrap sm:block hidden sm:text-[18px] sm:font-medium">
-                  {address_inform
-                    ? address_inform[`address_${lang}`]
-                    : lang == "uz"
-                    ? "Manzil tanlash"
-                    : lang == "en"
-                    ? "Address"
-                    : lang == "ru"
-                    ? "Адрес"
-                    : "Manzil tanlash"}
-                </h1>
-              </div>
-              <div className="flex flex-row pl-7.5 items-center w-full">
-                <h1 className="text-[12px] whitespace-nowrap sm:hidden block truncate">
-                  {address_inform
-                    ? address_inform[`address_${lang}`]
-                    : lang == "uz"
-                    ? "Manzil tanlash"
-                    : lang == "en"
-                    ? "Address"
-                    : lang == "ru"
-                    ? "Адрес"
-                    : "Manzil tanlash"}
-                </h1>
-                <ChevronRight className="w-4 h-4 mt-0.5 text-gray-400 sm:h-5 sm:w-5" />
-              </div>
-            </div>
-          </div>
-          <div
-            onClick={() => {
-              if (cashbackAmount < 1000) {
-                setIsVibrating(true);
-                setTimeout(() => setIsVibrating(false), 300);
-              } else {
-                set_cashback_is_using(!cashback_is_using);
-              }
-            }}
-            className={`border overflow-hidden border-[#D5D5D5] rounded-lg mb-4 mt-[20px] sm:mt-[30px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300 ${
-              isVibrating ? "animate-[vibrate_0.3s_linear]" : ""
-            }`}
-          >
-            <style jsx>{`
-              @keyframes vibrate {
-                0% {
-                  transform: translateX(0);
-                }
-                20% {
-                  transform: translateX(-2px);
-                }
-                40% {
-                  transform: translateX(2px);
-                }
-                60% {
-                  transform: translateX(-2px);
-                }
-                80% {
-                  transform: translateX(2px);
-                }
-                100% {
-                  transform: translateX(0);
-                }
-              }
-            `}</style>
-            <div className="flex items-center justify-between w-full p-3 cursor-pointer sm:p-4">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <img
-                  src={cash_icon || "/placeholder.svg"}
-                  alt="cash"
-                  className="h-[21px] w-[21px] sm:h-[25px] sm:w-[25px] object-contain"
-                />
-                <span className="text-[14px] sm:text-[18px] sm:font-medium">
-                  {lang === "uz"
-                    ? "Keshbekni ishlatish"
-                    : lang === "en"
-                    ? "Use cashback"
-                    : lang === "ru"
-                    ? "Использовать кешбек"
-                    : "Keshbekni ishlatish"}
-                </span>
-              </div>
-              <div className="flex items-center gap-[25px] sm:gap-[13px]">
-                <span
-                  className={`${
-                    cashback_is_using ? "translate-x-0" : "translate-x-11"
-                  } text-[13px] duration-200 sm:text-[18px] sm:font-medium ${
-                    cashbackAmount < 1000 ? "text-red-500 font-bold" : ""
-                  }`}
-                >
-                  {cashbackAmount.toLocaleString()}{" "}
-                  {lang === "uz"
-                    ? "so'm"
-                    : lang === "en"
-                    ? "uzs"
-                    : lang === "ru"
-                    ? "сум"
-                    : "so'm"}
-                </span>
-                <div
-                  className={`${
-                    cashback_is_using ? "translate-x-0" : "translate-x-11"
-                  } p-1 duration-200 ${
-                    cashbackAmount < 1000 ? "bg-white" : "bg-green-500"
-                  } rounded-full`}
-                >
-                  <Check className="w-3 h-3 text-white sm:h-4 sm:w-4" />
+                <div className="flex items-center gap-[25px] sm:gap-[13px]">
+                  <span
+                    className={`${
+                      cashback_is_using ? "translate-x-0" : "translate-x-11"
+                    } text-[13px] duration-200 sm:text-[18px] sm:font-medium ${
+                      cashbackAmount < 1000 ? "text-red-500 font-bold" : ""
+                    }`}
+                  >
+                    {cashbackAmount.toLocaleString()}{" "}
+                    {lang === "uz"
+                      ? "so'm"
+                      : lang === "en"
+                      ? "uzs"
+                      : lang === "ru"
+                      ? "сум"
+                      : "so'm"}
+                  </span>
+                  <div
+                    className={`${
+                      cashback_is_using ? "translate-x-0" : "translate-x-11"
+                    } p-1 duration-200 ${
+                      cashbackAmount < 1000 ? "bg-white" : "bg-green-500"
+                    } rounded-full`}
+                  >
+                    <Check className="w-3 h-3 text-white sm:h-4 sm:w-4" />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="w-full sm:w-[95%] mx-auto p-7 sm:p-4 -mt-[20px]">
-          <h1 className="font-inter font-[600] text-[16px] leading-[22px] text-black mb-4">
-            {lang === "uz"
-              ? "To'lov usuli"
-              : lang === "en"
-              ? "Payment method"
-              : lang === "ru"
-              ? "Способ оплаты"
-              : "To'lov usuli"}
-          </h1>
-          <div className="grid w-full gap-4 md:grid-cols-2">
-            <div className="border border-[#D5D5D5] w-full sm:w-[90%] rounded-lg p-4 bg-white">
-              <div className="space-y-3.5 sm:space-y-4">
-                <div
-                  className="flex items-center justify-between p-2 cursor-pointer"
-                  onClick={() => setSelectedMethod("click")}
-                >
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={click || "/placeholder.svg"}
-                      alt="Click"
-                      className="object-contain w-7 h-7 sm:w-8 sm:h-8"
-                    />
-                    <span className="font-inter font-[600] text-[16px] leading-[22px] text-black">
-                      Click
-                    </span>
-                  </div>
+          <div className="w-full sm:w-[95%] mx-auto p-7 sm:p-4 -mt-[20px]">
+            <h1 className="font-inter font-[600] text-[16px] leading-[22px] text-black mb-4">
+              {lang === "uz"
+                ? "To'lov usuli"
+                : lang === "en"
+                ? "Payment method"
+                : lang === "ru"
+                ? "Способ оплаты"
+                : "To'lov usuli"}
+            </h1>
+            <div className="grid w-full gap-4 md:grid-cols-2">
+              <div className="border border-[#D5D5D5] w-full sm:w-[90%] rounded-lg p-4 bg-white">
+                <div className="space-y-3.5 sm:space-y-4">
                   <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
-                      selectedMethod === "click" ? "bg-[#BEA086]" : ""
-                    }`}
+                    className="flex items-center justify-between p-2 cursor-pointer"
+                    onClick={() => setSelectedMethod("click")}
                   >
-                    {selectedMethod === "click" && (
-                      <Check className="w-4 h-4 text-white" />
-                    )}
-                  </div>
-                </div>
-                <div
-                  className="flex items-center justify-between p-2 cursor-pointer"
-                  onClick={() => setSelectedMethod("payme")}
-                >
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={pay_me || "/placeholder.svg"}
-                      alt="Payme"
-                      className="object-contain w-7 h-7 sm:w-8 sm:h-8"
-                    />
-                    <span className="font-inter font-[600] text-[16px] leading-[22px] text-black">
-                      Payme
-                    </span>
-                  </div>
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
-                      selectedMethod === "payme" ? "bg-[#BEA086]" : ""
-                    }`}
-                  >
-                    {selectedMethod === "payme" && (
-                      <Check className="w-4 h-4 text-white" />
-                    )}
-                  </div>
-                </div>
-                <div
-                  className="flex items-center justify-between p-2 cursor-pointer"
-                  onClick={() => setSelectedMethod("qabul")}
-                >
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={on_arrive || "/placeholder.svg"}
-                      alt="Qabul qilinganda"
-                      className="object-contain w-7 h-7 sm:w-8 sm:h-8"
-                    />
-                    <span className="font-inter font-[600] text-[16px] leading-[22px] text-black">
-                      {lang === "uz"
-                        ? "Qabul qilinganda"
-                        : lang === "en"
-                        ? "On arrival"
-                        : lang === "ru"
-                        ? "При получении"
-                        : "Qabul qilinganda"}
-                    </span>
-                  </div>
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
-                      selectedMethod === "qabul" ? "bg-[#BEA086]" : ""
-                    }`}
-                  >
-                    {selectedMethod === "qabul" && (
-                      <Check className="w-4 h-4 text-white" />
-                    )}
-                  </div>
-                </div>
-                <div
-                  className="flex items-center justify-between p-2 rounded-md cursor-pointer"
-                  onClick={() => setSelectedMethod("installment")}
-                >
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={payment_time || "/placeholder.svg"}
-                      alt="Muddatli to'lov"
-                      className="w-8 h-8"
-                    />
-                    <span className="font-inter font-[600] text-[16px] leading-[22px] text-black">
-                      {lang === "uz"
-                        ? "Muddatli to'lov"
-                        : lang === "en"
-                        ? "Installment"
-                        : lang === "ru"
-                        ? "Рассрочка"
-                        : "Muddatli to'lov"}
-                    </span>
-                  </div>
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
-                      selectedMethod === "installment" ? "bg-[#BEA086]" : ""
-                    }`}
-                  >
-                    {selectedMethod === "installment" && (
-                      <Check className="w-4 h-4 text-white" />
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-            {selectedMethod === "installment" && (
-              <div className="border border-[#D5D5D5] rounded-lg w-[75%] sm:w-[90%] p-[20px] sm:p-[27px] bg-white">
-                <div className="flex items-center justify-between mb-5 sm:mb-6">
-                  <div className="flex flex-row gap-3">
-                    <div className="w-10 h-10 object-contain rounded-[5px]">
-                      <img src={open_icon} alt="open" />
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={click || "/placeholder.svg"}
+                        alt="Click"
+                        className="object-contain w-7 h-7 sm:w-8 sm:h-8"
+                      />
+                      <span className="font-inter font-[600] text-[16px] leading-[22px] text-black">
+                        Click
+                      </span>
                     </div>
-                    <div className="flex flex-col h-[30px] -mt-[2px]">
-                      <span className="font-inter font-[500] text-[14px] sm:text-[16px] leading-[22px] text-black">
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
+                        selectedMethod === "click" ? "bg-[#BEA086]" : ""
+                      }`}
+                    >
+                      {selectedMethod === "click" && (
+                        <Check className="w-4 h-4 text-white" />
+                      )}
+                    </div>
+                  </div>
+                  <div
+                    className="flex items-center justify-between p-2 cursor-pointer"
+                    onClick={() => setSelectedMethod("payme")}
+                  >
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={pay_me || "/placeholder.svg"}
+                        alt="Payme"
+                        className="object-contain w-7 h-7 sm:w-8 sm:h-8"
+                      />
+                      <span className="font-inter font-[600] text-[16px] leading-[22px] text-black">
+                        Pay me
+                      </span>
+                    </div>
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
+                        selectedMethod === "payme" ? "bg-[#BEA086]" : ""
+                      }`}
+                    >
+                      {selectedMethod === "payme" && (
+                        <Check className="w-4 h-4 text-white" />
+                      )}
+                    </div>
+                  </div>
+                  <div
+                    className="flex items-center justify-between p-2 cursor-pointer"
+                    onClick={() => setSelectedMethod("qabul")}
+                  >
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={on_arrive || "/placeholder.svg"}
+                        alt="Qabul qilinganda"
+                        className="object-contain w-7 h-7 sm:w-8 sm:h-8"
+                      />
+                      <span className="font-inter font-[600] text-[16px] leading-[22px] text-black">
                         {lang === "uz"
-                          ? "Muddatli to'lov turi"
+                          ? "Qabul qilinganda"
                           : lang === "en"
-                          ? "Installment type"
+                          ? "On arrive"
                           : lang === "ru"
-                          ? "Тип рассрочки"
-                          : "Muddatli to'lov turi"}
+                          ? "При прибытии"
+                          : "Qabul qilinganda"}
                       </span>
-                      <span className="font-inter font-[600] text-[14px] sm:text-[16px] leading-[22px] text-black">
-                        Open
+                    </div>
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
+                        selectedMethod === "qabul" ? "bg-[#BEA086]" : ""
+                      }`}
+                    >
+                      {selectedMethod === "qabul" && (
+                        <Check className="w-4 h-4 text-white" />
+                      )}
+                    </div>
+                  </div>
+                  <div
+                    className="flex items-center justify-between p-2 rounded-md cursor-pointer"
+                    onClick={() => setSelectedMethod("installment")}
+                  >
+                    <div className="flex items-center gap-3 ">
+                      <img
+                        src={payment_time || "/placeholder.svg"}
+                        alt="Muddatli to'lov"
+                        className="w-8 h-8"
+                      />
+                      <span className="font-inter font-[600] text-[16px] leading-[22px] text-black">
+                        {lang === "uz"
+                          ? "Muddatli to'lov"
+                          : lang === "en"
+                          ? "Installment"
+                          : lang === "ru"
+                          ? "Рассрочка"
+                          : "Muddatli to'lov"}
                       </span>
+                    </div>
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
+                        selectedMethod === "installment" ? "bg-[#BEA086]" : ""
+                      }`}
+                    >
+                      {selectedMethod === "installment" && (
+                        <Check className="w-4 h-4 text-white" />
+                      )}
                     </div>
                   </div>
                 </div>
-                <hr className="border-[#D5D5D5] border-[1.5px] rounded-full" />
-                <div className="flex flex-col mt-8 justify-between w-[100%] py-[10px] px-[12px] h-[87px] rounded-[8px] border-[1px] border-[rgba(213,213,213,1)] bg-[rgba(242,242,241,1)]">
-                  <div className="w-full h-[26px] rounded-[5px] flex justify-between gap-[3.75px] bg-[rgba(213,213,213,1)]">
-                    {paymentOptions[lang].map((option, index) => (
-                      <div
-                        key={index}
-                        className={`transition-all duration-100 flex justify-center items-center w-[80px] h-[26px] rounded-[5px] cursor-pointer ${
-                          selectedPaymentIndex === index
-                            ? "bg-white border-[1.5px] border-[rgba(190,160,134,1)]"
-                            : ""
-                        }`}
-                        onClick={() => handlePaymentClick(index)}
-                      >
-                        <h1 className="font-inter font-[500] text-[10px] text-black">
-                          {option}
-                        </h1>
+              </div>
+              {selectedMethod === "installment" && (
+                <div className="border border-[#D5D5D5] rounded-lg w-[75%] sm:w-[90%] p-[20px] sm:p-[27px] bg-white">
+                  <div className="flex items-center justify-between mb-5 sm:mb-6">
+                    <div className="flex flex-row gap-3">
+                      <div className="w-10 h-10 object-contain rounded-[5px]">
+                        <img src={open_icon} alt="open" />
                       </div>
-                    ))}
+                      <div className="flex flex-col h-[30px] -mt-[2px]">
+                        <span className="font-inter font-[500] text-[14px] sm:text-[16px] leading-[22px] text-black">
+                          {lang === "uz"
+                            ? "Muddatli to'lov turi"
+                            : lang === "en"
+                            ? "Installment type"
+                            : lang === "ru"
+                            ? "Тип рассрочки"
+                            : "Muddatli to'lov turi"}
+                        </span>
+                        <span className="font-inter font-[600] text-[14px] sm:text-[16px] leading-[22px] text-black">
+                          Open
+                        </span>
+                      </div>
+                    </div>
                   </div>
+                  <hr className="border-[#D5D5D5] border-[1.5px] rounded-full" />
+                  <div className="flex flex-col mt-8 justify-between w-[100%] py-[10px] px-[12px] h-[87px] rounded-[8px] border-[1px] border-[rgba(213,213,213,1)] bg-[rgba(242,242,241,1)]">
+                    <div className="w-full h-[26px] rounded-[5px] flex justify-between gap-[3.75px] bg-[rgba(213,213,213,1)]">
+                      {paymentOptions[lang].map((option, index) => (
+                        <div
+                          key={index}
+                          className={`transition-all duration-100 flex justify-center items-center w-[80px] h-[26px] rounded-[5px] cursor-pointer ${
+                            selectedPaymentIndex === index
+                              ? "bg-white border-[1.5px] border-[rgba(190,160,134,1)]"
+                              : ""
+                          }`}
+                          onClick={() => handlePaymentClick(index)}
+                        >
+                          <h1 className="font-inter font-[500] text-[10px] text-black">
+                            {option}
+                          </h1>
+                        </div>
+                      ))}
+                    </div>
 
-                  <div className="flex gap-[10px] items-center">
-                    <h1 className="w-[89px] h-[28px] rounded-[2.5px] bg-[rgba(254,242,157,1)] font-inter font-[500] text-[13px] leading-[22px] flex justify-center items-center">
-                      {monthlyPayments[selectedPaymentIndex]} {uzs_lang}
-                    </h1>
-                    <h1 className="font-inter font-[500] text-[10px] leading-[22px] text-black">
-                      x {plans[selectedPaymentIndex].months}{" "}
-                      {lang === "uz"
-                        ? "oy"
-                        : lang === "en"
-                        ? "month"
-                        : lang === "ru"
-                        ? "мес."
-                        : "oy"}
-                    </h1>
+                    <div className="flex gap-[10px] items-center">
+                      <h1 className="w-[89px] h-[28px] rounded-[2.5px] bg-[rgba(254,242,157,1)] font-inter font-[500] text-[13px] leading-[22px] flex justify-center items-center">
+                        {monthlyPayments[selectedPaymentIndex]} {uzs_lang}
+                      </h1>
+                      <h1 className="font-inter font-[500] text-[10px] leading-[22px] text-black">
+                        x {plans[selectedPaymentIndex].months}{" "}
+                        {lang === "uz"
+                          ? "oy"
+                          : lang === "en"
+                          ? "month"
+                          : lang === "ru"
+                          ? "мес."
+                          : "oy"}
+                      </h1>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="w-[97%] mx-auto px-6 sm:p-6">
-          <div className="space-y-5 sm:space-y-10">
-            <h2 className="font-inter font-[600] text-[14px] sm:text-[24px] leading-[22px] text-black">
-              {lang === "uz"
-                ? "Sizning buyurtmangiz"
-                : lang === "en"
-                ? "Your order"
-                : lang === "ru"
-                ? "Ваш заказ"
-                : "Sizning buyurtmangiz"}
-            </h2>
-            <div className="space-y-5 w-[100%] text-[#000000BF] font-inter font-[500] text-[14px] sm:text-[20px] leading-[22px]">
-              <div className="flex items-center justify-between">
-                <span>
-                  {lang === "uz"
-                    ? "Maxsulotlar narxi"
-                    : lang === "en"
-                    ? "Products price"
-                    : lang === "ru"
-                    ? "Стоимость товаров"
-                    : "Maxsulotlar narxi"}
-                </span>
-                <span>
-                  {totalPrice.toLocaleString()}{" "}
-                  {lang === "uz"
-                    ? "so'm"
-                    : lang === "en"
-                    ? "uzs"
-                    : lang === "ru"
-                    ? "сум"
-                    : "so'm"}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>
-                  {lang === "uz"
-                    ? "Ishlatilayotgan keshbek"
-                    : lang === "en"
-                    ? "Used cashback"
-                    : lang === "ru"
-                    ? "Использованный кешбек"
-                    : "Ishlatilayotgan keshbek"}
-                </span>
-                <span>
-                  {(cashback_is_using ? cashbackAmount : 0).toLocaleString()}{" "}
-                  {lang === "uz"
-                    ? "so'm"
-                    : lang === "en"
-                    ? "uzs"
-                    : lang === "ru"
-                    ? "сум"
-                    : "so'm"}
-                </span>
-              </div>
-              <hr className="border-[#D5D5D5] border-[1.5px] my-[23px]" />
-              <div className="flex sm:text-[20px] font-[700] text-[16px] justify-between items-center">
-                <span>
-                  {lang === "uz"
-                    ? "Jami"
-                    : lang === "en"
-                    ? "Total"
-                    : lang === "ru"
-                    ? "Итого"
-                    : "Jami"}
-                </span>
-                <span>
-                  {payable.toLocaleString()}{" "}
-                  {lang === "uz"
-                    ? "so'm"
-                    : lang === "en"
-                    ? "uzs"
-                    : lang === "ru"
-                    ? "сум"
-                    : "so'm"}
-                </span>
-              </div>
-            </div>
-            <Link
-              to={selectedMethod === "installment" ? "/installment" : ""}
-              onClick={
-                selectedMethod === "installment"
-                  ? handleInstallment
-                  : handleOrderCreation
-              }
-            >
-              <button className="w-[100%] py-4 sm:py-6 bg-[#DCC38B] font-inter mt-5 sm:mt-2 font-[600] text-[16px] sm:text-[22px] leading-[22px] text-black rounded-[10px] cursor-pointer hover:scale-[101%] active:scale-[99%] duration-300">
-                {lang === "uz"
-                  ? "Xaridni rasmiylashtirish"
-                  : lang === "en"
-                  ? "Purchase clearance"
-                  : lang === "ru"
-                  ? "Подтверждение покупки"
-                  : "Xaridni rasmiylashtirish"}
-              </button>
-            </Link>
-            <div className="text-center font-inter font-[400] mt-8 text-[13px] sm:text-[18px] leading-[19px] sm:leading-[33px]">
-              {lang === "uz"
-                ? "Buyurtmani tasdiqlash orqali men "
-                : lang === "en"
-                ? "By confirming the order, I accept the "
-                : lang === "ru"
-                ? "Подтверждая заказ, я принимаю "
-                : ""}
-              <Link to="/terms" className="text-purple-600 hover:underline">
-                {lang === "uz"
-                  ? "foydalanuvchi shartnomasini"
-                  : lang === "en"
-                  ? "the user agreement"
-                  : lang === "ru"
-                  ? "пользовательское соглашение"
-                  : "foydalanuvchi shartnomasini"}
-              </Link>{" "}
-              {lang === "uz"
-                ? "shartlarini qabul qilaman."
-                : lang === "en"
-                ? "terms."
-                : lang === "ru"
-                ? "и условия."
-                : "shartlarini qabul qilaman."}
+              )}
             </div>
           </div>
+          <div className="w-[97%] mx-auto px-6 sm:p-6">
+            <div className="space-y-5 sm:space-y-10">
+              <h2 className="font-inter font-[600] text-[14px] sm:text-[24px] leading-[22px] text-black">
+                {lang === "uz"
+                  ? "Sizning buyurtmangiz"
+                  : lang === "en"
+                  ? "Your order"
+                  : lang === "ru"
+                  ? "Ваш заказ"
+                  : "Sizning buyurtmangiz"}
+              </h2>
+              <div className="space-y-5 w-[100%] text-[#000000BF] font-inter font-[500] text-[14px] sm:text-[20px] leading-[22px]">
+                <div className="flex items-center justify-between">
+                  <span>
+                    {lang === "uz"
+                      ? "Maxsulotlar narxi"
+                      : lang === "en"
+                      ? "Products price"
+                      : lang === "ru"
+                      ? "Стоимость товаров"
+                      : "Maxsulotlar narxi"}
+                  </span>
+                  <span>
+                    {basket
+                      .filter((item) => item.selected)
+                      .reduce(
+                        (sum, item) => sum + item.price * item.quantity,
+                        0
+                      )
+                      .toLocaleString()}{" "}
+                    {lang === "uz"
+                      ? "so'm"
+                      : lang === "en"
+                      ? "uzs"
+                      : lang === "ru"
+                      ? "сум"
+                      : "so'm"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>
+                    {lang === "uz"
+                      ? "Ishlatilayotgan keshbek"
+                      : lang === "en"
+                      ? "Used cashback"
+                      : lang === "ru"
+                      ? "Использованный кешбек"
+                      : "Ishlatilayotgan keshbek"}
+                  </span>
+                  <span>
+                    {(cashback_is_using && cashbackAmount) || 0}
+                    {` `}{" "}
+                    {lang === "uz"
+                      ? "so'm"
+                      : lang === "en"
+                      ? "uzs"
+                      : lang === "ru"
+                      ? "сум"
+                      : "so'm"}
+                  </span>
+                </div>
+                <hr className="border-[#D5D5D5] border-[1.5px] my-[23px]" />
+                <div className="flex sm:text-[20px] font-[700] text-[16px] justify-between items-center">
+                  <span>
+                    {lang === "uz"
+                      ? "Jami"
+                      : lang === "en"
+                      ? "Total"
+                      : lang === "ru"
+                      ? "Итого"
+                      : "Jami"}
+                  </span>
+                  <span>
+                    {(cashback_is_using && payable.toLocaleString()) ||
+                      totalPrice}{" "}
+                    {lang === "uz"
+                      ? "so'm"
+                      : lang === "en"
+                      ? "uzs"
+                      : lang === "ru"
+                      ? "сум"
+                      : "so'm"}
+                  </span>
+                </div>
+              </div>
+              <Link
+                to={selectedMethod === "installment" ? "/installment" : ""}
+                onClick={
+                  selectedMethod === "installment"
+                    ? handleInstallment
+                    : handleOrderCreation
+                }
+              >
+                <button className="w-[100%] py-4 sm:py-6 bg-[#DCC38B] font-inter mt-5 sm:mt-2 font-[600] text-[16px] sm:text-[22px] leading-[22px] text-black rounded-[10px] cursor-pointer hover:scale-[101%] active:scale-[99%] duration-300">
+                  {lang === "uz"
+                    ? "Xaridni rasmiylashtirish"
+                    : lang === "en"
+                    ? "Purchase clearance"
+                    : lang === "ru"
+                    ? "Подтверждение покупки"
+                    : "Xaridni rasmiylashtirish"}
+                </button>
+              </Link>
+              <div className="text-center font-inter font-[400] mt-8 text-[13px] sm:text-[18px] leading-[19px] sm:leading-[33px]">
+                {lang === "uz"
+                  ? "Buyurtmani tasdiqlash orqali men "
+                  : lang === "en"
+                  ? "By confirming the order, I accept the "
+                  : lang === "ru"
+                  ? "Подтверждая заказ, я принимаю "
+                  : ""}
+                <Link to="/terms" className="text-purple-600 hover:underline">
+                  {lang === "uz"
+                    ? "foydalanuvchi shartnomasini"
+                    : lang === "en"
+                    ? "the user agreement"
+                    : lang === "ru"
+                    ? "пользовательское соглашение"
+                    : "foydalanuvchi shartnomasini"}
+                </Link>{" "}
+                {lang === "uz"
+                  ? "shartlarini qabul qilaman."
+                  : lang === "en"
+                  ? "terms."
+                  : lang === "ru"
+                  ? "и условия."
+                  : "shartlarini qabul qilaman."}
+              </div>
+            </div>
+          </div>
         </div>
-        <Modal
-          is_modal_open={is_modal_open}
-          set_is_modal_open={set_is_modal_open}
-          method={modal_method}
+        <Delivery
+          setSelectedLocation={setSelectedLocation}
+          set_is_delivery={set_is_delivery}
+          is_delivery={is_delivery}
+          is_another_nav={is_another_nav}
+          set_address_inform={set_address_inform}
+        />
+        <Payment_variant
+          is_payment_variant={is_payment_variant}
+          set_is_payment_variant={set_is_payment_variant}
+          set_address_inform={set_address_inform}
+        />
+        <Pickup_address
+          is_pickup={is_pickup}
+          set_is_pickup={set_is_pickup}
+          set_address_inform={set_address_inform}
         />
       </div>
-      <Delivery
-        setSelectedLocation={setSelectedLocation}
-        set_is_delivery={set_is_delivery}
-        is_delivery={is_delivery}
-        is_another_nav={is_another_nav}
-        set_address_inform={set_address_inform}
-      />
-      <Payment_variant
-        is_payment_variant={is_payment_variant}
-        set_is_payment_variant={set_is_payment_variant}
-        set_address_inform={set_address_inform}
-      />
-      <Pickup_address
-        is_pickup={is_pickup}
-        set_is_pickup={set_is_pickup}
-        set_address_inform={set_address_inform}
-      />
     </div>
   );
 };
