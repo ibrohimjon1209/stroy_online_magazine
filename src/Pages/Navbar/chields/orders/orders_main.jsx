@@ -96,7 +96,7 @@ const Orders_main = ({ lang }) => {
 
   // Faqat pending va in_payment bo‘lmagan orderlar
   const filteredOrders = orders.filter(
-    (order) => !["pending", "in_payment"].includes(order.status)
+    (order) => !["ee", "eee"].includes(order.status)
   );
 
   return (
@@ -118,7 +118,7 @@ const Orders_main = ({ lang }) => {
           </h1>
         </Link>
       </div>
-      <div className="scale-[150%] container p-4 mx-auto my-4 mt-16">
+      <div className="scale-[100%] container p-4 mx-auto my-4 mt-16">
         {filteredOrders.length === 0 ? (
           <div className="flex flex-col justify-center items-center mt-16">
             <img
