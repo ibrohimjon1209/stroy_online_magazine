@@ -142,12 +142,12 @@ const Likes_main = ({ lang }) => {
               </div>
             ))
           ) : (
-            <div className="w-[1450px] h-full mt-[50px] flex flex-col justify-center items-center">
+            <div className="w-[1450px] h-full mt-[25px] ml-[23px] mb-[35%] flex flex-col items-center">
 
               <img src={no_liked} alt="" className="w-[400px] hover:scale-[103%] transition-all duration-[0.3s]" />
 
 
-              <h1 className="w-full mt-[10px] text-[25px] text-center text-gray-800 font-[600] font-inter">
+              <h1 className="w-full text-[25px] text-center text-gray-800 font-[600] font-inter">
                 {lang === "uz"
                   ? "Sevimlilar yo'q"
                   : lang === "en"

@@ -202,7 +202,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
 
 
   const get_basket_len = () => {
-    basket.filter((item) => item.branch_id == sl_option_id)
+    basket?.filter((item) => item.branch_id == sl_option_id)
   }
 
   return (

@@ -45,7 +45,15 @@ const App = () => {
 
   const [userSignIn, setUserSignIn] = useState(false);
   const [lang, set_lang] = useState("uz");
-  const [city, set_city] = useState("andijan city");
+  const [city, set_city] = useState(() => {
+    try {
+      const storedCity = localStorage.getItem("city");
+      return storedCity ? JSON.parse(storedCity) : null; // Fallback to null if no value
+    } catch (error) {
+      console.error("Failed to parse city from localStorage:", error);
+      return null; // Fallback value
+    }
+  });
   const [is_SI, set_is_SI] = useState(false);
   const [is_PM, set_is_PM] = useState("false");
   const [is_formalization_open, set_is_formalization_open] = useState(false);
@@ -80,12 +88,12 @@ const App = () => {
     setUserSignIn(localStorage.getItem("userId") ? true : false);
     !localStorage.getItem("lang") && localStorage.setItem("lang", "uz");
     !localStorage.getItem("city") &&
-      localStorage.setItem("city", "andijan city");
+      localStorage.setItem("city", null);
     !localStorage.getItem("is_entered") &&
       localStorage.setItem("is_entered", "false");
     const basketFromStorage = JSON.parse(localStorage.getItem("basket")) || [];
     set_lang(localStorage.getItem("lang") || "uz");
-    set_city(localStorage.getItem("city") || "andijan city");
+    set_city(localStorage.getItem("city") || null);
     set_basket(basketFromStorage || []);
     set_is_SI(localStorage.getItem("is_SI") || false);
     if (localStorage.getItem("is_entered") == "false") {
@@ -214,6 +222,8 @@ const App = () => {
       document.body.style.height = "";
     }
   }, []);
+
+  // useEffect(()=>{console.log(city)},[])
 
   function PaymentSuccess({ set_is_PM }) {
     const navigate = useNavigate();

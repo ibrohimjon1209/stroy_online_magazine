@@ -1,21 +1,6 @@
 import React, { useEffect, useState } from "react";
-import city_get from "../../Services/cities/city";
+import region_get from "../../Services/cities/region";
 import { Link } from "react-router-dom";
-
-const City = [
-  {
-    name: "Toshkent shahri",
-  },
-  {
-    name: "Andijon shahri",
-  },
-  {
-    name: "Farg'ona shahri",
-  },
-  {
-    name: "Namangan shahri",
-  },
-];
 
 const Borrow = ({ set_is_found, city, set_city, lang }) => {
   useEffect(() => {
@@ -25,7 +10,7 @@ const Borrow = ({ set_is_found, city, set_city, lang }) => {
   useEffect(() => {
     const get_cities = async () => {
       try {
-        const response = await city_get();
+        const response = await region_get();
         set_cities(response);
       } catch (err) {
         console.error("Error:", err);
@@ -52,15 +37,11 @@ const Borrow = ({ set_is_found, city, set_city, lang }) => {
         {cities.map((item, index) => (
           <div
             onClick={() => {
-              localStorage.setItem("city", item.name_en?.toLowerCase());
-              set_city(item.name_en);
+              localStorage.setItem("city", item[`name_${lang}`]?.toLowerCase());
+              set_city(item);
+              localStorage.setItem("city", JSON.stringify(item));
             }}
             key={index}
-            className={`${
-              item.name_en?.toLowerCase() === city?.toLowerCase()
-                ? "text-[#DCC38B]"
-                : ""
-            } cursor-pointer`}
           >
             <Link to="/enter/category">{item[`name_${lang}`]}</Link>
           </div>

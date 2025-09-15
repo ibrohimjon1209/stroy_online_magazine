@@ -1,4 +1,4 @@
-import { Minus, Plus, Check, ChevronLeft } from "lucide-react";
+import { Minus, Plus, Check, ChevronLeft, Trash2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import no_basket from "./no_basket.png";
@@ -18,16 +18,16 @@ export default function Basket_main({
     localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
-      ? 1
-      : 2;
+        ? 1
+        : 2;
   const uzs_lang =
     lang == "uz"
       ? "so'm"
       : lang == "en"
-      ? "uzs"
-      : lang == "ru"
-      ? "сум"
-      : "so'm";
+        ? "uzs"
+        : lang == "ru"
+          ? "сум"
+          : "so'm";
 
   useEffect(() => {
     const savedBasket = localStorage.getItem("basket");
@@ -74,12 +74,35 @@ export default function Basket_main({
     setProducts((prevProducts) => {
       const updatedProducts = prevProducts.map((product) =>
         product.id === productId &&
-        product.size[lang] === size &&
-        product.color[lang] === color
+          product.size[lang] === size &&
+          product.color[lang] === color
           ? { ...product, selected: !product.selected }
           : product
       );
       set_basket(updatedProducts);
+      return updatedProducts;
+    });
+  };
+
+  const deleteQuantity = (productId, size, color) => {
+    setProducts((prevProducts) => {
+      const updatedProducts = prevProducts
+        .map((product) => {
+          if (
+            product.id === productId &&
+            product.size[lang] === size &&
+            product.color[lang] === color
+          ) {
+            const newQuantity = product.quantity = 0;
+            return newQuantity > 0
+              ? { ...product, quantity: newQuantity }
+              : null;
+          }
+          return product;
+        })
+        .filter(Boolean);
+      set_basket(updatedProducts);
+      localStorage.setItem("basket", JSON.stringify(updatedProducts));
       return updatedProducts;
     });
   };
@@ -111,8 +134,8 @@ export default function Basket_main({
     setProducts((prevProducts) => {
       const updatedProducts = prevProducts.map((product) =>
         product.id === productId &&
-        product.size[lang] === size &&
-        product.color[lang] === color
+          product.size[lang] === size &&
+          product.color[lang] === color
           ? { ...product, quantity: product.quantity + 1 }
           : product
       );
@@ -158,17 +181,17 @@ export default function Basket_main({
             {lang === "uz"
               ? "Savatcha"
               : lang === "en"
-              ? "Basket"
-              : lang === "ru"
-              ? "Корзина"
-              : "Savatcha"}
+                ? "Basket"
+                : lang === "ru"
+                  ? "Корзина"
+                  : "Savatcha"}
           </h1>
         </Link>
       </div>
 
       <div className="w-full mx-auto p-5 sm:p-6 sm:mt-0 mt-16 pt-[20px] sm:pt-[35px]">
-        {products.length === 0 ? (
-          <div className="w-full mt-[50px] flex flex-col justify-center items-center">
+        {visibleProducts.length == 0 ? (
+          <div className="w-full mt-[50px] mb-[6%] flex flex-col justify-center items-center">
             <img
               src={no_basket}
               alt="No basket"
@@ -178,15 +201,15 @@ export default function Basket_main({
               {lang === "uz"
                 ? "Savatchangiz bo'sh"
                 : lang === "en"
-                ? "Your basket is empty"
-                : "Ваша корзина пуста"}
+                  ? "Your basket is empty"
+                  : "Ваша корзина пуста"}
             </h1>
             <h1 className="ml-[40px] w-full mt-[10px] text-[18px] text-center text-gray-700 font-[500] font-inter">
               {lang === "uz"
                 ? "Iltimos, mahsulotlarni tanlang"
                 : lang === "en"
-                ? "Please select some products"
-                : "Пожалуйста, выберите товары"}
+                  ? "Please select some products"
+                  : "Пожалуйста, выберите товары"}
             </h1>
           </div>
         ) : (
@@ -201,27 +224,26 @@ export default function Basket_main({
                     {lang === "uz"
                       ? "Hammasini tanlash"
                       : lang === "en"
-                      ? "Select all"
-                      : lang === "ru"
-                      ? "Выбрать все"
-                      : "Hammasini tanlash"}{" "}
+                        ? "Select all"
+                        : lang === "ru"
+                          ? "Выбрать все"
+                          : "Hammasini tanlash"}{" "}
                     <span className="hidden sm:inline">
                       {visibleProducts.length}{" "}
                       {lang == "uz"
                         ? "ta maxsulot"
                         : lang === "en"
-                        ? "products"
-                        : lang === "ru"
-                        ? "продукт"
-                        : "ta maxsulot"}
+                          ? "products"
+                          : lang === "ru"
+                            ? "продукт"
+                            : "ta maxsulot"}
                     </span>
                   </h1>
                   <div
-                    className={`sm:w-6 sm:h-6 w-5 h-5 ${
-                      allSelected && products.length > 0
-                        ? "bg-[#DCC38B]"
-                        : "bg-gray-300"
-                    } rounded-md flex items-center border border-gray-500 justify-center cursor-pointer`}
+                    className={`sm:w-6 sm:h-6 w-5 h-5 ${allSelected && products.length > 0
+                      ? "bg-[#DCC38B]"
+                      : "bg-gray-300"
+                      } rounded-md flex items-center border border-gray-500 justify-center cursor-pointer`}
                   >
                     {allSelected && products.length > 0 && (
                       <Check className="w-4 h-4 text-white" />
@@ -257,76 +279,105 @@ export default function Basket_main({
                       >
                         {product.name[lang]}
                       </h2>
-                      <button
-                        onClick={() =>
-                          toggleProductSelection(
-                            product.id,
-                            product.size[lang],
-                            product.color[lang]
-                          )
-                        }
-                        className={`sm:w-6 sm:h-6 w-5 h-5 ${
-                          product.selected ? "bg-[#DCC38B]" : "bg-gray-300"
-                        } rounded-md flex items-center justify-center border border-gray-500 cursor-pointer sm:mr-5`}
-                      >
-                        {product.selected && (
-                          <Check className="w-4 h-4 text-white" />
-                        )}
-                      </button>
+                      <div className="selection-div">
+                        <button
+                          onClick={() =>
+                            toggleProductSelection(
+                              product.id,
+                              product.size[lang],
+                              product.color[lang]
+                            )
+                          }
+                          className={`sm:w-6 sm:h-6 w-5 h-5 ${product.selected ? "bg-[#DCC38B]" : "bg-gray-300"
+                            } rounded-md flex items-center justify-center border border-gray-500 cursor-pointer sm:mr-0`}
+                        >
+                          {product.selected && (
+                            <Check className="w-4 h-4 text-white" />
+                          )}
+                        </button>
+
+
+                      </div>
                     </div>
                     <p className="font-inter font-[600] text-[16px] mt-2">
                       {lang == "uz"
                         ? "O'lchami"
                         : lang == "en"
-                        ? "Size"
-                        : "Размер"}
+                          ? "Size"
+                          : "Размер"}
                       : {product.size[lang]}
                     </p>
                     <p className="font-inter font-[600] text-[16px] leading-[22px] text-black mt-2">
                       {product.price.toLocaleString()} {uzs_lang}
                     </p>
-                    <div className="flex items-center mt-4 sm:mt-10">
-                      <button
-                        onClick={() =>
-                          decreaseQuantity(
-                            product.id,
-                            product.size[lang],
-                            product.color[lang]
-                          )
-                        }
-                        className="flex items-center justify-center w-8 h-8 border rounded-md cursor-pointer"
-                      >
-                        <Minus className="w-4 h-4" />
-                      </button>
 
-                      <input
-                        className="w-16 mx-4 text-center border rounded-md"
-                        type="number"
-                        min={1}
-                        value={product.quantity}
-                        onChange={(e) =>
-                          handleQuantityChange(
-                            product.id,
-                            product.size[lang],
-                            product.color[lang],
-                            e.target.value
-                          )
-                        }
-                      />
+                    <div className="flex justify-between ">
 
-                      <button
-                        onClick={() =>
-                          increaseQuantity(
-                            product.id,
-                            product.size[lang],
-                            product.color[lang]
-                          )
-                        }
-                        className="flex items-center justify-center w-8 h-8 border rounded-md cursor-pointer"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center mt-4 sm:mt-10">
+                        <button
+                          onClick={() =>
+                            decreaseQuantity(
+                              product.id,
+                              product.size[lang],
+                              product.color[lang]
+                            )
+                          }
+                          className="flex items-center justify-center w-8 h-8 border rounded-md cursor-pointer"
+                        >
+                          <Minus className="w-4 h-4" />
+                        </button>
+
+                        <input
+                          className="w-16 mx-4 text-center border rounded-md"
+                          type="number"
+                          min={1}
+                          value={product.quantity}
+                          onChange={(e) =>
+                            handleQuantityChange(
+                              product.id,
+                              product.size[lang],
+                              product.color[lang],
+                              e.target.value
+                            )
+                          }
+                        />
+
+                        <button
+                          onClick={() =>
+                            increaseQuantity(
+                              product.id,
+                              product.size[lang],
+                              product.color[lang]
+                            )
+                          }
+                          className="flex items-center justify-center w-8 h-8 border rounded-md cursor-pointer"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+
+
+                      <div className="flex justify-center items-end ">
+                        <button
+                          onClick={() =>
+                            deleteQu(
+                              product.id,
+                              product.size[lang],
+                              product.color[lang]
+                            )
+                          }
+                          className={`sm:w-37 sm:h-8.5 w-9 h-7.5 opacity-50 hover:opacity-100  duration-200 overflow-hidden justify-end gap-[8px] rounded-md flex items-center cursor-pointer sm:mr-0`}
+                        >
+                          <Trash2 className="" />
+                          <h1>{lang == "uz" ? "Yo'q qilish" : lang == "en" ? "Delete" : "Удалить"}</h1>
+                        </button>
+
+                      </div>
+
+
                     </div>
+
+
                   </div>
                 </div>
               ))}
@@ -338,35 +389,33 @@ export default function Basket_main({
                   <div className="relative flex p-1 bg-gray-100 rounded-xl">
                     <button
                       onClick={() => setPaymentType("immediate")}
-                      className={`flex-1 py-2.5 text-center rounded-lg text-sm font-medium cursor-pointer ${
-                        paymentType === "immediate"
-                          ? "bg-white shadow-sm duration-400"
-                          : "text-gray-500"
-                      }`}
+                      className={`flex-1 py-2.5 text-center rounded-lg text-sm font-medium cursor-pointer ${paymentType === "immediate"
+                        ? "bg-white shadow-sm duration-400"
+                        : "text-gray-500"
+                        }`}
                     >
                       {lang === "uz"
                         ? "Hoziroq to'lash"
                         : lang === "en"
-                        ? "Pay now"
-                        : lang === "ru"
-                        ? "Сразу"
-                        : "Hoziroq to'lash"}
+                          ? "Pay now"
+                          : lang === "ru"
+                            ? "Сразу"
+                            : "Hoziroq to'lash"}
                     </button>
                     <button
                       onClick={() => setPaymentType("installment")}
-                      className={`flex-1 py-2.5 text-center rounded-lg text-sm font-medium cursor-pointer ${
-                        paymentType === "installment"
-                          ? "bg-white shadow-sm duration-400"
-                          : "text-gray-500"
-                      }`}
+                      className={`flex-1 py-2.5 text-center rounded-lg text-sm font-medium cursor-pointer ${paymentType === "installment"
+                        ? "bg-white shadow-sm duration-400"
+                        : "text-gray-500"
+                        }`}
                     >
                       {lang === "uz"
                         ? "Muddatli to'lov"
                         : lang === "en"
-                        ? "Installment"
-                        : lang === "ru"
-                        ? "Рассрочка"
-                        : "Muddatli to'lov"}
+                          ? "Installment"
+                          : lang === "ru"
+                            ? "Рассрочка"
+                            : "Muddatli to'lov"}
                     </button>
                   </div>
                   <div
@@ -375,21 +424,20 @@ export default function Basket_main({
                   >
                     <div
                       ref={immediateRef}
-                      className={`absolute top-0 left-0 w-full ${
-                        paymentType === "immediate"
-                          ? "opacity-100 z-10 duration-400"
-                          : "opacity-0 z-0"
-                      }`}
+                      className={`absolute top-0 left-0 w-full ${paymentType === "immediate"
+                        ? "opacity-100 z-10 duration-400"
+                        : "opacity-0 z-0"
+                        }`}
                     >
                       <div className="flex justify-between items-center font-inter font-[700] text-[16px] leading-[22px] text-black">
                         <span>
                           {lang === "uz"
                             ? "Umumiy"
                             : lang === "en"
-                            ? "Total"
-                            : lang === "ru"
-                            ? "Итого"
-                            : "Umumiy"}
+                              ? "Total"
+                              : lang === "ru"
+                                ? "Итого"
+                                : "Umumiy"}
                           :
                         </span>
                         <span>
@@ -399,11 +447,10 @@ export default function Basket_main({
                     </div>
                     <div
                       ref={installmentRef}
-                      className={`absolute top-0 left-0 w-full ${
-                        paymentType === "installment"
-                          ? "opacity-100 z-10 duration-400"
-                          : "opacity-0 z-0"
-                      }`}
+                      className={`absolute top-0 left-0 w-full ${paymentType === "installment"
+                        ? "opacity-100 z-10 duration-400"
+                        : "opacity-0 z-0"
+                        }`}
                     >
                       <div className="flex justify-between">
                         <h1 className="font-inter font-[500] text-[16px] leading-[22px] text-black">
@@ -411,10 +458,10 @@ export default function Basket_main({
                           {lang == "uz"
                             ? "ta maxsulot"
                             : lang === "en"
-                            ? "products"
-                            : lang === "ru"
-                            ? "продукт"
-                            : "ta maxsulot"}
+                              ? "products"
+                              : lang === "ru"
+                                ? "продукт"
+                                : "ta maxsulot"}
                         </h1>
                         <p className="font-inter font-[500] text-[16px] leading-[22px] text-black">
                           {totalPrice.toLocaleString()} {uzs_lang}
@@ -424,10 +471,10 @@ export default function Basket_main({
                         {lang == "uz"
                           ? "Siz buyurtmani 6 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."
                           : lang == "en"
-                          ? "You can purchase an order for a period of 6 to 24 months for a fixed fee."
-                          : lang == "ru"
-                          ? "Вы можете приобрести заказ на срок от 6 до 24 месяцев за фиксированную плату."
-                          : "Siz buyurtmani 6 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."}
+                            ? "You can purchase an order for a period of 6 to 24 months for a fixed fee."
+                            : lang == "ru"
+                              ? "Вы можете приобрести заказ на срок от 6 до 24 месяцев за фиксированную плату."
+                              : "Siz buyurtmani 6 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."}
                       </p>
                     </div>
                   </div>
@@ -441,19 +488,18 @@ export default function Basket_main({
                         e.preventDefault();
                       }
                     }}
-                    className={`sm:w-[87%] w-[90%] absolute flex items-center justify-center py-4 sm:mt-[35%] mt-[28%] ${
-                      hasSelectedProducts
-                        ? "bg-[#E6D1A7] hover:bg-[#dac59b] cursor-pointer"
-                        : "bg-[#c9bb9d] cursor-not-allowed"
-                    } rounded-xl font-inter font-[600] text-[15px] leading-[22px] text-black transition-colors duration-300`}
+                    className={`sm:w-[87%] w-[90%] absolute flex items-center justify-center py-4 sm:mt-[35%] mt-[28%] ${hasSelectedProducts
+                      ? "bg-[#E6D1A7] hover:bg-[#dac59b] cursor-pointer"
+                      : "bg-[#c9bb9d] cursor-not-allowed"
+                      } rounded-xl font-inter font-[600] text-[15px] leading-[22px] text-black transition-colors duration-300`}
                   >
                     {lang === "uz"
                       ? "Rasmiylashtirish"
                       : lang === "en"
-                      ? "Formalization"
-                      : lang === "ru"
-                      ? "Формализация"
-                      : "Rasmiylashtirish"}
+                        ? "Formalization"
+                        : lang === "ru"
+                          ? "Формализация"
+                          : "Rasmiylashtirish"}
                   </Link>
                 </div>
               </div>

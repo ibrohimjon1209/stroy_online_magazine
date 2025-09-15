@@ -31,9 +31,8 @@ const CustomDropdown = ({ options, value, onChange, placeholder }) => {
           {selectedOption ? selectedOption[`name_${lang}`] : placeholder}
         </span>
         <ChevronDown
-          className={`w-5 h-5 text-gray-400 transition-transform ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""
+            }`}
         />
       </div>
 
@@ -42,9 +41,8 @@ const CustomDropdown = ({ options, value, onChange, placeholder }) => {
           {options.map((option) => (
             <div
               key={option.id}
-              className={`px-4 py-4 cursor-pointer hover:bg-gray-100 text-[18px] ${
-                option.id === value ? "bg-gray-100" : ""
-              }`}
+              className={`px-4 py-4 cursor-pointer hover:bg-gray-100 text-[18px] ${option.id === value ? "bg-gray-100" : ""
+                }`}
               onClick={() => {
                 onChange(option.id);
                 setIsOpen(false);
@@ -93,10 +91,32 @@ function RegionSelectionForm({ set_address_inform, set_is_pickup }) {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    try {
+      const storedCity = localStorage.getItem("city");
+      if (storedCity) {
+        const parsedCity = JSON.parse(storedCity);
+        if (parsedCity && typeof parsedCity === "object" && parsedCity.id) {
+          setSelectedRegion(parsedCity.id);
+        } else {
+          console.error("Stored city does not have an 'id' property");
+          setSelectedRegion(null); // Fallback
+        }
+      } else {
+        console.error("No city found in localStorage");
+        setSelectedRegion(null); // Fallback
+      }
+    } catch (error) {
+      console.error("Failed to parse city from localStorage:", error);
+      setSelectedRegion(null); // Fallback on error
+    }
+  }, []);
+
   const handleRegionChange = (regionId) => {
     setSelectedRegion(regionId);
     const filtered = cities.filter((city) => city.region === regionId);
     setFilteredCities(filtered);
+    localStorage.setItem("city", JSON.stringify(regions.filter((item)=> item.id == regionId)[0]))
     setSelectedCity(null); // reset city
   };
 
@@ -119,27 +139,26 @@ function RegionSelectionForm({ set_address_inform, set_is_pickup }) {
     });
 
 
-  if (!regionObj?.name_uz || !cityObj?.name_uz || !street) {
-    alert(
-      !regionObj?.name_uz
-        ? (lang === "uz" ? "Viloyat tanlanmagan" : lang === "ru" ? "Регион не выбран" : "Region not selected")
-        : !cityObj?.name_uz
-        ? (lang === "uz" ? "Shahar yoki tuman tanlanmagan" : lang === "ru" ? "Город или район не выбран" : "City or district not selected")
-        : (lang === "uz" ? "Ko‘cha kiritilmagan" : lang === "ru" ? "Улица не введена" : "Street not entered")
-    );
-    return;
-  }
+    if (!regionObj?.name_uz || !cityObj?.name_uz || !street) {
+      alert(
+        !regionObj?.name_uz
+          ? (lang === "uz" ? "Viloyat tanlanmagan" : lang === "ru" ? "Регион не выбран" : "Region not selected")
+          : !cityObj?.name_uz
+            ? (lang === "uz" ? "Shahar yoki tuman tanlanmagan" : lang === "ru" ? "Город или район не выбран" : "City or district not selected")
+            : (lang === "uz" ? "Ko‘cha kiritilmagan" : lang === "ru" ? "Улица не введена" : "Street not entered")
+      );
+      return;
+    }
 
-  set_address_inform({
-    address_uz: `${regionObj?.name_uz}, ${cityObj?.name_uz}, ${street}`,
-    address_ru: `${regionObj?.name_ru}, ${cityObj?.name_ru}, ${street}`,
-    address_en: `${regionObj?.name_en}, ${cityObj?.name_en}, ${street}`,
-  });
+    set_address_inform({
+      address_uz: `${regionObj?.name_uz}, ${cityObj?.name_uz}, ${street}`,
+      address_ru: `${regionObj?.name_ru}, ${cityObj?.name_ru}, ${street}`,
+      address_en: `${regionObj?.name_en}, ${cityObj?.name_en}, ${street}`,
+    });
 
     set_is_pickup(false);
     console.log(
-      `${regionObj?.[`name_${lang}`]} Viloyat, ${
-        cityObj?.[`name_${lang}`]
+      `${regionObj?.[`name_${lang}`]} Viloyat, ${cityObj?.[`name_${lang}`]
       }, ${street}`
     );
   };
@@ -158,8 +177,8 @@ function RegionSelectionForm({ set_address_inform, set_is_pickup }) {
             lang === "uz"
               ? "Viloyat tanlang"
               : lang === "ru"
-              ? "Выберите регион"
-              : "Select region"
+                ? "Выберите регион"
+                : "Select region"
           }
         />
       </div>
@@ -169,8 +188,8 @@ function RegionSelectionForm({ set_address_inform, set_is_pickup }) {
           {lang === "uz"
             ? "Shahar / Tuman"
             : lang === "ru"
-            ? "Город / Район"
-            : "City / District"}
+              ? "Город / Район"
+              : "City / District"}
         </label>
         <CustomDropdown
           options={filteredCities}
@@ -180,8 +199,8 @@ function RegionSelectionForm({ set_address_inform, set_is_pickup }) {
             lang === "uz"
               ? "Shahar yoki tuman tanlang"
               : lang === "ru"
-              ? "Выберите город или район"
-              : "Select city or district"
+                ? "Выберите город или район"
+                : "Select city or district"
           }
         />
       </div>
@@ -197,8 +216,8 @@ function RegionSelectionForm({ set_address_inform, set_is_pickup }) {
             lang === "uz"
               ? "Ko’chani kiriting"
               : lang === "ru"
-              ? "Введите улицу"
-              : "Enter your street"
+                ? "Введите улицу"
+                : "Enter your street"
           }
           className="w-full h-[70px] px-4 flex items-center bg-gray-100 border border-gray-200 rounded text-[18px]"
         />
@@ -211,8 +230,8 @@ function RegionSelectionForm({ set_address_inform, set_is_pickup }) {
         {lang === "uz"
           ? "Davom etish"
           : lang === "ru"
-          ? "Продолжить"
-          : "Continue"}
+            ? "Продолжить"
+            : "Continue"}
       </button>
     </div>
   );
@@ -226,9 +245,8 @@ const Pickup_address_main = ({
   const lang = localStorage.getItem("lang") || "uz";
   return (
     <div
-      className={`w-full ${
-        is_pickup ? "flex" : "hidden"
-      } items-center justify-center flex-col sm:mb-[84px]`}
+      className={`w-full ${is_pickup ? "flex" : "hidden"
+        } items-center justify-center flex-col sm:mb-[84px]`}
     >
       <div className="flex justify-center top-[5px] w-full h-[65px] sm:h-[80px] fixed z-50">
         <div className="bg-[#DCC38B] flex items-center gap-[10px] w-[1450px]  rounded-[15px] h-full font-inter font-[600] text-[17px] sm:text-[20px] leading-[22px] text-black pl-[13px] sm:pl-[50px]">
@@ -239,8 +257,8 @@ const Pickup_address_main = ({
             {lang === "uz"
               ? "Yetkazib berish manzili"
               : lang === "ru"
-              ? "Адрес доставки"
-              : "Delivery address"}
+                ? "Адрес доставки"
+                : "Delivery address"}
           </p>
         </div>
       </div>

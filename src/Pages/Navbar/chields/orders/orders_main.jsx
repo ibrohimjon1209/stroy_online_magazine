@@ -89,15 +89,22 @@ const Orders_main = ({ lang }) => {
     lang === "uz"
       ? "so'm"
       : lang === "en"
-      ? "uzs"
-      : lang === "ru"
-      ? "сум"
-      : "so'm";
+        ? "uzs"
+        : lang === "ru"
+          ? "сум"
+          : "so'm";
 
   // Faqat pending va in_payment bo‘lmagan orderlar
-  const filteredOrders = orders.filter(
-    (order) => !["ee", "eee"].includes(order.status)
-  );
+  const [filteredOrders, set_filteredOrders] = useState(null)
+  useEffect(() => {
+    set_filteredOrders(
+      orders.filter(
+        (order) =>
+          !["ee", "eee", "pending", "in_payment"].includes(order.status)
+      )
+    );
+  }, [orders]);
+
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -111,35 +118,17 @@ const Orders_main = ({ lang }) => {
             {lang === "uz"
               ? "Buyurtmalar"
               : lang === "en"
-              ? "Orders"
-              : lang === "ru"
-              ? "Заказы"
-              : "Buyurtmalar"}
+                ? "Orders"
+                : lang === "ru"
+                  ? "Заказы"
+                  : "Buyurtmalar"}
           </h1>
         </Link>
       </div>
       <div className="scale-[100%] container p-4 mx-auto my-4 mt-16">
-        {filteredOrders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center mt-16">
-            <img
-              src={no_order}
-              alt="No orders"
-              className="w-[250px] hover:scale-105 transition-all duration-300"
-            />
-            <h1 className="mt-6 text-xl font-semibold text-gray-700">
-              {lang === "uz"
-                ? "Buyurtmalaringiz yo'q"
-                : lang === "en"
-                ? "No orders found"
-                : lang === "ru"
-                ? "Заказы не найдены"
-                : "Buyurtmalaringiz yo'q"}
-            </h1>
-            
-          </div>
-        ) : (
+        {filteredOrders?.length ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {filteredOrders.map((order) => (
+            {filteredOrders?.map((order) => (
               <div
                 key={order.id}
                 className="p-6 space-y-4 border rounded-lg shadow-md"
@@ -151,69 +140,65 @@ const Orders_main = ({ lang }) => {
                     {lang === "uz"
                       ? `${order.id}-sonli buyurtma`
                       : lang === "en"
-                      ? `Order № ${order.id}`
-                      : lang === "ru"
-                      ? `Заказ № ${order.id}`
-                      : `${order.id}-sonli buyurtma`}
+                        ? `Order № ${order.id}`
+                        : lang === "ru"
+                          ? `Заказ № ${order.id}`
+                          : `${order.id}-sonli buyurtma`}
                   </div>
                   <div
                     className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium
-                    ${
-                      order.status === "delivered"
+                  ${order.status === "delivered"
                         ? "text-green-700 bg-green-100"
                         : ""
-                    }
-                    ${
-                      order.status === "processing"
+                      }
+                  ${order.status === "processing"
                         ? "text-yellow-700 bg-yellow-100"
                         : ""
-                    }
-                    ${
-                      order.status === "shipped"
+                      }
+                  ${order.status === "shipped"
                         ? "text-blue-700 bg-blue-100"
                         : ""
-                    }
-                    ${
-                      order.status === "cancelled"
+                      }
+                  ${order.status === "cancelled"
                         ? "text-red-700 bg-red-100"
                         : ""
-                    }`}
+                      }`}
                   >
                     {order.status === "delivered"
                       ? lang === "uz"
                         ? "Yetkazilgan"
                         : lang === "en"
-                        ? "Delivered"
-                        : lang === "ru"
-                        ? "Доставлен"
-                        : "Yetkazilgan"
+                          ? "Delivered"
+                          : lang === "ru"
+                            ? "Доставлен"
+                            : "Yetkazilgan"
                       : ""}
                     {order.status === "processing"
                       ? lang === "uz"
                         ? "Jarayonda"
                         : lang === "en"
-                        ? "In progress"
-                        : lang === "ru"
-                        ? "В процессе"
-                        : "Jarayonda"
+                          ? "In progress"
+                          : lang === "ru"
+                            ? "В процессе"
+                            : "Jarayonda"
                       : ""}
                     {order.status === "shipped"
                       ? lang === "uz"
                         ? "Yetkazilmoqda"
                         : lang === "en"
-                        ? "Delivering"
-                        : lang === "ru"
-                        ? "Доставляется"
-                        : "Yetkazilmoqda"
+                          ? "Delivering"
+                          : lang === "ru"
+                            ? "Доставляется"
+                            : "Yetkazilmoqda"
                       : ""}
                     {order.status === "cancelled"
                       ? lang === "uz"
                         ? "Bekor qilingan"
                         : lang === "en"
-                        ? "Cancelled"
-                        : lang === "ru"
-                        ? "Отменён"
-                        : "Bekor qilingan"
+                          ? "Cancelled"
+                          : lang === "ru"
+                            ? "Отменён"
+                            : "Bekor qilingan"
                       : ""}
                   </div>
                 </div>
@@ -225,18 +210,18 @@ const Orders_main = ({ lang }) => {
                       {lang === "uz"
                         ? "Yaratilgan sanasi"
                         : lang === "en"
-                        ? "Created date"
-                        : lang === "ru"
-                        ? "Дата создания"
-                        : "Yaratilgan sanasi"}
+                          ? "Created date"
+                          : lang === "ru"
+                            ? "Дата создания"
+                            : "Yaratilgan sanasi"}
                     </span>
                     <span className="font-medium text-gray-900">
                       {new Date(order.created_at).toLocaleString(
                         lang === "uz"
                           ? "uz-UZ"
                           : lang === "en"
-                          ? "en-US"
-                          : "ru-RU",
+                            ? "en-US"
+                            : "ru-RU",
                         {
                           year: "numeric",
                           month: "2-digit",
@@ -252,10 +237,10 @@ const Orders_main = ({ lang }) => {
                       {lang === "uz"
                         ? "Olib ketish manzili"
                         : lang === "en"
-                        ? "Pickup address"
-                        : lang === "ru"
-                        ? "Адрес самовывоза"
-                        : "Olib ketish manzili"}
+                          ? "Pickup address"
+                          : lang === "ru"
+                            ? "Адрес самовывоза"
+                            : "Olib ketish manzili"}
                     </span>
                     <span className="font-medium text-gray-900">
                       {order.delivery_address}
@@ -266,33 +251,33 @@ const Orders_main = ({ lang }) => {
                       {lang === "uz"
                         ? "To'lov usuli"
                         : lang === "en"
-                        ? "Payment method"
-                        : lang === "ru"
-                        ? "Способ оплаты"
-                        : "To'lov usuli"}
+                          ? "Payment method"
+                          : lang === "ru"
+                            ? "Способ оплаты"
+                            : "To'lov usuli"}
                     </span>
                     <span className="font-medium text-gray-900">
                       {order.payment_method === "cash"
                         ? lang === "uz"
                           ? "Naqd"
                           : lang === "en"
-                          ? "Cash"
-                          : lang === "ru"
-                          ? "Наличные"
-                          : "Naqd"
+                            ? "Cash"
+                            : lang === "ru"
+                              ? "Наличные"
+                              : "Naqd"
                         : order.payment_method === "payme"
-                        ? "Payme"
-                        : order.payment_method === "click"
-                        ? "Click"
-                        : order.payment_method === "installments_payment"
-                        ? lang === "uz"
-                          ? "Nasiya to'lov"
-                          : lang === "en"
-                          ? "Installment payment"
-                          : lang === "ru"
-                          ? "Рассрочка"
-                          : "Nasiya to'lov"
-                        : order.payment_method}
+                          ? "Payme"
+                          : order.payment_method === "click"
+                            ? "Click"
+                            : order.payment_method === "installments_payment"
+                              ? lang === "uz"
+                                ? "Nasiya to'lov"
+                                : lang === "en"
+                                  ? "Installment payment"
+                                  : lang === "ru"
+                                    ? "Рассрочка"
+                                    : "Nasiya to'lov"
+                              : order.payment_method}
                     </span>
                   </div>
                   <div className="flex justify-between text-base">
@@ -301,10 +286,10 @@ const Orders_main = ({ lang }) => {
                       {lang === "uz"
                         ? "dona mahsulot"
                         : lang === "en"
-                        ? "piece of product"
-                        : lang === "ru"
-                        ? "штук товара"
-                        : "dona mahsulot"}
+                          ? "piece of product"
+                          : lang === "ru"
+                            ? "штук товара"
+                            : "dona mahsulot"}
                     </span>
                     <span className="font-medium text-gray-900">
                       {order.total_amount} {uzs_lang}
@@ -320,10 +305,10 @@ const Orders_main = ({ lang }) => {
                         {lang === "uz"
                           ? "Mahsulotlar ro'yxati"
                           : lang === "en"
-                          ? "Product list"
-                          : lang === "ru"
-                          ? "Список товаров"
-                          : "Mahsulotlar ro'yxati"}
+                            ? "Product list"
+                            : lang === "ru"
+                              ? "Список товаров"
+                              : "Mahsulotlar ro'yxati"}
                       </h3>
                       <button
                         onClick={() => toggleProductView(order.id)}
@@ -356,25 +341,25 @@ const Orders_main = ({ lang }) => {
                                 <div className="font-medium">
                                   {productData
                                     ? productData[`name_${lang}`] ||
-                                      productData.name ||
-                                      "Mahsulot nomi"
+                                    productData.name ||
+                                    "Mahsulot nomi"
                                     : lang === "uz"
-                                    ? "Yuklanmoqda..."
-                                    : lang === "en"
-                                    ? "Loading..."
-                                    : lang === "ru"
-                                    ? "Загрузка..."
-                                    : "Yuklanmoqda..."}
+                                      ? "Yuklanmoqda..."
+                                      : lang === "en"
+                                        ? "Loading..."
+                                        : lang === "ru"
+                                          ? "Загрузка..."
+                                          : "Yuklanmoqda..."}
                                 </div>
                                 <div className="text-sm text-gray-600">
                                   {product.quantity}{" "}
                                   {lang === "uz"
                                     ? "dona"
                                     : lang === "en"
-                                    ? "pcs"
-                                    : lang === "ru"
-                                    ? "шт."
-                                    : "dona"}
+                                      ? "pcs"
+                                      : lang === "ru"
+                                        ? "шт."
+                                        : "dona"}
                                 </div>
                               </div>
                             </div>
@@ -393,10 +378,10 @@ const Orders_main = ({ lang }) => {
                       {lang === "uz"
                         ? "Yopish"
                         : lang === "en"
-                        ? "Close"
-                        : lang === "ru"
-                        ? "Закрыть"
-                        : "Yopish"}
+                          ? "Close"
+                          : lang === "ru"
+                            ? "Закрыть"
+                            : "Yopish"}
                     </button>
                   </div>
                 )}
@@ -410,14 +395,32 @@ const Orders_main = ({ lang }) => {
                     {lang === "uz"
                       ? "Maxsulotlarni ko'rsatish"
                       : lang === "en"
-                      ? "View products"
-                      : lang === "ru"
-                      ? "Просмотр товаров"
-                      : "Maxsulotlarni ko'rsatish"}
+                        ? "View products"
+                        : lang === "ru"
+                          ? "Просмотр товаров"
+                          : "Maxsulotlarni ko'rsatish"}
                   </button>
                 )}
               </div>
             ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center scale-[151%] mb-[10%] justify-center mt-19 ml-8">
+            <img
+              src={no_order}
+              alt="No orders"
+              className="w-[250px] hover:scale-105 transition-all duration-300"
+            />
+            <h1 className="mt-6 text-xl font-semibold text-gray-700">
+              {lang === "uz"
+                ? "Buyurtmalaringiz yo'q"
+                : lang === "en"
+                  ? "No orders found"
+                  : lang === "ru"
+                    ? "Заказы не найдены"
+                    : "Buyurtmalaringiz yo'q"}
+            </h1>
+
           </div>
         )}
       </div>
