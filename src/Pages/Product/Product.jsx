@@ -607,7 +607,7 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
               <img
                 src={getImageSource(productData.variants[selectedColorIndex])}
                 onError={handleImageError}
-                className={`w-[162px] sm:w-[504px] h-[188px] sm:h-[504px] object-fill ${
+                className={`w-full sm:w-[504px] h-full sm:h-[504px] object-cover ${
                   isTransitioning
                     ? slideDirection
                     : slideDirection

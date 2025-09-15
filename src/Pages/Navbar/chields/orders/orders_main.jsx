@@ -118,11 +118,7 @@ const Orders_main = ({ lang }) => {
           </h1>
         </Link>
       </div>
-<<<<<<< HEAD
       <div className="scale-[100%] container p-4 mx-auto my-4 mt-16">
-=======
-      <div className="container p-4 mx-auto my-4 mt-16">
->>>>>>> 2fd2d27d9b80338f328862eaa6ea9b54a4638ab5
         {filteredOrders.length === 0 ? (
           <div className="flex flex-col items-center justify-center mt-16">
             <img
