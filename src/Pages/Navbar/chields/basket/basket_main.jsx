@@ -328,7 +328,7 @@ export default function Basket_main({
                         </button>
 
                         <input
-                          className="w-16 mx-4 text-center border rounded-md"
+                          className="w-16 mx-3 text-center border rounded-md sm:mx-4"
                           type="number"
                           min={1}
                           value={product.quantity}
@@ -357,19 +357,19 @@ export default function Basket_main({
                       </div>
 
 
-                      <div className="flex justify-center items-end ">
+                      <div className="flex items-end justify-center ">
                         <button
                           onClick={() =>
-                            deleteQu(
+                            deleteQuantity(
                               product.id,
                               product.size[lang],
                               product.color[lang]
                             )
                           }
-                          className={`sm:w-37 sm:h-8.5 w-9 h-7.5 opacity-50 hover:opacity-100  duration-200 overflow-hidden justify-end gap-[8px] rounded-md flex items-center cursor-pointer sm:mr-0`}
+                          className={`sm:w-37 sm:h-8.5 w-9 h-7.5 opacity-70 sm:opacity-50 hover:opacity-100  duration-200 overflow-hidden justify-end gap-[8px] rounded-md flex items-center cursor-pointer sm:mr-0`}
                         >
-                          <Trash2 className="" />
-                          <h1>{lang == "uz" ? "Yo'q qilish" : lang == "en" ? "Delete" : "Удалить"}</h1>
+                          <Trash2 />
+                          <h1 className="hidden sm:block">{lang == "uz" ? "Yo'q qilish" : lang == "en" ? "Delete" : "Удалить"}</h1>
                         </button>
 
                       </div>

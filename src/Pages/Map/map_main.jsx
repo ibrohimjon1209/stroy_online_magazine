@@ -9,28 +9,10 @@ const Delivery_main = ({
   set_is_delivery,
   is_delivery,
   set_address_inform,
+  addresses_list
 }) => {
   const [active, set_active] = useState("address");
   const lang = localStorage.getItem("lang");
-  const sl_option_id =
-    localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
-      ? 0
-      : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
-      ? 1
-      : 2;
-  const [addresses_list, set_addresses_list] = useState([]);
-  useEffect(() => {
-    const fetch_locations = async () => {
-      try {
-        const locations = await get_locations();
-        const allowed_locations = locations.filter((loc) => loc.branch === sl_option_id);
-        set_addresses_list(allowed_locations);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetch_locations();
-  }, []);
   return (
     <div
       className={`w-full h-full ${

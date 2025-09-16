@@ -7,8 +7,7 @@ import on_arrive from "./imgs/on_arrive.png";
 import pay_me from "./imgs/pay_me.png";
 import click from "./imgs/click.png";
 import open_icon from "./imgs/open.png";
-import Modal from "../../components/formalization_modal";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import Delivery from "../Map/map_main";
 import Payment_variant from "../payment_variant/payment_main";
 import Pickup_address from "../pickup_address/pickup_address_main";
@@ -16,6 +15,7 @@ import { get_user } from "../../Services/auth/get_user";
 import axios from "axios";
 import { order_create } from "../../Services/auth/create_order";
 import BasketGrid from "./basket_grid";
+import get_locations from "../../Services/locations/get_locations";
 
 const Formalization_main = ({
   basket,
@@ -30,7 +30,7 @@ const Formalization_main = ({
   set_is_SI,
   set_basket,
   set_modal_method,
-  set_is_modal_open
+  set_is_modal_open,
 }) => {
   const [userData, setUserData] = useState({ name: "...", phone: "..." });
   const [deliver_type, set_deliver_type] = useState("pickup");
@@ -45,6 +45,7 @@ const Formalization_main = ({
   const [selectedPaymentIndex, setSelectedPaymentIndex] = useState(3);
   const [notification, setNotification] = useState("");
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
+  const [addresses_list, set_addresses_list] = useState([]);
   const paymentOptions = {
     uz: ["6 oy", "12 oy", "15 oy", "18 oy", "24 oy"],
     en: ["6 mon", "12 mon", "15 mon", "18 mon", "24 mon"],
@@ -109,8 +110,56 @@ const Formalization_main = ({
   }, [userSignIn, lang, setUserSignIn]);
 
   useEffect(() => {
+    const fetch_locations = async () => {
+      try {
+        const locations = await get_locations();
+        const allowed_locations = locations.filter(
+          (loc) => loc.branch === sl_option_id
+        );
+        set_addresses_list(allowed_locations);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetch_locations();
+  }, []);
+
+  useEffect(() => {
+  const sync_local_addresses = () => {
+    let local_addresses = JSON.parse(localStorage.getItem("deliver_address")) || [];
+
+    const filtered = local_addresses.filter((localAddr) =>
+      addresses_list.some((dbAddr) => dbAddr.id === localAddr.id)
+    );
+
+    if (filtered.length !== local_addresses.length) {
+      localStorage.setItem("deliver_address", JSON.stringify(filtered));
+    }
+  };
+
+  if (addresses_list.length > 0) {
+    sync_local_addresses();
+  }
+}, [addresses_list]);
+
+
+useEffect(() => {
+  if (deliver_type == "deliver") {
+    set_address_inform(
+      JSON.parse(localStorage.getItem("pickup_address"))
+    );
+  }
+  else if (deliver_type == "pickup") {
+    let addresses = JSON.parse(localStorage.getItem("deliver_address"));
+    addresses?.map((item) => {
+      if (item.branch == sl_option_id) {
+        set_address_inform(item);
+      }
+    })
+  } else {
     set_address_inform(null);
-  }, [deliver_type]);
+  }
+}, [deliver_type, lang]);
 
   const uzs_lang =
     lang === "uz"
@@ -623,7 +672,7 @@ const Formalization_main = ({
               </div>
             </div>
           </div>
-          <div className="w-full sm:w-[95%] mx-auto p-7 sm:p-4 -mt-[20px]">
+          <div className="w-[90%] sm:w-[95%] sm:mx-auto p-7 sm:p-4 -mt-[20px]">
             <h1 className="font-inter font-[600] text-[16px] leading-[22px] text-black mb-4">
               {lang === "uz"
                 ? "To'lov usuli"
@@ -634,7 +683,11 @@ const Formalization_main = ({
                 : "To'lov usuli"}
             </h1>
             <div className="grid w-full gap-4 md:grid-cols-2">
-              <div className="border border-[#D5D5D5] w-full sm:w-[90%] rounded-lg p-4 bg-white">
+              <div
+                className={`border border-[#D5D5D5] ${
+                  selectedMethod === "installment" ? "w-[70%]" : "w-[115%]"
+                } sm:w-[90%] rounded-lg p-4 bg-white`}
+              >
                 <div className="space-y-3.5 sm:space-y-4">
                   <div
                     className="flex items-center justify-between p-2 cursor-pointer"
@@ -747,7 +800,7 @@ const Formalization_main = ({
                 </div>
               </div>
               {selectedMethod === "installment" && (
-                <div className="border border-[#D5D5D5] rounded-lg w-[75%] sm:w-[90%] p-[20px] sm:p-[27px] bg-white">
+                <div className="border border-[#D5D5D5] w-[70%] sm:w-[90%] rounded-lg p-4 bg-white">
                   <div className="flex items-center justify-between mb-5 sm:mb-6">
                     <div className="flex flex-row gap-3">
                       <div className="w-10 h-10 object-contain rounded-[5px]">
@@ -946,6 +999,7 @@ const Formalization_main = ({
           is_delivery={is_delivery}
           is_another_nav={is_another_nav}
           set_address_inform={set_address_inform}
+          addresses_list={addresses_list}
         />
         <Payment_variant
           is_payment_variant={is_payment_variant}
