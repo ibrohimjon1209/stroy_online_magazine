@@ -47,7 +47,7 @@ const App = () => {
   const [lang, set_lang] = useState("uz");
   const [city, set_city] = useState(() => {
     try {
-      const storedCity = localStorage.getItem("city");
+      const storedCity = localStorage.getItem("region");
       return storedCity ? JSON.parse(storedCity) : null; // Fallback to null if no value
     } catch (error) {
       console.error("Failed to parse city from localStorage:", error);
@@ -87,13 +87,13 @@ const App = () => {
   useEffect(() => {
     setUserSignIn(localStorage.getItem("userId") ? true : false);
     !localStorage.getItem("lang") && localStorage.setItem("lang", "uz");
-    !localStorage.getItem("city") &&
-      localStorage.setItem("city", null);
+    !localStorage.getItem("region") &&
+      localStorage.setItem("region", null);
     !localStorage.getItem("is_entered") &&
       localStorage.setItem("is_entered", "false");
     const basketFromStorage = JSON.parse(localStorage.getItem("basket")) || [];
     set_lang(localStorage.getItem("lang") || "uz");
-    set_city(localStorage.getItem("city") || null);
+    set_city(localStorage.getItem("region") || null);
     set_basket(basketFromStorage || []);
     set_is_SI(localStorage.getItem("is_SI") || false);
     if (localStorage.getItem("is_entered") == "false") {

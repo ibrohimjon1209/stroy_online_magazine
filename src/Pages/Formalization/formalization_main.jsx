@@ -555,7 +555,7 @@ useEffect(() => {
                       {label_delivery}
                     </span>
                   </div>
-                  <div className="flex-row items-center justify-center hidden gap-1 sm:flex">
+                  <div className="flex-row items-center justify-center hidden gap-1 sm:flex max-w-[80%]">
                     <h1
                       className={`${
                         address_inform ? "max-w-[60%]" : ""

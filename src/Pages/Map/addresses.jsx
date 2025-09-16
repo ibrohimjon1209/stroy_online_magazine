@@ -32,7 +32,8 @@ const Addresses = ({
         active === "address" ? "flex" : "hidden"
       } flex-col mt-[30px] sm:mt-[35px]`}
     >
-      <div className="sm:w-[85%] mx-auto h-[32px] flex flex-row font-inter font-[600] text-[16px] leading-[22px] text-black gap-[65px]">
+{/* !!!!!!!!!!!!!!!!! hidden ni o'rniga flex yozilsa ko'rinadi !!!!!!!!!!!!!!! */}
+      <div className="sm:w-[85%] mx-auto h-[32px] hidden flex-row font-inter font-[600] text-[16px] leading-[22px] text-black gap-[65px]">
         <div className="border-[#DCC38B] border-b-2 pb-[10px] cursor-pointer">
           {t.list[lang]}
         </div>
@@ -43,7 +44,7 @@ const Addresses = ({
 
       <div className="flex flex-col gap-[45px] mt-[40px] sm:mt-[45px]">
         {sortedAddresses.map((address, index) => (
-          <div key={index} className="flex flex-col gap-[25px]">
+          <div key={index} className="flex flex-col gap-[25px] ">
             <div className="flex flex-row gap-[15px]">
               <img
                 src={arrive_icon}

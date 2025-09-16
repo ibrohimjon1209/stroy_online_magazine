@@ -181,14 +181,14 @@ const Sidebar = ({ city, set_city, lang, set_lang, isUserSignIn, setUserSignIn, 
 };
 
 function NavItem({ href, icon, label, isActive, onClick }) {
-  const activeColor = isActive ? "#DCC38B" : "#000000";
+  const activeColor = isActive ? "#c09f5d" : "#000000";
 
 
   return (
     <Link
       to={href}
       onClick={onClick ? onClick : null}
-      className="font-inter font-[500] text-[13px] leading-[22px] flex items-center justify-between px-4 py-4 rounded-[8px] transition duration-100 hover:bg-gray-100"
+      className="font-inter font-[500] text-[14px] leading-[22px] flex items-center justify-between px-4 py-4 rounded-[8px] transition duration-100 hover:bg-gray-100"
     >
       <div className="flex items-center">
         <span className="mr-3">

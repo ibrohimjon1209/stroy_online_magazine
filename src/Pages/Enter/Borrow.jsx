@@ -37,9 +37,8 @@ const Borrow = ({ set_is_found, city, set_city, lang }) => {
         {cities.map((item, index) => (
           <div
             onClick={() => {
-              localStorage.setItem("city", item[`name_${lang}`]?.toLowerCase());
               set_city(item);
-              localStorage.setItem("city", JSON.stringify(item));
+              localStorage.setItem("region", JSON.stringify(item));
             }}
             key={index}
           >

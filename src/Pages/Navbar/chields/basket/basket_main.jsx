@@ -35,7 +35,6 @@ export default function Basket_main({
       const parsed_basket = JSON.parse(savedBasket);
       setProducts(parsed_basket);
     }
-    console.log(products);
   }, []);
 
   useEffect(() => {
