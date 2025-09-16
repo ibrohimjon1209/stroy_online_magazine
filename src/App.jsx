@@ -1,4 +1,8 @@
-"use client";
+import { HelmetProvider } from "react-helmet-async";
+import HomePage from "./HomePage";
+// for google CEO
+
+
 
 import { lazy, Suspense, useState, useEffect } from "react";
 import {
@@ -62,8 +66,8 @@ const App = () => {
     localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
-      ? 1
-      : 2;
+        ? 1
+        : 2;
   const [basket, set_basket] = useState(() => {
     const saved = localStorage.getItem("basket");
     return saved ? JSON.parse(saved) : [];
@@ -144,7 +148,7 @@ const App = () => {
             clearInterval(interval);
             set_pay_id(0);
           }
-        } catch (err) {}
+        } catch (err) { }
       }, 1000);
 
       // Komponent unmount bo‘lganda intervalni tozalash
@@ -271,18 +275,16 @@ const App = () => {
           />
         )}
         <div
-          className={`${
-            is_found ? "sm:w-[1450px]" : "w-full"
-          } m-auto overflow-hidden`}
+          className={`${is_found ? "sm:w-[1450px]" : "w-full"
+            } m-auto overflow-hidden`}
         >
           <div
-            className={`flex flex-col justify-between ${
-              is_found
+            className={`flex flex-col justify-between ${is_found
                 ? is_another_nav
                   ? "h-[calc(106.9vh-100px)] sm:h-[calc(118vh)]"
                   : "h-[calc(106.9vh-100px)] sm:h-[calc(119.5vh-100px)]"
                 : "h-full"
-            } w-[100%]`}
+              } w-[100%]`}
             style={{
               ...customScrollbar,
               overflowY: "auto",
