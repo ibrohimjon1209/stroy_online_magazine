@@ -109,7 +109,7 @@ function RegionSelectionForm({ set_address_inform, set_is_pickup }) {
     } catch (error) {
       console.error("Failed to parse city from localStorage:", error);
       setSelectedRegion(null); // Fallback on error
-    }
+    }n
   }, []);
 
   const handleRegionChange = (regionId) => {
