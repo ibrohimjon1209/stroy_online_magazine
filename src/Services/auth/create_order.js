@@ -13,30 +13,6 @@ export const order_create = async (
   }
 ) => {
   try {
-    console.log({
-        cart_items: basket
-          .filter((item) => item.selected)
-          .map((item) => ({
-            variant_id: item.variant_id,
-            quantity: item.quantity,
-            product_id: item.id,
-            item: item
-          })),
-        delivery_address: address_inform.address_uz,
-        payment_method:
-          selectedMethod === "click"
-            ? "click"
-            : selectedMethod === "payme"
-            ? "payme"
-            : selectedMethod === "qabul"
-            ? "cash"
-            : null,
-        use_cashback: cashback_is_using ,
-        branch_id: address_inform?.id || null,
-        part: sl_option_id,
-        status: "pending",
-        delivery_method: deliver_type,
-      })
     const response = await instance.post(
       "/api/api/order/create/",
       {
@@ -59,7 +35,7 @@ export const order_create = async (
         use_cashback: cashback_is_using ,
         branch_id: address_inform?.id || null,
         part: sl_option_id,
-        status: "pending",
+        status: selectedMethod == "qabul" ? "processing" : "pending",
         delivery_method: deliver_type,
       },
       {

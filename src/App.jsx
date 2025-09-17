@@ -1,9 +1,3 @@
-import { HelmetProvider } from "react-helmet-async";
-import HomePage from "./HomePage";
-// for google CEO
-
-
-
 import { lazy, Suspense, useState, useEffect } from "react";
 import {
   Route,
@@ -30,12 +24,11 @@ import Enter_language from "./Pages/Enter/Language";
 import Enter_borrow from "./Pages/Enter/Borrow";
 import Enter_category from "./Pages/Enter/Category";
 import Enter_region from "./Pages/Enter/Region";
-import User_offer from "./Pages/User_offer/User_offer";
 import get_favorites from "./Services/favorites/get_favorites";
 import create_favorites from "./Services/favorites/create_favorites";
 import Installment from "./Pages/Installment/installment";
 import Payment_success from "./components/payment_success";
-import Form_modal from "./components/formalization_modal"
+import Form_modal from "./components/formalization_modal";
 
 const Product = lazy(() => import("./Pages/Product/Product"));
 const Category = lazy(() => import("./Pages/Category/Category"));
@@ -52,10 +45,10 @@ const App = () => {
   const [city, set_city] = useState(() => {
     try {
       const storedCity = localStorage.getItem("region");
-      return storedCity ? JSON.parse(storedCity) : null; // Fallback to null if no value
+      return storedCity ? JSON.parse(storedCity) : null;
     } catch (error) {
       console.error("Failed to parse city from localStorage:", error);
-      return null; // Fallback value
+      return null;
     }
   });
   const [is_SI, set_is_SI] = useState(false);
@@ -143,15 +136,13 @@ const App = () => {
           const data = await response.json();
           console.log("Status:", data);
 
-          // Agar serverdan kerakli ma'lumot kelsa intervalni to'xtatamiz
           if (data && data.success) {
             clearInterval(interval);
             set_pay_id(0);
           }
-        } catch (err) { }
+        } catch (err) {}
       }, 1000);
 
-      // Komponent unmount bo‘lganda intervalni tozalash
       return () => clearInterval(interval);
     }
   }, [pay_id]);
@@ -176,6 +167,7 @@ const App = () => {
       window.removeEventListener("offline", updateOnlineStatus);
     };
   }, []);
+
   useEffect(() => {
     localStorage.setItem("basket", JSON.stringify(basket));
   }, [basket]);
@@ -194,16 +186,17 @@ const App = () => {
     if (currentLocation == "installment" && is_SI) set_is_found(false);
     if (
       currentLocation == "delivery" ||
-      (currentLocation == "terms" && formalization_open) ||
+      currentLocation == "terms" ||
       currentLocation == "payment-variant" ||
       currentLocation == "login" ||
-      currentLocation == "register"
+      currentLocation == "register" ||
+      currentLocation == "terms"
     ) {
       set_is_another_nav(true);
     } else {
       set_is_another_nav(false);
     }
-  }, [location]);
+  }, [location, userSignIn, is_SI]);
 
   const customScrollbar = {
     overflowY: "auto",
@@ -227,26 +220,19 @@ const App = () => {
     }
   }, []);
 
-  // useEffect(()=>{console.log(city)},[])
-
   function PaymentSuccess({ set_is_PM }) {
     const navigate = useNavigate();
 
     useEffect(() => {
-      // Check if this is a legitimate payment success redirect
       const paymentToken = localStorage.getItem("payment_token");
       const onlinePayment = localStorage.getItem("online_payment");
 
       if (onlinePayment === "true" && paymentToken) {
-        // Set modal to show
         set_is_PM("true");
-
-        // Clear the payment token to prevent reuse
         localStorage.removeItem("payment_token");
         localStorage.removeItem("online_payment");
       }
 
-      // Always redirect to home
       navigate("/", { replace: true });
     }, [set_is_PM, navigate]);
 
@@ -275,8 +261,7 @@ const App = () => {
           />
         )}
         <div
-          className={`${is_found ? "sm:w-[1450px]" : "w-full"
-            } m-auto overflow-hidden`}
+          className={`${is_found ? "sm:w-[1450px]" : "w-full"} m-auto overflow-hidden`}
         >
           <div
             className={`flex flex-col justify-between ${is_found
@@ -438,7 +423,7 @@ const App = () => {
                   path="/terms"
                   element={
                     formalization_open && basket.length ? (
-                      <Terms lang={lang} />
+                      <Terms lang={lang} set_is_another_nav={set_is_another_nav} />
                     ) : (
                       <Navigate to="/" />
                     )
@@ -470,11 +455,8 @@ const App = () => {
                     />
                   }
                 />
-
-                <Route path="/user_offer" element={<User_offer />} />
               </Routes>
             </div>
-
             {is_found && is_footer_visible && <Footer lang={lang} />}
           </div>
         </div>
