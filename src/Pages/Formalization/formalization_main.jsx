@@ -151,7 +151,7 @@ const Formalization_main = ({
     }
     else if (deliver_type == "pickup") {
       let address = JSON.parse(localStorage.getItem("deliver_address"))
-      set_address_inform(address.branch == sl_option_id ? address : null)
+      set_address_inform(address?.branch == sl_option_id ? address : null)
   }}, [deliver_type, lang]);
 
   const uzs_lang =
