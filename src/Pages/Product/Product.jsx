@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
-const Product = ({ lang, basket, set_basket, userSignIn }) => {
+const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
   const navigate = useNavigate();
   const [productData, setProductData] = useState(null);
   const [selectedSize, setSelectedSize] = useState("4x6");
@@ -286,7 +286,13 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
   };
 
   const handleAddToCart = () => {
-    setNotification("Mahsulot savatga qo'shildi");
+    notify(
+      lang === "uz"
+        ? "Mahsulot savatga qo'shildi"
+        : lang === "en"
+        ? "Product added to cart"
+        : "Товар добавлен в корзину"
+    );
 
     setIsVisible(true);
     setTimeout(() => {

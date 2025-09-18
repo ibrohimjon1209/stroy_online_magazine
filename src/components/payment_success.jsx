@@ -2,7 +2,7 @@ const Modal = ({ is_modal_open, set_is_modal_open }) => {
   if (is_modal_open == "false") return null;
 
   return (
-    <div className="fixed w-full scale-1 sm:scale-[1.4] inset-0 flex items-center justify-center z-50">
+    <div className="fixed w-full scale-[100%] sm:scale-[1.4] inset-0 flex items-center justify-center z-50">
       <div
         className="fixed inset-0 bg-black opacity-70"
         onClick={() => set_is_modal_open("false")}
