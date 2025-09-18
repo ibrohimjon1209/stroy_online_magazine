@@ -225,7 +225,7 @@ const Orders_main_profile = () => {
               </div>
               <div className="flex justify-between text-base">
                 <span className="text-gray-600">
-                  {order.items.length}{" "}
+                  {order.items.map((item) => item.quantity).reduce((a, b) => a + b, 0)}{" "}
                   {lang === "uz"
                     ? "dona mahsulot"
                     : lang === "en"
@@ -238,6 +238,20 @@ const Orders_main_profile = () => {
                   {order.total_amount} {uzs_lang}
                 </span>
               </div>
+              <div className="flex justify-between text-base">
+                    <span className="text-gray-600">
+                      {lang === "uz"
+                        ? "Ishlatilgan keshbek"
+                        : lang === "en"
+                          ? "Used cashback"
+                          : lang === "ru"
+                            ? "Использованный кешбек"
+                            : "Ishlatilgan keshbek"}
+                    </span>
+                    <span className="font-medium text-gray-900">
+                      {order.cashback_used} {uzs_lang}
+                    </span>
+                  </div>
             </div>
 
             {expandedOrders.includes(order.id) && (

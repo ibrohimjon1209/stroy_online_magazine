@@ -108,7 +108,7 @@ const Cashback_main = ({ lang }) => {
             </div>
             <div className="flex justify-between font-inter font-[500] text-[15px] leading-[22px] text-black">
               <div>
-                {item.items.length}{" "}
+                {item.items.map((i) => i.quantity).reduce((a, b) => a + b, 0)}{" "}
                 {lang === "uz"
                   ? "dona mahsulot"
                   : lang === "en"
@@ -121,7 +121,6 @@ const Cashback_main = ({ lang }) => {
             </div>
             <div className="flex justify-between font-inter font-[500] text-[15px] leading-[22px] text-black">
               <div>
-                {item.items.length}{" "}
                 {lang === "uz"
                   ? "Ishlatilgan keshbek"
                   : lang === "en"
@@ -134,7 +133,6 @@ const Cashback_main = ({ lang }) => {
             </div>
             <div className="flex justify-between font-inter font-[500] text-[15px] leading-[22px] text-black">
               <div>
-                {item.items.length}{" "}
                 {lang === "uz"
                   ? "Ishlab olingan keshbek"
                   : lang === "en"
