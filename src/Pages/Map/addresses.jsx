@@ -28,11 +28,10 @@ const Addresses = ({
 
   return (
     <div
-      className={`w-[90%] mx-auto h-full ${
-        active === "address" ? "flex" : "hidden"
-      } flex-col mt-[30px] sm:mt-[35px]`}
+      className={`w-[90%] mx-auto h-full ${active === "address" ? "flex" : "hidden"
+        } flex-col mt-[30px] sm:mt-[35px]`}
     >
-{/* !!!!!!!!!!!!!!!!! hidden ni o'rniga flex yozilsa ko'rinadi !!!!!!!!!!!!!!! */}
+      {/* !!!!!!!!!!!!!!!!! hidden ni o'rniga flex yozilsa ko'rinadi !!!!!!!!!!!!!!! */}
       <div className="sm:w-[85%] mx-auto h-[32px] hidden flex-row font-inter font-[600] text-[16px] leading-[22px] text-black gap-[65px]">
         <div className="border-[#DCC38B] border-b-2 pb-[10px] cursor-pointer">
           {t.list[lang]}
@@ -54,24 +53,19 @@ const Addresses = ({
                 {lang === "ru"
                   ? address.address_ru
                   : lang === "en"
-                  ? address.address_en
-                  : address.address_uz}
+                    ? address.address_en
+                    : address.address_uz}
               </h1>
             </div>
 
             <div
               onClick={() => {
                 set_address_inform(address);
-                let addresses =
-                  JSON.parse(localStorage.getItem("deliver_address")) || [];
-                if (addresses.some((a) => a.id === address.id)) {
-                } else {
-                  addresses.filter((a) => a.branch_id !== address.branch_id);
-                  localStorage.setItem(
-                    "deliver_address",
-                    JSON.stringify([...addresses, address])
-                  );
-                }
+
+                localStorage.setItem(
+                  "deliver_address",
+                  JSON.stringify(address)
+                );
                 set_is_delivery(false);
               }}
               className="hover:scale-[102%] transition-all active:scale-[98%] duration-200 cursor-pointer bg-[#FFDF02] w-[169px] h-[40px] rounded-[8px] font-inter font-[500] text-[15px] leading-[22px] text-black flex items-center justify-center"

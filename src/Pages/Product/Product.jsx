@@ -30,8 +30,8 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
       : "so'm";
   const paymentOptions = {
     uz: ["6 oy", "12 oy", "15 oy", "18 oy", "24 oy"],
-    en: ["6 months", "12 months", "15 months", "18 months", "24 months"],
-    ru: ["6 месяцев", "12 месяцев", "15 месяцев", "18 месяцев", "24 месяцев"],
+    en: ["6 mth", "12 mth", "15 mth", "18 mth", "24 mth"],
+    ru: ["6 мес", "12 мес", "15 мес", "18 мес", "24 мес"],
   };
 
   useEffect(() => {
