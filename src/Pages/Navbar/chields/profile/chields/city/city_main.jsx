@@ -19,13 +19,13 @@ const City_main = ({ lang }) => {
     get_cities();
   }, []);
   return (
-<div className="flex flex-col w-full gap-10">
+<div className="flex flex-col w-full gap-8 mt-5 sm:-mt-2 sm:gap-10">
       
-<h1 className="ml-[1px] sm:ml-[50px] font-inter font-[600] text-[30px] leading-[22px] text-black">
+<h1 className="sm:ml-[50px] font-inter font-[600] text-[26px] sm:text-[30px] leading-[22px] text-black">
   {region[`name_${lang}`]}
 </h1>
 <hr className="w-full"/>
-<div className="ml-[1px] sm:ml-[50px] mt-4 sm:mt-0 flex flex-col gap-[50px] sm:gap-[80px] font-inter font-[600] text-[20px] leading-[22px] text-black">
+<div className="sm:ml-[50px] flex flex-col gap-[50px] sm:gap-[80px] font-inter font-[600] text-[20px] leading-[22px] text-black">
       {cities.map((item, index) => (
         <div
         onClick={() => {

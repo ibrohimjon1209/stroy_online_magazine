@@ -35,7 +35,7 @@ const Profile_main = ({ isUserSignIn, setUserSignIn, set_is_found, lang, set_lan
   return (
     <div className="flex flex-col w-full h-full mb-17 sm:mb-0">
     <div className="mb-10 gap-[20px] sm:gap-0 sm:my-[20px] flex flex-col items-center justify-center w-full">
-      <div className="sticky top-0 z-50 block w-full sm:hidden">
+      <div className="sticky top-0 z-[1000000000] block w-full sm:hidden">
         <div className="w-full h-[65px] bg-[#DCC38B]">
           <Link
             className="w-full h-full flex items-center gap-[10px] pl-[13px]"

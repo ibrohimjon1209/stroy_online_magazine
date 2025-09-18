@@ -1,9 +1,3 @@
-import { HelmetProvider } from "react-helmet-async";
-import HomePage from "./HomePage";
-// for google CEO
-
-
-
 import { lazy, Suspense, useState, useEffect } from "react";
 import {
   Route,
