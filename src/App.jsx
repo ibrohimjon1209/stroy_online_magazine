@@ -28,7 +28,10 @@ import get_favorites from "./Services/favorites/get_favorites";
 import create_favorites from "./Services/favorites/create_favorites";
 import Installment from "./Pages/Installment/installment";
 import Payment_success from "./components/payment_success";
+import LogOutModal from "./components/log_out_modal";
 import Form_modal from "./components/formalization_modal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Product = lazy(() => import("./Pages/Product/Product"));
 const Category = lazy(() => import("./Pages/Category/Category"));
@@ -59,8 +62,8 @@ const App = () => {
     localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
-        ? 1
-        : 2;
+      ? 1
+      : 2;
   const [basket, set_basket] = useState(() => {
     const saved = localStorage.getItem("basket");
     return saved ? JSON.parse(saved) : [];
@@ -84,8 +87,7 @@ const App = () => {
   useEffect(() => {
     setUserSignIn(localStorage.getItem("userId") ? true : false);
     !localStorage.getItem("lang") && localStorage.setItem("lang", "uz");
-    !localStorage.getItem("region") &&
-      localStorage.setItem("region", null);
+    !localStorage.getItem("region") && localStorage.setItem("region", null);
     !localStorage.getItem("is_entered") &&
       localStorage.setItem("is_entered", "false");
     const basketFromStorage = JSON.parse(localStorage.getItem("basket")) || [];
@@ -153,6 +155,7 @@ const App = () => {
   const [is_footer_visible, set_is_footer_visible] = useState(true);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [formalization_open, set_formalization_open] = useState(false);
+  const [is_logout_open, set_is_logout_open] = useState(false);
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
@@ -248,230 +251,306 @@ const App = () => {
     (item) => item.branch_id == sl_option_id
   );
 
+  const notify = (message, type = "info") => {
+    switch (type) {
+      case "success":
+        toast.success(message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        break;
+      case "warning":
+        toast.warn(message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        break;
+      case "error":
+        toast.error(message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+        break;
+      default:
+        toast.info(message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+    }
+  };
+
   if (!is_online) {
-    return <InternetChecker lang={lang} />;
+    return (
+      <>
+        <InternetChecker lang={lang} />
+      </>
+    );
   } else {
     return (
-      <div className={`${is_found ? "sm:w-[1450px]" : "w-full "} m-auto `}>
-        {is_found && !is_another_nav && (
-          <Navbar
-            lang={lang}
-            searchText={searchText}
-            setSearchText={setSearchText}
-          />
-        )}
-        <div
-          className={`${is_found ? "sm:w-[1450px]" : "w-full"} m-auto overflow-hidden`}
-        >
+      <>
+        <div className={`${is_found ? "sm:w-[1450px]" : "w-full "} m-auto `}>
+          {is_found && !is_another_nav && (
+            <Navbar
+              lang={lang}
+              searchText={searchText}
+              setSearchText={setSearchText}
+            />
+          )}
           <div
-            className={`flex flex-col justify-between ${is_found
-                ? is_another_nav
-                  ? "h-[calc(106.9vh-100px)] sm:h-[calc(118vh)]"
-                  : "h-[calc(106.9vh-100px)] sm:h-[calc(119.5vh-100px)]"
-                : "h-full"
-              } w-[100%]`}
-            style={{
-              ...customScrollbar,
-              overflowY: "auto",
-              scrollbarWidth: "none",
-              scrollbarColor: "rgba(244,244,244,1) rgba(255, 255, 255, 1)",
-            }}
+            className={`${
+              is_found ? "sm:w-[1450px]" : "w-full"
+            } m-auto overflow-hidden`}
           >
-            <div style={transitionStyles}>
-              <Routes location={displayLocation}>
-                <Route
-                  path="/"
-                  element={
-                    <Home
-                      lang={lang}
-                      setSearchText={setSearchText}
-                      searchText={searchText}
-                    />
-                  }
-                />
-                <Route path="/likes" element={<Likes lang={lang} />} />
-                <Route
-                  path="/basket"
-                  element={
-                    <Basket
-                      set_basket={set_basket}
-                      basket={basket}
-                      set_formalization_open={set_formalization_open}
-                      lang={lang}
-                    />
-                  }
-                />
-                <Route path="/orders" element={<Orders lang={lang} />} />
-                <Route
-                  path="/enter/language"
-                  element={
-                    localStorage.getItem("is_entered") == "true" ? (
-                      <Navigate to="/" />
-                    ) : (
-                      <Enter_language
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+              />
+            <div
+              className={`flex flex-col justify-between ${
+                is_found
+                  ? is_another_nav
+                    ? "h-[calc(106.9vh-100px)] sm:h-[calc(118vh)]"
+                    : "h-[calc(106.9vh-100px)] sm:h-[calc(119.5vh-100px)]"
+                  : "h-full"
+              } w-[100%]`}
+              style={{
+                ...customScrollbar,
+                overflowY: "auto",
+                scrollbarWidth: "none",
+                scrollbarColor: "rgba(244,244,244,1) rgba(255, 255, 255, 1)",
+              }}
+            >
+              <div style={transitionStyles}>
+                <Routes location={displayLocation}>
+                  <Route
+                    path="/"
+                    element={
+                      <Home
                         lang={lang}
-                        set_lang={set_lang}
-                        set_is_found={set_is_found}
+                        setSearchText={setSearchText}
+                        searchText={searchText}
                       />
-                    )
-                  }
-                />
-                <Route
-                  path="/enter/region"
-                  element={
-                    localStorage.getItem("is_entered") == "true" ? (
-                      <Navigate to="/" />
-                    ) : (
-                      <Enter_region lang={lang} set_is_found={set_is_found} />
-                    )
-                  }
-                />
-                <Route
-                  path="/enter/borrow"
-                  element={
-                    localStorage.getItem("is_entered") == "true" ? (
-                      <Navigate to="/" />
-                    ) : (
-                      <Enter_borrow
-                        lang={lang}
-                        set_city={set_city}
-                        city={city}
-                        set_is_found={set_is_found}
-                      />
-                    )
-                  }
-                />
-                <Route
-                  path="/enter/category"
-                  element={
-                    localStorage.getItem("is_entered") == "true" ? (
-                      <Navigate to="/" />
-                    ) : (
-                      <Enter_category set_is_found={set_is_found} />
-                    )
-                  }
-                />
-                <Route path="/search" element={<Category_mobile />} />
-                <Route
-                  path="/profile/*"
-                  element={
-                    <Profile
-                      isUserSignIn={userSignIn}
-                      set_is_found={set_is_found}
-                      setUserSignIn={setUserSignIn}
-                      lang={lang}
-                      set_lang={set_lang}
-                      city={city}
-                      set_city={set_city}
-                    />
-                  }
-                />
-                <Route
-                  path="/payment/success"
-                  element={<PaymentSuccess set_is_PM={set_is_PM} />}
-                />
-                <Route
-                  path="/product/*"
-                  element={
-                    <Suspense fallback={<div>Loading...</div>}>
-                      <Product
+                    }
+                  />
+                  <Route path="/likes" element={<Likes lang={lang} />} />
+                  <Route
+                    path="/basket"
+                    element={
+                      <Basket
                         set_basket={set_basket}
                         basket={basket}
-                        lang={lang}
-                        userSignIn={userSignIn}
-                      />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="/category/*"
-                  element={
-                    <Suspense fallback={<div>Loading...</div>}>
-                      <Category searchText={searchText} />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="/formalization"
-                  element={
-                    formalization_open && basket.length ? (
-                      <Formalization
-                        basket={visibleProducts}
-                        lang={lang}
-                        userSignIn={userSignIn}
-                        setSelectedLocation={setSelectedLocation}
-                        set_is_another_nav={set_is_another_nav}
-                        is_another_nav={is_another_nav}
-                        set_is_footer_visible={set_is_footer_visible}
                         set_formalization_open={set_formalization_open}
-                        setUserSignIn={setUserSignIn}
-                        set_is_SI={set_is_SI}
-                        set_basket={set_basket}
-                        set_modal_method={set_form_modal_method}
-                        set_is_modal_open={set_is_formalization_open}
+                        lang={lang}
                       />
-                    ) : (
-                      <Navigate to="/" />
-                    )
-                  }
-                />
-                <Route
-                  path="/installment"
-                  element={is_SI ? <Installment /> : <Navigate to="/" />}
-                />
-                <Route
-                  path="/terms"
-                  element={
-                    formalization_open && basket.length ? (
-                      <Terms lang={lang} set_is_another_nav={set_is_another_nav} />
-                    ) : (
-                      <Navigate to="/" />
-                    )
-                  }
-                />
-                <Route
-                  path="*"
-                  element={
-                    <Not_found lang={lang} set_is_found={set_is_found} />
-                  }
-                />
-                <Route
-                  path="/register"
-                  element={
-                    <Register
-                      lang={lang}
-                      set_is_found={set_is_found}
-                      setUserSignIn={setUserSignIn}
-                    />
-                  }
-                />
-                <Route
-                  path="/login"
-                  element={
-                    <Log_in
-                      lang={lang}
-                      set_is_found={set_is_found}
-                      setUserSignIn={setUserSignIn}
-                    />
-                  }
-                />
-              </Routes>
+                    }
+                  />
+                  <Route path="/orders" element={<Orders lang={lang} />} />
+                  <Route
+                    path="/enter/language"
+                    element={
+                      localStorage.getItem("is_entered") == "true" ? (
+                        <Navigate to="/" />
+                      ) : (
+                        <Enter_language
+                          lang={lang}
+                          set_lang={set_lang}
+                          set_is_found={set_is_found}
+                        />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/enter/region"
+                    element={
+                      localStorage.getItem("is_entered") == "true" ? (
+                        <Navigate to="/" />
+                      ) : (
+                        <Enter_region lang={lang} set_is_found={set_is_found} />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/enter/borrow"
+                    element={
+                      localStorage.getItem("is_entered") == "true" ? (
+                        <Navigate to="/" />
+                      ) : (
+                        <Enter_borrow
+                          lang={lang}
+                          set_city={set_city}
+                          city={city}
+                          set_is_found={set_is_found}
+                        />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/enter/category"
+                    element={
+                      localStorage.getItem("is_entered") == "true" ? (
+                        <Navigate to="/" />
+                      ) : (
+                        <Enter_category set_is_found={set_is_found} />
+                      )
+                    }
+                  />
+                  <Route path="/search" element={<Category_mobile />} />
+                  <Route
+                    path="/profile/*"
+                    element={
+                      <Profile
+                        isUserSignIn={userSignIn}
+                        set_is_found={set_is_found}
+                        setUserSignIn={setUserSignIn}
+                        lang={lang}
+                        set_lang={set_lang}
+                        city={city}
+                        set_city={set_city}
+                        set_is_logout_open={set_is_logout_open}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/payment/success"
+                    element={<PaymentSuccess set_is_PM={set_is_PM} />}
+                  />
+                  <Route
+                    path="/product/*"
+                    element={
+                      <Suspense fallback={<div>Loading...</div>}>
+                        <Product
+                          set_basket={set_basket}
+                          basket={basket}
+                          lang={lang}
+                          userSignIn={userSignIn}
+                          notify={notify}
+                        />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/category/*"
+                    element={
+                      <Suspense fallback={<div>Loading...</div>}>
+                        <Category searchText={searchText} />
+                      </Suspense>
+                    }
+                  />
+                  <Route
+                    path="/formalization"
+                    element={
+                      formalization_open && basket.length ? (
+                        <Formalization
+                          basket={visibleProducts}
+                          lang={lang}
+                          userSignIn={userSignIn}
+                          setSelectedLocation={setSelectedLocation}
+                          set_is_another_nav={set_is_another_nav}
+                          is_another_nav={is_another_nav}
+                          set_is_footer_visible={set_is_footer_visible}
+                          set_formalization_open={set_formalization_open}
+                          setUserSignIn={setUserSignIn}
+                          set_is_SI={set_is_SI}
+                          set_basket={set_basket}
+                          set_modal_method={set_form_modal_method}
+                          set_is_modal_open={set_is_formalization_open}
+                          notify={notify}
+                        />
+                      ) : (
+                        <Navigate to="/" />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/installment"
+                    element={is_SI ? <Installment /> : <Navigate to="/" />}
+                  />
+                  <Route
+                    path="/terms"
+                    element={
+                      formalization_open && basket.length ? (
+                        <Terms
+                          lang={lang}
+                          set_is_another_nav={set_is_another_nav}
+                        />
+                      ) : (
+                        <Navigate to="/" />
+                      )
+                    }
+                  />
+                  <Route
+                    path="*"
+                    element={
+                      <Not_found lang={lang} set_is_found={set_is_found} />
+                    }
+                  />
+                  <Route
+                    path="/register"
+                    element={
+                      <Register
+                        lang={lang}
+                        set_is_found={set_is_found}
+                        setUserSignIn={setUserSignIn}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/login"
+                    element={
+                      <Log_in
+                        lang={lang}
+                        set_is_found={set_is_found}
+                        setUserSignIn={setUserSignIn}
+                      />
+                    }
+                  />
+                </Routes>
+              </div>
+              {is_found && is_footer_visible && <Footer lang={lang} />}
             </div>
-            {is_found && is_footer_visible && <Footer lang={lang} />}
           </div>
+          <Payment_success
+            lang={lang}
+            is_modal_open={is_PM}
+            set_is_modal_open={set_is_PM}
+          />
+          <Form_modal
+            lang={lang}
+            is_modal_open={is_formalization_open}
+            set_is_modal_open={set_is_formalization_open}
+            method={form_modal_method}
+          />
+          <LogOutModal
+            isOpen={is_logout_open}
+            onClose={() => set_is_logout_open(false)}
+            setUserSignIn={setUserSignIn}
+          />
         </div>
-        <Payment_success
-          lang={lang}
-          is_modal_open={is_PM}
-          set_is_modal_open={set_is_PM}
-        />
-        <Form_modal
-          lang={lang}
-          is_modal_open={is_formalization_open}
-          set_is_modal_open={set_is_formalization_open}
-          method={form_modal_method}
-        />
-      </div>
+      </>
     );
   }
 };

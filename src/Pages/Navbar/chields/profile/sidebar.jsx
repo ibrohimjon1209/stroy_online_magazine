@@ -70,14 +70,14 @@ const Sidebar = ({ city, set_city, lang, set_lang, isUserSignIn, setUserSignIn, 
 
   return (
     <div
-      className={`h-auto sm:mx-0 m  x-auto w-[100%] ${help_modal_open ? "z-[10000]" : ""
+      className={`sm:mx-0 h-auto mx-auto w-[100%] ${help_modal_open ? "z-[10000] overflow-y-hidden" : ""
         } sm:w-[350px]`}
     >
       <Routes>
         <Route
           path="*"
           element={
-            <div className="sticky top-0 w-[100%] sm:w-[350px]">
+            <div className="sticky top-0 w-[100%] sm:w-[350px] overflow-y-hidden">
               <div>
                 {isUserSignIn ? (
                   <div className="flex h-[70px] sm:h-[80px] items-center w-full gap-3 border-[#D5D5D5] border rounded-[8px] pl-[13px] sm:pl-[20px] pr-[30px] py-[12px]">
@@ -108,7 +108,7 @@ const Sidebar = ({ city, set_city, lang, set_lang, isUserSignIn, setUserSignIn, 
                 )}
               </div>
 
-              <div className="flex flex-col mt-[20px] border-[#D5D5D5] border rounded-[8px]">
+              <div className="flex flex-col mt-[15px] sm:mt-[20px] border-[#D5D5D5] border rounded-[8px]">
                 <NavItem
                   href={isSmallScreen ? "/orders" : "/profile/orders"}
                   isActive={location.pathname === "/profile/orders"}
@@ -129,7 +129,7 @@ const Sidebar = ({ city, set_city, lang, set_lang, isUserSignIn, setUserSignIn, 
                 />
               </div>
 
-              <div className="flex flex-col mt-[20px] border-[#D5D5D5] border rounded-[8px]">
+              <div className="flex flex-col mt-[15px] sm:mt-[20px] border-[#D5D5D5] border rounded-[8px]">
                 <NavItem
                   href="/profile/city"
                   isActive={location.pathname === "/profile/city"}
@@ -144,7 +144,7 @@ const Sidebar = ({ city, set_city, lang, set_lang, isUserSignIn, setUserSignIn, 
                 />
               </div>
 
-              <div className="flex flex-col mt-[20px] border-[#D5D5D5] border rounded-[8px]">
+              <div className="flex flex-col mt-[15px] sm:mt-[20px] border-[#D5D5D5] border rounded-[8px]">
                 <NavItem
                   onClick={() => isSmallScreen ? set_help_modal_open(true) : null}
                   href={`${isSmallScreen ? "/profile" : "/profile/help"}`}
@@ -188,7 +188,7 @@ function NavItem({ href, icon, label, isActive, onClick }) {
     <Link
       to={href}
       onClick={onClick ? onClick : null}
-      className="font-inter font-[500] text-[14px] leading-[22px] flex items-center justify-between px-4 py-4 rounded-[8px] transition duration-100 hover:bg-gray-100"
+      className="font-inter font-[500] text-[14px] leading-[22px] flex items-center justify-between px-4 py-3.5 sm:py-4 rounded-[8px] transition duration-100 hover:bg-gray-100"
     >
       <div className="flex items-center">
         <span className="mr-3">

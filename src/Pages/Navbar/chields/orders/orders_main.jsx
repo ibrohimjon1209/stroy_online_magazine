@@ -2,13 +2,18 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, X } from "lucide-react";
 import { order_get } from "../../../../Services/order/get_my";
-import no_order from './image.png'
+import no_order from './image.png';
+import { Tooltip as ReactTooltip } from 'react-tooltip'; // Updated import
 
 const Orders_main = ({ lang }) => {
   // State to track which orders have expanded product views
   const [expandedOrders, setExpandedOrders] = useState([]);
   const [productDetails, setProductDetails] = useState({});
   const [orders, set_orders] = useState([]);
+  // State for expanded addresses on mobile
+  const [expandedAddresses, setExpandedAddresses] = useState(new Set());
+  // State to detect mobile screen size (below sm breakpoint: 640px)
+  const [isMobile, setIsMobile] = useState(false);
 
   const toggleProductView = (orderId) => {
     if (expandedOrders.includes(orderId)) {
@@ -18,6 +23,29 @@ const Orders_main = ({ lang }) => {
       fetchProductsForOrder(orderId);
     }
   };
+
+  // Toggle address expansion for mobile
+  const toggleAddress = (orderId) => {
+    setExpandedAddresses((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(orderId)) {
+        newSet.delete(orderId);
+      } else {
+        newSet.add(orderId);
+      }
+      return newSet;
+    });
+  };
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -134,6 +162,7 @@ const Orders_main = ({ lang }) => {
                 className="p-6 space-y-4 border rounded-lg shadow-md"
                 style={{ borderStyle: "dashed" }}
               >
+          
                 {/* Order Header */}
                 <div className="flex items-start justify-between">
                   <div className="text-lg font-bold text-gray-900 sm:text-xl">
@@ -242,9 +271,21 @@ const Orders_main = ({ lang }) => {
                             ? "Адрес самовывоза"
                             : "Olib ketish manzili"}
                     </span>
-                    <span className="font-medium text-gray-900">
+                    <p 
+                      className={`font-medium text-gray-900 cursor-pointer ${
+                        isMobile 
+                          ? expandedAddresses.has(order.id) 
+                            ? 'max-w-[60%]' 
+                            : 'max-w-[50%] truncate' 
+                          : 'max-w-[50%] truncate'
+                      }`} 
+                      onClick={isMobile ? () => toggleAddress(order.id) : undefined}
+                      title={!isMobile ? order.delivery_address : undefined}
+                      data-tip={!isMobile ? order.delivery_address : undefined}
+                    >
                       {order.delivery_address}
-                    </span>
+                    </p>
+                    <ReactTooltip place="top" effect="solid" />
                   </div>
                   <div className="flex justify-between text-base">
                     <span className="text-gray-600">
@@ -282,7 +323,7 @@ const Orders_main = ({ lang }) => {
                   </div>
                   <div className="flex justify-between text-base">
                     <span className="text-gray-600">
-                      {order.items.length}{" "}
+                      {order.items.map((item) => item.quantity).reduce((a, b) => a + b, 0)}{" "}
                       {lang === "uz"
                         ? "dona mahsulot"
                         : lang === "en"
@@ -293,6 +334,20 @@ const Orders_main = ({ lang }) => {
                     </span>
                     <span className="font-medium text-gray-900">
                       {order.total_amount} {uzs_lang}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-base">
+                    <span className="text-gray-600">
+                      {lang === "uz"
+                        ? "Ishlatilgan keshbek"
+                        : lang === "en"
+                          ? "Used cashback"
+                          : lang === "ru"
+                            ? "Использованный кешбек"
+                            : "Ishlatilgan keshbek"}
+                    </span>
+                    <span className="font-medium text-gray-900">
+                      {order.cashback_used} {uzs_lang}
                     </span>
                   </div>
                 </div>

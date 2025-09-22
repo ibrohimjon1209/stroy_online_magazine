@@ -7,7 +7,7 @@ import on_arrive from "./imgs/on_arrive.png";
 import pay_me from "./imgs/pay_me.png";
 import click from "./imgs/click.png";
 import open_icon from "./imgs/open.png";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Delivery from "../Map/map_main";
 import Payment_variant from "../payment_variant/payment_main";
 import Pickup_address from "../pickup_address/pickup_address_main";
@@ -31,6 +31,7 @@ const Formalization_main = ({
   set_basket,
   set_modal_method,
   set_is_modal_open,
+  notify
 }) => {
   const [userData, setUserData] = useState({ name: "...", phone: "..." });
   const [deliver_type, set_deliver_type] = useState("pickup");
@@ -217,17 +218,13 @@ const Formalization_main = ({
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("userId");
-      setNotification(
-        lang === "uz"
-          ? "Sessiya tugadi, iltimos qayta kiring"
-          : lang === "en"
-            ? "Session expired, please log in again"
-            : lang === "ru"
-              ? "Сессия истекла, пожалуйста, войдите снова"
-              : "Sessiya tugadi, iltimos qayta kiring"
-      );
-      setIsNotificationVisible(true);
-      setTimeout(() => setIsNotificationVisible(false), 3000);
+      notify(lang === "uz"
+        ? "Sessiya tugadi, iltimos qayta kiring"
+        : lang === "en"
+          ? "Session expired, please log in again"
+          : lang === "ru"
+            ? "Сессия истекла, пожалуйста, войдите снова"
+            : "Sessiya tugadi, iltimos qayta kiring", "warning");
       return null;
     }
   };
@@ -286,48 +283,44 @@ const Formalization_main = ({
     } catch (error) {
       console.error("[v0] Payment processing error:", error);
       console.error("[v0] Error response:", error.response?.data);
-      setNotification(
+      notify(
         lang === "uz"
           ? "To'lov jarayonida xatolik yuz berdi"
           : lang === "en"
             ? "Error occurred during payment"
             : lang === "ru"
               ? "Ошибка при обработке платежа"
-              : "To'lov jarayonida xatolik yuz berdi"
+              : "To'lov jarayonida xatolik yuz berdi", "error"
       );
-      setIsNotificationVisible(true);
-      setTimeout(() => setIsNotificationVisible(false), 3000);
     }
   };
 
   const handleOrderCreation = async () => {
     try {
       if (!userSignIn) {
-        setNotification(
+        notify(
           lang === "uz"
             ? "Iltimos tizimdan ro'yxatdan o'ting"
             : lang === "en"
               ? "Please log in"
               : lang === "ru"
                 ? "Пожалуйста, войдите в систему"
-                : "Iltimos tizimdan ro'yxatdan o'ting"
+                : "Iltimos tizimdan ro'yxatdan o'ting",
+          "warning"
         );
-        setIsNotificationVisible(true);
-        setTimeout(() => setIsNotificationVisible(false), 4000);
         return;
       }
       if (!address_inform) {
-        setNotification(
+        notify(
           lang === "uz"
             ? "Iltimos yetkazib berish manzilini tanlang"
             : lang === "en"
               ? "Please select a delivery address"
               : lang === "ru"
                 ? "Пожалуйста, выберите адрес доставки"
-                : "Iltimos yetkazib berish manzilini tanlang"
+                : "Iltimos yetkazib berish manzilini tanlang",
+          "warning"
         );
-        setIsNotificationVisible(true);
-        setTimeout(() => setIsNotificationVisible(false), 4000);
         return;
       }
       const orderResult = await order_create(
@@ -367,17 +360,16 @@ const Formalization_main = ({
         }
       }
     } catch (error) {
-      setNotification(
+      notify(
         lang === "uz"
           ? "Buyurtma yaratishda xatolik"
           : lang === "en"
             ? "Error creating order"
             : lang === "ru"
               ? "Ошибка при создании заказа"
-              : "Buyurtma yaratishda xatolik"
+              : "Buyurtma yaratishda xatolik",
+        "error"
       );
-      setIsNotificationVisible(true);
-      setTimeout(() => setIsNotificationVisible(false), 3000);
     }
   };
 
@@ -389,20 +381,6 @@ const Formalization_main = ({
   return (
     <div>
       <div className="flex flex-col w-full h-full mb-17 sm:mb-0">
-        {isNotificationVisible && notification && (
-          <div className="absolute z-50 top-15 left-1/2 transform border-[2px] border-red-500 bg-red-100 -translate-x-1/2 w-[90%] sm:w-[400px] scale-[130%] text-red-800 rounded-lg shadow-lg p-4 flex items-center justify-between">
-            <span className="font-inter font-[500] text-[16px] text-black">
-              {notification}
-            </span>
-            <button
-              onClick={() => setIsNotificationVisible(false)}
-              className="text-black"
-            >
-              ✕
-            </button>
-          </div>
-        )}
-
         <div className="w-full fixed z-50 h-[65px] bg-[#DCC38B] sm:hidden block">
           <Link
             onClick={() => set_formalization_open(false)}

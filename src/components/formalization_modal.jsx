@@ -6,10 +6,13 @@ const Modal = ({ is_modal_open, set_is_modal_open, method }) => {
 
   if (method == "cash") {
     return (
-      <div className="fixed w-full scale-1 sm:scale-[1.4] inset-0 flex items-center justify-center z-50">
+      <div className="fixed w-full scale-[100%] sm:scale-[1.4] inset-0 flex items-center justify-center z-50">
         <div
           className="fixed inset-0 bg-black opacity-70"
-          onClick={() => set_is_modal_open(false)}
+          onClick={() => {
+            set_is_modal_open(false);
+            window.location.reload();
+          }}
         />
 
         <div className="bg-white scale-[0.85] rounded-lg p-6 w-[310px] h-[350px] relative z-10 mx-4 shadow-lg">
@@ -40,8 +43,9 @@ const Modal = ({ is_modal_open, set_is_modal_open, method }) => {
 
             <button
               onClick={() => {
-                set_is_modal_open(false);
+                set_is_modal_open(false);                
                 localStorage.setItem("online_pay", "false");
+                window.location.reload();
               }}
               className="w-[70%] py-2 bg-[#FFDF02] border border-[#D5D5D5] cursor-pointer rounded hover:scale-[102%] active:scale-[98%] duration-200"
             >
@@ -67,24 +71,37 @@ const Modal = ({ is_modal_open, set_is_modal_open, method }) => {
   } else {
     return (
       <div className="fixed w-full scale-1 sm:scale-[1.4] inset-0 flex items-center justify-center z-50">
-        <div
-          className="fixed inset-0 bg-black opacity-70"
-        />
-        
-        <div className="relative flex items-center justify-center w-35 h-35 scale-[130%]">
-              <div className={`absolute w-full h-full ${method == "click" ? "bg-blue-600" : "bg-sky-300"} rounded-full animate-ping`}></div>
-              <div className={`${method == "click" ? "relative" : "hidden"} w-auto h-auto bg-white rounded-full py-13.5 px-10`}>
-                <div className="flex flex-row items-center justify-center gap-[7px]">
-                  <img src={click} alt="click" className="w-6 h-6"/><p className="text-[18px] font-semibold">Click</p>
-                </div>
-              </div>
-              <div className={`${method == "payme" ? "relative" : "hidden"} w-auto h-auto bg-sky-200 rounded-full py-14 px-10`}>
-                <div className="flex flex-row items-center justify-center gap-[7px]">
-                  <img src={payme} alt="payme" className="w-6 h-6"/><p className="text-[18px] text-sky-950 font-semibold whitespace-nowrap">Pay me</p>
-                </div>
-              </div>
-            </div>
+        <div className="fixed inset-0 bg-black opacity-70" />
 
+        <div className="relative flex items-center justify-center w-35 h-35 scale-[130%]">
+          <div
+            className={`absolute w-full h-full ${
+              method == "click" ? "bg-blue-600" : "bg-sky-300"
+            } rounded-full animate-ping`}
+          ></div>
+          <div
+            className={`${
+              method == "click" ? "relative" : "hidden"
+            } w-auto h-auto bg-white rounded-full py-13.5 px-10`}
+          >
+            <div className="flex flex-row items-center justify-center gap-[7px]">
+              <img src={click} alt="click" className="w-6 h-6" />
+              <p className="text-[18px] font-semibold">Click</p>
+            </div>
+          </div>
+          <div
+            className={`${
+              method == "payme" ? "relative" : "hidden"
+            } w-auto h-auto bg-sky-200 rounded-full py-14 px-10`}
+          >
+            <div className="flex flex-row items-center justify-center gap-[7px]">
+              <img src={payme} alt="payme" className="w-6 h-6" />
+              <p className="text-[18px] text-sky-950 font-semibold whitespace-nowrap">
+                Pay me
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

@@ -13,12 +13,10 @@ import Language from "./chields/language/language_main";
 import Help from "./chields/help/help_main";
 import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
-import LogOutModal from "./log_out_modal";
 import Edit_profile from "./edit_profile";
 
-const Profile_main = ({ isUserSignIn, setUserSignIn, set_is_found, lang, set_lang, city, set_city }) => {
+const Profile_main = ({ isUserSignIn, setUserSignIn, set_is_found, lang, set_lang, city, set_city, set_is_logout_open }) => {
   set_is_found(true)
-  const [is_logout_open, set_is_logout_open] = useState(false);
   const [edit_profile_open, set_edit_profile_open] = useState(false);
   const [user, set_user] = useState({});
   
@@ -35,7 +33,7 @@ const Profile_main = ({ isUserSignIn, setUserSignIn, set_is_found, lang, set_lan
   return (
     <div className="flex flex-col w-full h-full mb-17 sm:mb-0">
     <div className="mb-10 gap-[20px] sm:gap-0 sm:my-[20px] flex flex-col items-center justify-center w-full">
-      <div className="sticky top-0 z-50 block w-full sm:hidden">
+      <div className="sticky top-0 z-[1000000000] block w-full sm:hidden">
         <div className="w-full h-[65px] bg-[#DCC38B]">
           <Link
             className="w-full h-full flex items-center gap-[10px] pl-[13px]"
@@ -63,7 +61,6 @@ const Profile_main = ({ isUserSignIn, setUserSignIn, set_is_found, lang, set_lan
         </div>
       </div>
     </div>
-    <LogOutModal isOpen={is_logout_open} onClose={() => set_is_logout_open(false)} setUserSignIn={setUserSignIn} />
     <Edit_profile isOpen={edit_profile_open} onClose={() => set_edit_profile_open(false)} name={user.name} surname={user.surname}/>
     </div>
   );

@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 const BottomModal = ({ isOpen, onClose, lang }) => {
   const [support, set_support] = useState([]);
   const [media, set_media] = useState(null);
+  const [copiedId, setCopiedId] = useState(null); // New state for copied phone ID
   const sl_option_id =
     localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
@@ -50,20 +51,34 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
       });
   }, []);
 
+  const handleCopy = (phoneNumber, id) => {
+    navigator.clipboard.writeText(phoneNumber).then(() => {
+      setCopiedId(id); // Set the copied ID
+      setTimeout(() => setCopiedId(null), 2000); // Clear copied ID after 2 seconds
+    });
+  };
+
   if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 z-[9999] bg-[#0000008C]"
+      className="fixed inset-0 flex items-end justify-center z-[9999] bg-[#00000050] h-[calc(100vh-50px)]"
       onClick={onClose}
       style={{ zIndex: 9999 }}
     >
       <div
-        className="fixed bottom-0 left-0 right-0 bg-white rounded-t-[20px]"
+        className="w-full sm:w-[400px] bg-white rounded-t-[20px] pb-10"
         onClick={(e) => e.stopPropagation()}
-        style={{ zIndex: 10000 }}
+        style={{
+          maxHeight: "80vh",
+          height: "auto",
+          overflowY: "auto",
+          boxShadow: "0 -2px 16px rgba(0,0,0,0.08)",
+          zIndex: 10000,
+          touchAction: "none",
+        }}
       >
-        <div className="p-4">
+        <div className="p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-medium">
               {lang == "uz"
@@ -93,12 +108,19 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
 
           <div className="mb-6 space-y-4">
             {support.map((item) => (
-              <div key={item.id} className="flex items-center justify-between">
+              <div key={item.id} onClick={() => handleCopy(item.phone_number, item.id)} className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">{item.phone_number}</p>
+                  <p className="font-medium">
+                    {item.phone_number}
+                  </p>
                   <p className="text-sm text-gray-500">
                     {item[`title_${lang}`]}
                   </p>
+                  {copiedId === item.id && (
+                    <p className="text-green-500">
+                      {lang === "uz" ? "Nushalandi" : "Copied"}
+                    </p>
+                  )} {/* Display copied message only for the clicked number */}
                 </div>
                 <Phone className="h-[28px] w-[28px]" />
               </div>

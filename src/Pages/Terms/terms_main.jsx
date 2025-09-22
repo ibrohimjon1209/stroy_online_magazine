@@ -19,10 +19,10 @@ const Terms_main = ({ lang, set_is_another_nav }) => {
   }, [set_is_another_nav]);
 
   const getTitle = () => {
-    if (lang === "uz") return "Foydalamuvchi shartnomasi";
+    if (lang === "uz") return "Foydalanuvchi shartnomasi";
     if (lang === "ru") return "Пользовательское соглашение";
     if (lang === "en") return "User agreement";
-    return "Foydalamuvchi shartnomasi";
+    return "Foydalanuvchi shartnomasi";
   };
 
   // Function to format the content
@@ -49,7 +49,7 @@ const Terms_main = ({ lang, set_is_another_nav }) => {
         );
       }
       // Handle bullet points or continuation text
-      return <p key={index} className="ml-4 mb-2">{line}</p>;
+      return <p key={index} className="mb-2 ml-4">{line}</p>;
     });
   };
 

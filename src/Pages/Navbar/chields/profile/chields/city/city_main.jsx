@@ -68,14 +68,14 @@ const City_main = ({ lang }) => {
   };
 
   return (
-    <div className="flex flex-col w-full gap-10">
+    <div className="flex flex-col w-full gap-8 sm:gap-10">
       {!is_region_selected ? (
         <>
-          <h1 className="ml-[1px] sm:ml-[50px] font-inter font-[600] text-[30px] leading-[22px] text-black">
-            {lang === "en" ? "Select a Region" : "Viloyatni tanlang"}
+          <h1 className="sm:ml-[50px] font-inter font-[600] text-[25px] mt-3 sm:text-[30px] leading-[22px] text-black">
+            {lang === "uz" ? "Viloyatni tanlang" : "en" ? "Select a region" : "ru" ? "Выберите регион" : "Viloyatni tanlang"}
           </h1>
           <hr className="w-full" />
-          <div className="ml-[1px] sm:ml-[50px] mt-4 sm:mt-0 flex flex-col gap-[50px] sm:gap-[80px] font-inter font-[600] text-[20px] leading-[22px] text-black">
+          <div className="sm:ml-[50px] sm:mt-0 flex flex-col gap-[50px] sm:gap-[80px] font-inter font-[600] text-[20px] leading-[22px] text-black">
             {regions.map((item, index) => (
               <div
                 key={index}
@@ -88,20 +88,20 @@ const City_main = ({ lang }) => {
           </div>
         </>
       ) : (
-        <>
-          <div className="flex items-center gap-4 ml-[1px] sm:ml-[50px]">
+        <div className="flex flex-col gap-8 mt-2">
+          <div className="flex items-center gap-2 sm:gap-4 sm:ml-[50px]">
             <button
               onClick={handle_back_to_regions}
-              className="font-inter font-[600] text-[16px] text-[#DCC38B] hover:text-[#B89E6F] underline"
+              className="text-[#DCC38B] hover:text-[#B89E6F]"
             >
-              <ChevronLeft/>
+              <ChevronLeft className="w-8 h-8"/>
             </button>
-            <h1 className="font-inter font-[600] text-[30px] leading-[22px] text-black">
+            <h1 className="font-inter font-[600] text-[25px] sm:text-[30px] leading-[22px] text-black">
               {region?.[`name_${lang}`]}
             </h1>
           </div>
-          <hr className="w-full" />
-          <div className="ml-[1px] sm:ml-[50px] mt-4 sm:mt-0 flex flex-col gap-[50px] sm:gap-[80px] font-inter font-[600] text-[20px] leading-[22px] text-black">
+          <hr className="w-full -mt-2" />
+          <div className="sm:ml-[50px] flex flex-col gap-[50px] sm:gap-[80px] font-inter font-[600] text-[20px] leading-[22px] text-black">
             {cities.map((item, index) => (
               <div
                 onClick={() => handle_city_select(item)}
@@ -114,7 +114,7 @@ const City_main = ({ lang }) => {
               </div>
             ))}
           </div>
-        </>
+        </div>
       )}
     </div>
   );

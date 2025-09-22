@@ -8,6 +8,7 @@ import apple from "./Images/apple.png";
 import play from "./Images/play.png";
 import instagram from "./Images/instagram.svg";
 import { support_get } from "../../Services/general/support";
+import { Link } from "react-router-dom";
 
 const Footer = ({ lang = "uz" }) => {
   const [media, set_media] = useState(null);
@@ -127,10 +128,11 @@ const Footer = ({ lang = "uz" }) => {
           </h1>
           <div className="flex flex-col gap-[27px] mt-[20px]">
             {[
-              { img: apple, store: "App Store" },
-              { img: play, store: "Google Play" },
+              { img: apple, store: "App Store", url: "/"},
+              { img: play, store: "Google Play", url: "https://play.google.com/store/apps/details?id=com.gold_house" },
             ].map((item, index) => (
-              <div
+              <Link
+                to={item.url}
                 key={index}
                 className="bg-[#111111] w-[151px] h-[37px] flex rounded-[3px] pt-[6px] pl-[10px]"
               >
@@ -151,7 +153,7 @@ const Footer = ({ lang = "uz" }) => {
                   </h1>
                   <h1 className="text-white text-[11px]">{item.store}</h1>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

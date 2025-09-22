@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
-const Product = ({ lang, basket, set_basket, userSignIn }) => {
+const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
   const navigate = useNavigate();
   const [productData, setProductData] = useState(null);
   const [selectedSize, setSelectedSize] = useState("4x6");
@@ -98,6 +98,7 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
         updatedBasket.push(newItem);
       }
       set_basket(updatedBasket);
+      notify(notification, "success");
       localStorage.setItem("basket", JSON.stringify(updatedBasket));
     }
   }, [isVisible, notification]);
@@ -279,9 +280,6 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
       setIsAdded(true);
       setIsAnimating(false);
       handleAddToCart();
-
-      // Navigate to basket page after a short delay
-      setTimeout(() => {}, 800);
     }, 600);
   };
 
@@ -291,7 +289,7 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
     setIsVisible(true);
     setTimeout(() => {
       setIsVisible(false);
-    }, 3000);
+    }, 300);
   };
 
   const handleImageError = (e) => {
@@ -515,7 +513,7 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
         </div>
       </div>
 
-      {isVisible && notification && (
+      {/* {isVisible && notification && (
         <div
           className={`absolute z-50 left-1 scale-70 w-full h-auto flex justify-center items-center notification`}
         >
@@ -560,7 +558,7 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       <h1 className="hidden sm:block font-inter font-[600] text-[20px] leading-[22px] text-black">
         {productData[`name_${lang}`]}
@@ -819,16 +817,26 @@ const Product = ({ lang, basket, set_basket, userSignIn }) => {
                 }`}
                 onClick={handleClick}
               >
-                {!isAnimating
+                <h1 className="uppercase font-inter font-[600] text-[16px] leading-[22px] text-[#FFDF02] whitespace-nowrap"></h1>
+                {/* {!isAnimating
                   ? isAdded
                     ? lang == "uz"
-                      ? "Qo'shildi ✅"
-                      : lang == "en"
-                      ? "Added ✅"
-                      : lang == "ru"
-                      ? "Добавлено ✅"
-                      : "Qo'shildi ✅"
+                    ? "Savatga o'tish ➡️"
+                    : lang == "en"
+                    ? "Go to cart ➡️"
+                    : lang == "ru"
+                    ? "Перейти в корзину ➡️"
+                    : "Savatga o'tish ➡️"
                     : lang == "uz"
+                    ? "Savatchaga qo'shish"
+                    : lang == "en"
+                    ? "Add to cart"
+                    : lang == "ru"
+                    ? "Добавить в корзину"
+                    : "Savatchaga qo'shish"
+                  : ""} */}
+                {!isAnimating
+                  ? lang == "uz"
                     ? "Savatchaga qo'shish"
                     : lang == "en"
                     ? "Add to cart"
