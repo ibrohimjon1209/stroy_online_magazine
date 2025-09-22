@@ -1,5 +1,5 @@
 import React from "react";
-import phones from "./images/phones.png";
+import phones from "./images/phones.svg";
 import qr_ex from "./images/qr_ex.png";
 import appstore from "./images/appstore.png";
 import googleplay from "./images/googleplay.png";
@@ -8,7 +8,7 @@ const Download_page = () => {
   const lang = localStorage.getItem("lang");
   return (
     <div className="hidden flex-row sm:flex gap-[126px] w-full sm:mb-12 pl-[190px] overflow-hidden h-[500px] bg-white">
-      <img src={phones} alt="" className="scale-[120%]" />
+      <img src={phones} alt="" className="scale-[100%]" />
       <div>
         <h1 className="text-[36px] uppercase font-semibold mt-10">
           {lang === "uz"
