@@ -108,7 +108,7 @@ const Category_mobile = () => {
   )
 
   return (
-    <div className="w-full">
+    <div className="w-full mb-10">
       <div>
         <style jsx="true">
           {`
@@ -157,7 +157,6 @@ const Category_mobile = () => {
         </style>
 
         <div className="w-full h-[80px] flex flex-col items-center justify-center bg-[#DCC38B]">
-          {/* Search input for mobile */}
           <div className="w-[90%] h-[40px] pl-[23.5px] bg-[#FFFFFF] rounded-[10px] flex items-center">
             <Search className="cursor-pointer" onClick={handleSearchClick} />
             <input

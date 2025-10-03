@@ -68,6 +68,7 @@ export default function Basket_main({
     );
     setProducts(updated);
     set_basket(updated);
+    localStorage.setItem("basket", JSON.stringify(updated));
   };
 
   const toggleProductSelection = (productId, size, color) => {
@@ -80,6 +81,7 @@ export default function Basket_main({
           : product
       );
       set_basket(updatedProducts);
+      localStorage.setItem("basket", JSON.stringify(updatedProducts));
       return updatedProducts;
     });
   };
@@ -256,8 +258,8 @@ export default function Basket_main({
                         : lang === "ru"
                           ? "Выбрать все"
                           : "Hammasini tanlash"}{" "}
-                    <span className="hidden sm:inline">
-                      {visibleProducts.length}{" "}
+                    <span>
+                      {visibleProducts.filter((p) => p.selected).map((p)=> p.quantity).reduce((a, b) => a + b, 0)}{" "}
                       {lang == "uz"
                         ? "ta maxsulot"
                         : lang === "en"
