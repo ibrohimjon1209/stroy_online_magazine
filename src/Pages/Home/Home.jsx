@@ -106,8 +106,13 @@ function Home({ lang, setSearchText, searchText }) {
     const getProducts = async () => {
       try {
         const response = await products_get(sl_option_id)
-        setProducts(response || [])
-        setFilteredProducts(response || []) // initially, no filtering
+        // Filter products where is_available is true and at least one variant has is_available: true
+        const availableProducts = (response || []).filter(
+          (product) =>
+            product.is_available === true && product.variants?.some((variant) => variant.is_available === true)
+        )
+        setProducts(availableProducts)
+        setFilteredProducts(availableProducts)
       } catch (error) {
         console.error("API xatosi:", error)
       } finally {
@@ -115,12 +120,12 @@ function Home({ lang, setSearchText, searchText }) {
       }
     }
     getProducts()
-  }, [])
+  }, [sl_option_id])
 
   useEffect(() => {
     if (searchText.trim()) {
       const filtered = products.filter((product) =>
-        product[`name_${lang}`].toLowerCase().includes(searchText.toLowerCase()),
+        product[`name_${lang}`].toLowerCase().includes(searchText.toLowerCase())
       )
       setLoading(true)
       setCurrentPage(1) // Reset to first page
@@ -237,6 +242,11 @@ function Home({ lang, setSearchText, searchText }) {
 
   const handleLoadMore = () => {
     setCurrentPage((prevPage) => prevPage + 1)
+  }
+
+  // Function to get the first available variant for display
+  const getFirstAvailableVariant = (product) => {
+    return product.variants.find((variant) => variant.is_available === true) || product.variants[0]
   }
 
   return (
@@ -358,47 +368,51 @@ function Home({ lang, setSearchText, searchText }) {
                 <div style={styles.loader}></div>
               </div>
             ) : sliderProducts.length > 0 ? (
-              sliderProducts.map((product, index) => (
-                <div key={`slider-${index}`} className="flex-none w-[160px] sm:w-[245px] snap-start">
-                  <Link to={`/product/${product.id}`}>
-                    <div className="rounded-[10px] w-[160px] h-[160px] border-[0px] sm:w-[245px] sm:h-[245px] bg-[#F2F2F1] overflow-hidden group">
-                      <img
-                        src={`https://backkk.stroybazan1.uz/${product.image}`}
-                        className="object-cover w-full h-full transition-transform group-hover:scale-105"
-                        alt={product[`name_${lang}`]}
-                      />
-                    </div>
-                    <div className="flex flex-row items-end w-[160px] sm:w-[245px] justify-between mt-1.5 px-3">
-                      <div className="flex flex-col sm:gap-1">
-                        <h1 className="text-black truncate font-semibold text-[14px] sm:text-[16px] max-w-[120px] sm:max-w-[180px]">
-                          {product[`name_${lang}`]}
-                        </h1>
-                        <p className="text-black text-[12px] sm:text-[14px] max-w-[120px] sm:max-w-[180px] truncate">
-                          {product.variants?.[0]?.price
-                            ? `${
-                                lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
-                              }: ${Number.parseFloat(product.variants[0].price).toFixed(2)} ${uzs_lang}`
-                            : lang === "uz"
-                              ? "Narxi mavjud emas"
-                              : lang === "en"
-                                ? "Price not available"
-                                : lang === "ru"
-                                  ? "Цена не доступна"
-                                  : "Narxi mavjud emas"}
-                        </p>
+              sliderProducts.map((product, index) => {
+                const variant = getFirstAvailableVariant(product)
+                if (!variant.is_available) return null // Skip if the selected variant is not available
+                return (
+                  <div key={`slider-${index}`} className="flex-none w-[160px] sm:w-[245px] snap-start">
+                    <Link to={`/product/${product.id}`}>
+                      <div className="rounded-[10px] w-[160px] h-[160px] border-[0px] sm:w-[245px] sm:h-[245px] bg-[#F2F2F1] overflow-hidden group">
+                        <img
+                          src={`https://backkk.stroybazan1.uz/${variant.image || product.image}`}
+                          className="object-cover w-full h-full transition-transform group-hover:scale-105"
+                          alt={product[`name_${lang}`]}
+                        />
                       </div>
-                      <Heart
-                        className="w-[19px] h-[19px] sm:w-[28px] sm:h-[28px] text-[#FF0000] cursor-pointer mb-0.5"
-                        fill={likedProducts.some((fav) => fav.product === product.id) ? "#FF0000" : "none"}
-                        onClick={(e) => {
-                          e.preventDefault()
-                          handleLikeToggle(product.id)
-                        }}
-                      />
-                    </div>
-                  </Link>
-                </div>
-              ))
+                      <div className="flex flex-row items-end w-[160px] sm:w-[245px] justify-between mt-1.5 px-3">
+                        <div className="flex flex-col sm:gap-1">
+                          <h1 className="text-black truncate font-semibold text-[14px] sm:text-[16px] max-w-[120px] sm:max-w-[180px]">
+                            {product[`name_${lang}`]}
+                          </h1>
+                          <p className="text-black text-[12px] sm:text-[14px] max-w-[120px] sm:max-w-[180px] truncate">
+                            {variant.price
+                              ? `${
+                                  lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
+                                }: ${Number.parseFloat(variant.price).toFixed(2)} ${uzs_lang}`
+                              : lang === "uz"
+                                ? "Narxi mavjud emas"
+                                : lang === "en"
+                                  ? "Price not available"
+                                  : lang === "ru"
+                                    ? "Цена не доступна"
+                                    : "Narxi mavjud emas"}
+                          </p>
+                        </div>
+                        <Heart
+                          className="w-[19px] h-[19px] sm:w-[28px] sm:h-[28px] text-[#FF0000] cursor-pointer mb-0.5"
+                          fill={likedProducts.some((fav) => fav.product === product.id) ? "#FF0000" : "none"}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            handleLikeToggle(product.id)
+                          }}
+                        />
+                      </div>
+                    </Link>
+                  </div>
+                )
+              })
             ) : null}
           </div>
         </div>
@@ -411,50 +425,54 @@ function Home({ lang, setSearchText, searchText }) {
               <div style={styles.loader}></div>
             </div>
           ) : currentProducts.length > 0 ? (
-            currentProducts.map((product, index) => (
-              <div key={`grid-${gridStartIndex + index}`} className="cursor-pointer">
-                <Link to={`/product/${product.id}`}>
-                  <div className="rounded-[10px] w-full aspect-square bg-[#F2F2F1] overflow-hidden group">
-                    <img
-                      src={`https://backkk.stroybazan1.uz/${product.image}`}
-                      className="object-cover w-full h-full transition-transform group-hover:scale-105"
-                      alt={product[`name_${lang}`]}
-                    />
-                  </div>
-                  <div className="flex flex-row items-end w-full justify-between mt-1.5 px-1">
-                    <div className="flex flex-col flex-1 min-w-0 pr-2 sm:gap-1">
-                      <h1 className="text-black truncate font-semibold text-[14px] sm:text-[16px] w-full">
-                        {product[`name_${lang}`]}
-                      </h1>
-                      <p className="text-black text-[12px] sm:text-[14px] truncate w-full">
-                        {product.variants?.[0]?.price
-                          ? `${
-                              lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
-                            }: ${Number.parseFloat(product.variants[0].price).toFixed(2)} ${uzs_lang}`
-                          : lang === "uz"
-                            ? "Narxi mavjud emas"
-                            : lang === "en"
-                              ? "Price not available"
-                              : lang === "ru"
-                                ? "Цена не доступна"
-                                : "Narxi mavjud emas"}
-                      </p>
+            currentProducts.map((product, index) => {
+              const variant = getFirstAvailableVariant(product)
+              if (!variant.is_available) return null // Skip if the selected variant is not available
+              return (
+                <div key={`grid-${gridStartIndex + index}`} className="cursor-pointer">
+                  <Link to={`/product/${product.id}`}>
+                    <div className="rounded-[10px] w-full aspect-square bg-[#F2F2F1] overflow-hidden group">
+                      <img
+                        src={`https://backkk.stroybazan1.uz/${variant.image || product.image}`}
+                        className="object-cover w-full h-full transition-transform group-hover:scale-105"
+                        alt={product[`name_${lang}`]}
+                      />
                     </div>
-                    <Heart
-                      className="w-[19px] h-[19px] sm:w-[28px] sm:h-[28px] text-[#FF0000] cursor-pointer mb-0.5 flex-shrink-0 ml-2"
-                      fill={likedProducts.some((fav) => fav.product === product.id) ? "#FF0000" : "none"}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        handleLikeToggle(product.id)
-                      }}
-                    />
-                  </div>
-                </Link>
-              </div>
-            ))
+                    <div className="flex flex-row items-end w-full justify-between mt-1.5 px-1">
+                      <div className="flex flex-col flex-1 min-w-0 pr-2 sm:gap-1">
+                        <h1 className="text-black truncate font-semibold text-[14px] sm:text-[16px] w-full">
+                          {product[`name_${lang}`]}
+                        </h1>
+                        <p className="text-black text-[12px] sm:text-[14px] truncate w-full">
+                          {variant.price
+                            ? `${
+                                lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
+                              }: ${Number.parseFloat(variant.price).toFixed(2)} ${uzs_lang}`
+                            : lang === "uz"
+                              ? "Narxi mavjud emas"
+                              : lang === "en"
+                                ? "Price not available"
+                                : lang === "ru"
+                                  ? "Цена не доступна"
+                                  : "Narxi mavjud emas"}
+                        </p>
+                      </div>
+                      <Heart
+                        className="w-[19px] h-[19px] sm:w-[28px] sm:h-[28px] text-[#FF0000] cursor-pointer mb-0.5 flex-shrink-0 ml-2"
+                        fill={likedProducts.some((fav) => fav.product === product.id) ? "#FF0000" : "none"}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          handleLikeToggle(product.id)
+                        }}
+                      />
+                    </div>
+                  </Link>
+                </div>
+              )
+            })
           ) : (
             <div className="flex justify-center mx-auto items-center scale-[70%] sm:scale-[100%] w-[200%] h-[130px] sm:w-[500%] sm:h-[400px]">
-                <div style={styles.loader}></div>
+              <div style={styles.loader}></div>
             </div>
           )}
         </div>
