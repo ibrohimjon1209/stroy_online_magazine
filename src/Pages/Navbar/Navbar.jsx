@@ -38,6 +38,7 @@ const getStoredTopics = () => {
 const Navbar = ({ lang, setSearchText, searchText }) => {
   const navigate = useNavigate();
   const inputRef = useRef(null);
+  const categoryCloseTimeout = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [is_category_open, set_is_category_open] = useState(false);
   const [is_search_open, set_is_search_open] = useState(false);
@@ -96,18 +97,47 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
 
   const handleCategoryClick = () => {
     if (is_category_open) {
+      if (categoryCloseTimeout.current) {
+        clearTimeout(categoryCloseTimeout.current);
+      }
       setCategoryAnimation(false);
       setTimeout(() => {
         set_is_category_open(false);
       }, 300);
     } else {
+      if (categoryCloseTimeout.current) {
+        clearTimeout(categoryCloseTimeout.current);
+      }
       set_is_category_open(true);
       setTimeout(() => {
         setCategoryAnimation(true);
-      }, 300);
+      }, 100);
       set_is_search_open(false);
       setSearchAnimation(false);
     }
+  };
+
+  const handleMouseEnterCategory = () => {
+    if (categoryCloseTimeout.current) {
+      clearTimeout(categoryCloseTimeout.current);
+    }
+    if (!is_category_open) {
+      set_is_category_open(true);
+      setTimeout(() => {
+        setCategoryAnimation(true);
+      }, 100);
+      set_is_search_open(false);
+      setSearchAnimation(false);
+    }
+  };
+
+  const handleMouseLeaveCategory = () => {
+    categoryCloseTimeout.current = setTimeout(() => {
+      setCategoryAnimation(false);
+      setTimeout(() => {
+        set_is_category_open(false);
+      }, 300);
+    }, 500);
   };
 
   const handleSearchClick = () => {
@@ -176,13 +206,6 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
     window.location.href = "/";
   };
 
-  const handleClickOutside_category = () => {
-    setCategoryAnimation(false);
-    setTimeout(() => {
-      set_is_category_open(false);
-    }, 300);
-  };
-
   const handleClickOutside_search = () => {
     setSearchAnimation(false);
     setTimeout(() => {
@@ -218,11 +241,11 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
   return (
     <>
       <div className="hidden sm:block">
-        <div className="w-full h-auto md:h-[80px] flex flex-col  md:flex-row justify-between gap-[20px] z-50 items-center px-[4.2%] sticky mt-[5px] rounded-[15px] bg-[#DCC38B] py-4 md:py-0">
+        <div className="w-full h-auto md:h-[80px] flex flex-col md:flex-row justify-between gap-[20px] z-50 items-center px-[4.2%] sticky mt-[5px] rounded-[15px] bg-[#DCC38B] py-4 md:py-0">
           <style jsx="true">{`
             .dropdown-enter {
               opacity: 0;
-              transform: translateY(-20px);
+              transform: translateY(-10px);
               max-height: 0;
               overflow: hidden;
             }
@@ -231,7 +254,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
               opacity: 1;
               transform: translateY(0);
               max-height: 500px;
-              transition: opacity 300ms, transform 300ms, max-height 300ms;
+              transition: opacity 300ms ease-in-out, transform 300ms ease-in-out, max-height 300ms ease-in-out;
             }
 
             .dropdown-exit {
@@ -242,9 +265,9 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
 
             .dropdown-exit-active {
               opacity: 0;
-              transform: translateY(-20px);
+              transform: translateY(-10px);
               max-height: 0;
-              transition: opacity 300ms, transform 300ms, max-height 300ms;
+              transition: opacity 300ms ease-in-out, transform 300ms ease-in-out, max-height 300ms ease-in-out;
               overflow: hidden;
             }
           `}</style>
@@ -378,12 +401,15 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
 
           <div className="w-full md:w-[653px] hidden md:flex gap-[20px]">
             <div
-              onMouseEnter={handleCategoryClick}
-              onClick={handleCategoryClick}
-              onMouseLeave={handleClickOutside_category}
               className="relative inline-block"
             >
-              <div className="border-[3px] border-white drop-shadow-xl hover:opacity-75 cursor-pointer w-[100px] h-[40px] bg-transparent flex justify-center items-center rounded-[5px] gap-[5px]">
+              <div
+                onMouseEnter={handleMouseEnterCategory}
+              onMouseLeave={handleMouseLeaveCategory}
+            
+                onClick={handleCategoryClick}
+                className="border-[3px] border-white drop-shadow-xl hover:opacity-75 cursor-pointer w-[100px] h-[40px] bg-transparent flex justify-center items-center rounded-[5px] gap-[5px]"
+              >
                 <Menu strokeWidth={1.5} color="white" />
                 <h1 className="font-inter font-[500] text-[13px] text-white uppercase">
                   {lang == "uz"
@@ -398,8 +424,9 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
 
               {is_category_open && (
                 <div
-                  className="absolute left-0 z-50 mt-2 top-full"
-                  onClick={handleClickOutside_category}
+                  className="absolute left-0 z-50 mt-2 top-[100%]"
+                  onMouseEnter={handleMouseEnterCategory}
+                  onMouseLeave={handleMouseLeaveCategory}
                 >
                   <div
                     className={`search_modal w-[600px] h-[450px] bg-white border-[1px] overflow-auto border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${
