@@ -103,6 +103,10 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
     }
   }, [isVisible, notification]);
 
+  useEffect(() => {
+    setSelectedPaymentIndex(Number(localStorage.getItem("selectedPaymentIndex")) || 0);
+  }, []);
+
   const fetchProduct = async () => {
     try {
       const url = window.location.href;
@@ -272,6 +276,7 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
 
   const handlePaymentClick = (index) => {
     setSelectedPaymentIndex(index);
+    localStorage.setItem("selectedPaymentIndex", index);
   };
 
   const handleClick = () => {
@@ -818,23 +823,7 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
                 onClick={handleClick}
               >
                 <h1 className="uppercase font-inter font-[600] text-[16px] leading-[22px] text-[#FFDF02] whitespace-nowrap"></h1>
-                {/* {!isAnimating
-                  ? isAdded
-                    ? lang == "uz"
-                    ? "Savatga o'tish ➡️"
-                    : lang == "en"
-                    ? "Go to cart ➡️"
-                    : lang == "ru"
-                    ? "Перейти в корзину ➡️"
-                    : "Savatga o'tish ➡️"
-                    : lang == "uz"
-                    ? "Savatchaga qo'shish"
-                    : lang == "en"
-                    ? "Add to cart"
-                    : lang == "ru"
-                    ? "Добавить в корзину"
-                    : "Savatchaga qo'shish"
-                  : ""} */}
+
                 {!isAnimating
                   ? lang == "uz"
                     ? "Savatchaga qo'shish"

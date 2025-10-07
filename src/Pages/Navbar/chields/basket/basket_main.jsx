@@ -14,20 +14,24 @@ export default function Basket_main({
   const [contentHeight, setContentHeight] = useState("auto");
   const immediateRef = useRef(null);
   const installmentRef = useRef(null);
+  const [selectedPaymentIndex, setSelectedPaymentIndex] = useState(3);
+  useEffect(() => {
+    setSelectedPaymentIndex(Number(localStorage.getItem("selectedPaymentIndex")) || 0);
+  }, []);
   const sl_option_id =
     localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
-        ? 1
-        : 2;
+      ? 1
+      : 2;
   const uzs_lang =
     lang == "uz"
       ? "so'm"
       : lang == "en"
-        ? "uzs"
-        : lang == "ru"
-          ? "сум"
-          : "so'm";
+      ? "uzs"
+      : lang == "ru"
+      ? "сум"
+      : "so'm";
 
   useEffect(() => {
     const savedBasket = localStorage.getItem("basket");
@@ -46,6 +50,10 @@ export default function Basket_main({
   }, [basket]);
 
   useEffect(() => {
+    localStorage.setItem("paymentType", paymentType);
+  }, [paymentType]);
+
+  useEffect(() => {
     if (products.length === 1 && !products[0].selected) {
       const updatedProducts = [{ ...products[0], selected: true }];
       setProducts(updatedProducts);
@@ -57,6 +65,9 @@ export default function Basket_main({
   const visibleProducts = products.filter(
     (item) => item.branch_id == sl_option_id
   );
+  const totalPrice = visibleProducts
+    .filter((product) => product.selected)
+    .reduce((sum, product) => sum + product.price * product.quantity, 0);
 
   const allSelected = visibleProducts.every((product) => product.selected);
 
@@ -75,8 +86,8 @@ export default function Basket_main({
     setProducts((prevProducts) => {
       const updatedProducts = prevProducts.map((product) =>
         product.id === productId &&
-          product.size[lang] === size &&
-          product.color[lang] === color
+        product.size[lang] === size &&
+        product.color[lang] === color
           ? { ...product, selected: !product.selected }
           : product
       );
@@ -84,6 +95,29 @@ export default function Basket_main({
       localStorage.setItem("basket", JSON.stringify(updatedProducts));
       return updatedProducts;
     });
+  };
+
+  const paymentOptions = {
+    uz: ["6 oy", "12 oy", "15 oy", "18 oy", "24 oy"],
+    en: ["6 mth", "12 mth", "15 mth", "18 mth", "24 mth"],
+    ru: ["6 мес", "12 мес", "15 мес", "18 мес", "24 мес"],
+  };
+  const plans = [
+    { months: 6, percent: 26 },
+    { months: 12, percent: 42 },
+    { months: 15, percent: 50 },
+    { months: 18, percent: 56 },
+    { months: 24, percent: 75 },
+  ];
+
+  const monthlyPayments = plans.map(({ months, percent }) => {
+    const priceWithPercent = totalPrice + (totalPrice * percent) / 100;
+    return Math.ceil(priceWithPercent / months);
+  });
+
+  const handlePaymentClick = (index) => {
+    setSelectedPaymentIndex(index);
+    localStorage.setItem("selectedPaymentIndex", index);
   };
 
   const deleteQuantity = (productId, size, color) => {
@@ -133,8 +167,8 @@ export default function Basket_main({
     setProducts((prevProducts) => {
       const updatedProducts = prevProducts.map((product) =>
         product.id === productId &&
-          product.size[lang] === size &&
-          product.color[lang] === color
+        product.size[lang] === size &&
+        product.color[lang] === color
           ? { ...product, quantity: product.quantity + 1 }
           : product
       );
@@ -144,10 +178,6 @@ export default function Basket_main({
     });
   };
 
-  const totalPrice = visibleProducts
-    .filter((product) => product.selected)
-    .reduce((sum, product) => sum + product.price * product.quantity, 0);
-
   const monthlyPayment = Math.round(totalPrice / 24);
 
   useEffect(() => {
@@ -156,7 +186,13 @@ export default function Basket_main({
     setContentHeight(`${Math.max(immediateHeight, installmentHeight)}px`);
   }, [totalPrice]);
 
-  const handleQuantityChange = (id, size, color, newQuantity, validate = false) => {
+  const handleQuantityChange = (
+    id,
+    size,
+    color,
+    newQuantity,
+    validate = false
+  ) => {
     setProducts((prevProducts) =>
       prevProducts.map((p) => {
         if (p.id === id && p.size[lang] === size && p.color[lang] === color) {
@@ -173,17 +209,23 @@ export default function Basket_main({
           const updatedProduct = { ...p, quantity: parsedQuantity };
 
           // Basket va localStorage ni yangilash
-          set_basket(prevProducts.map((item) =>
-            item.id === id && item.size[lang] === size && item.color[lang] === color
-              ? updatedProduct
-              : item
-          ));
+          set_basket(
+            prevProducts.map((item) =>
+              item.id === id &&
+              item.size[lang] === size &&
+              item.color[lang] === color
+                ? updatedProduct
+                : item
+            )
+          );
 
           localStorage.setItem(
             "basket",
             JSON.stringify(
               prevProducts.map((item) =>
-                item.id === id && item.size[lang] === size && item.color[lang] === color
+                item.id === id &&
+                item.size[lang] === size &&
+                item.color[lang] === color
                   ? updatedProduct
                   : item
               )
@@ -211,10 +253,10 @@ export default function Basket_main({
             {lang === "uz"
               ? "Savatcha"
               : lang === "en"
-                ? "Basket"
-                : lang === "ru"
-                  ? "Корзина"
-                  : "Savatcha"}
+              ? "Basket"
+              : lang === "ru"
+              ? "Корзина"
+              : "Savatcha"}
           </h1>
         </Link>
       </div>
@@ -231,15 +273,15 @@ export default function Basket_main({
               {lang === "uz"
                 ? "Savatchangiz bo'sh"
                 : lang === "en"
-                  ? "Your basket is empty"
-                  : "Ваша корзина пуста"}
+                ? "Your basket is empty"
+                : "Ваша корзина пуста"}
             </h1>
             <h1 className="ml-[40px] w-full mt-[6px] text-[14px] sm:text-[18px] text-center text-gray-700 font-[500] font-inter leading-snug sm:leading-normal">
               {lang === "uz"
                 ? "Iltimos, mahsulotlarni tanlang"
                 : lang === "en"
-                  ? "Please select some products"
-                  : "Пожалуйста, выберите товары"}
+                ? "Please select some products"
+                : "Пожалуйста, выберите товары"}
             </h1>
           </div>
         ) : (

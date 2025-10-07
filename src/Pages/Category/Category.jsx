@@ -20,14 +20,14 @@ const Category = ({ searchText }) => {
   const category_id = useLocation().pathname.split("/")[2];
 
   const loader_style = {
-      border: "4px solid #f3f3f3",
-      borderTop: "4px solid #DCC38B",
-      borderRadius: "50%",
-      width: "50px",
-      height: "50px",
-      animation: "spin 1s linear infinite",
-      margin: "0 auto",
-    }
+    border: "4px solid #f3f3f3",
+    borderTop: "4px solid #DCC38B",
+    borderRadius: "50%",
+    width: "50px",
+    height: "50px",
+    animation: "spin 1s linear infinite",
+    margin: "0 auto",
+  };
 
   const [likedProducts, setLikedProducts] = useState(() => {
     try {
@@ -58,8 +58,9 @@ const Category = ({ searchText }) => {
         const categoryProducts = productsData.filter(
           (item) => item.category == category_id
         );
-        setProducts(categoryProducts);
-        setFilteredProducts(categoryProducts);
+        console.log("categoryProducts", categoryProducts);
+        setProducts(categoryProducts.filter((item) => item.is_available === true));
+        setFilteredProducts(categoryProducts.filter((item) => item.is_available === true));
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -155,8 +156,10 @@ const Category = ({ searchText }) => {
         <div className="hidden sm:block">
           <Link className="w-full flex items-center gap-[10px]" to={"/"}>
             <ChevronLeft className="scale-110" />
-            <h1 className="font-inter font-[500] text-[32px] leading-[45px] text-black">
-              {category_data?.[`name_${lang}`] || (lang == "uz" ? "Yuklanmoqda..." : lang == "en" ? "Loading..." : lang == "ru" ? "Загрузка..." : "Yuklanmoqda...")}
+            <h1 className="flex font-inter font-[500] text-[32px] leading-[45px] text-black">
+              {category_data?.[`name_${lang}`] || (lang == "uz" ? "Yuklanmoqda..." : lang == "en" ? "Loading..." : lang == "ru" ? "Загрузка..." : "Yuklanmoqda...")} 
+             <div className="w-[5px]"></div>
+              <span className="product_count_working">({products.length})</span>  {/* <-- Bu yerda o'zgartirish: products.length ishlatilgan, qavs ichida */}
             </h1>
           </Link>
         </div>
@@ -170,6 +173,7 @@ const Category = ({ searchText }) => {
               <ChevronLeft className="scale-110" />
               <h1 className="font-inter font-[500] text-[15px] leading-[22px] text-black">
                 {category_data?.[`name_${lang}`] || (lang == "uz" ? "Yuklanmoqda..." : lang == "en" ? "Loading..." : lang == "ru" ? "Загрузка..." : "Yuklanmoqda...")}
+                <span className="product_count">({products.length})</span>  {/* <-- Mobile versiya uchun ham o'zgartirish */}
               </h1>
             </Link>
           </div>
@@ -177,8 +181,8 @@ const Category = ({ searchText }) => {
 
         {loading ? (
           <div className="flex justify-center mx-auto items-center scale-[70%] sm:scale-[100%] w-[200%] h-[130px] sm:w-[500%] sm:h-[400px]">
-                <div style={loader_style}></div>
-              </div>
+            <div style={loader_style}></div>
+          </div>
         ) : filteredProducts.length > 0 ? (
           <div className="mt-[20px] px-[15px] grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-[10px] sm:gap-x-[20px] gap-y-[15px] sm:gap-y-[30px]">
             {filteredProducts.map((product, index) => (
