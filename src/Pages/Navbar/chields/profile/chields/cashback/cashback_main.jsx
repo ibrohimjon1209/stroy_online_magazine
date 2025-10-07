@@ -23,22 +23,41 @@ const Cashback_main = ({ lang }) => {
     if (userId) {
       const accessToken = localStorage.getItem("accessToken");
 
-      get_user_cash(userId, accessToken).then((data) => {
-        const balance = data?.cashback_balance ?? 0;
-        const userBalance = parseFloat(balance) || 0;
+      get_user_cash(userId, accessToken)
+        .then((data) => {
+          const balance = data?.cashback_balance ?? 0;
+          const userBalance = parseFloat(balance) || 0;
 
-        set_userCashback(userBalance);
-        order_get(accessToken).then((orders) => {
-          set_cashback_list(orders);
+          set_userCashback(userBalance);
 
-          const used = orders.reduce(
-            (sum, order) => sum + (parseFloat(order.cashback_used) || 0),
-            0
-          );
+          order_get(accessToken)
+            .then((orders) => {
+              if (!Array.isArray(orders)) return;
 
-          set_paid(parseFloat(used.toFixed(1)));
+              set_cashback_list(orders);
+
+              const used = orders.reduce(
+                (sum, order) => sum + (parseFloat(order.cashback_used) || 0),
+                0
+              );
+
+              set_paid(parseFloat(used.toFixed(1)));
+            })
+            .catch(() => {
+              // login qilinmagan yoki token noto‘g‘ri bo‘lsa
+              set_cashback_list([]);
+              set_paid(0);
+            });
+        })
+        .catch(() => {
+          // foydalanuvchi ma'lumoti olinmasa
+          set_userCashback(0);
         });
-      });
+    } else {
+      // foydalanuvchi login qilmagan holat
+      set_userCashback(0);
+      set_paid(0);
+      set_cashback_list([]);
     }
   }, [userId]);
 
@@ -63,8 +82,7 @@ const Cashback_main = ({ lang }) => {
         </div>
         <div className="flex flex-col gap-4 font-inter font-[600] text-[18px] sm:text-[20px] leading-[22px] text-black">
           <div>
-            {common_cashback + userCashback} {uzs_lang}{" "}
-            {/* Keshbekni qo'shish */}
+            {common_cashback + userCashback} {uzs_lang}
           </div>
           <div>
             {paid} {uzs_lang}
@@ -108,7 +126,9 @@ const Cashback_main = ({ lang }) => {
             </div>
             <div className="flex justify-between font-inter font-[500] text-[15px] leading-[22px] text-black">
               <div>
-                {item.items.map((i) => i.quantity).reduce((a, b) => a + b, 0)}{" "}
+                {Array.isArray(item.items)
+                  ? item.items.map((i) => i.quantity).reduce((a, b) => a + b, 0)
+                  : 0}{" "}
                 {lang === "uz"
                   ? "dona mahsulot"
                   : lang === "en"

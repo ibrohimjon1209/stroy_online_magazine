@@ -11,6 +11,10 @@ import Download_page from "./Download"
 import { products_get } from "../../Services/products_get"
 import create_favorites from "../../Services/favorites/create_favorites"
 import delete_favorites from "../../Services/favorites/delete_favorites"
+import like from "./Images/like.svg";
+import like_a from "./Images/like_a.svg";
+import { useNavigate, useLocation } from "react-router-dom";
+
 
 const getStoredTopics = () => {
   try {
@@ -22,6 +26,9 @@ const getStoredTopics = () => {
 }
 
 function Home({ lang, setSearchText, searchText }) {
+  const [is_likes_hovered, set_is_likes_hovered] = useState(false);
+  const location = useLocation().pathname;
+
   const styles = {
     loader: {
       border: "4px solid #f3f3f3",
@@ -252,13 +259,17 @@ function Home({ lang, setSearchText, searchText }) {
   return (
     <div>
       <div className="w-full h-[220px] sm:h-[0px]">
-        <div className="w-full h-[150px] flex flex-col items-center bg-[#DCC38B] sm:hidden">
+        <div className="w-full h-[100px] flex flex-col items-center bg-[#DCC38B] sm:hidden">
           <img
             src={sl_option_id == 0 ? logo : sl_option_id == 1 ? logo2 : logo3}
             className={sl_option_id == 2 ? "h-[71px] mt-[10px]" : "w-[77px] h-[71px] mt-[10px]"}
             alt="Logo"
           />
-          <div className="w-[90%] h-[40px] pl-[23.5px] bg-[#FFFFFF] rounded-[10px] flex items-center mt-4">
+
+        </div>
+
+        <div className="w-full h-[50px] pb-[10px] bg-[#DCC38B] px-[20px] flex justify-evenly gap-[10px] items-center sm:hidden">
+          <div className="w-[90%] h-[40px] pl-[23.5px] bg-[#FFFFFF] rounded-[10px] flex items-center ">
             <Search className="cursor-pointer" onClick={handleSearchClick} />
             <input
               type="text"
@@ -278,6 +289,20 @@ function Home({ lang, setSearchText, searchText }) {
                 onClick={() => setSearchText("")}
               />
             )}
+
+
+          </div>
+
+          <div className="bg-invisible ">
+            <Link to="/profile/favorites">
+              <img
+                className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
+                src={location === "/profile/favorites" || is_likes_hovered ? like_a : like}
+                onMouseEnter={() => set_is_likes_hovered(true)}
+                onMouseLeave={() => set_is_likes_hovered(false)}
+                alt="likes"
+              />
+            </Link>
           </div>
           {isSearchOpen && (
             <div
@@ -331,15 +356,15 @@ function Home({ lang, setSearchText, searchText }) {
           )}
         </div>
 
+
         <div className="branches-home px-[22px] block sm:hidden">
           <div className="rounded-[10px] h-[50px] mt-[20px] border-[0.5px] border-[#8879798C] px-[18px] flex items-center justify-between">
             {["Stroy Baza №1", "Giaz Mebel", "Gold Klinker"].map((branch, idx) => (
               <div
                 key={idx}
                 onClick={() => handleBranchClick(branch)}
-                className={`font-inter font-[500] text-[13px] leading-[22px] cursor-pointer ${
-                  selectedBranch === branch ? "text-[#DA9700]" : "text-[#0D1218]"
-                }`}
+                className={`font-inter font-[500] text-[13px] leading-[22px] cursor-pointer ${selectedBranch === branch ? "text-[#DA9700]" : "text-[#0D1218]"
+                  }`}
               >
                 {branch}
               </div>
@@ -388,9 +413,8 @@ function Home({ lang, setSearchText, searchText }) {
                           </h1>
                           <p className="text-black text-[12px] sm:text-[14px] max-w-[120px] sm:max-w-[180px] truncate">
                             {variant.price
-                              ? `${
-                                  lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
-                                }: ${Number.parseFloat(variant.price).toFixed(2)} ${uzs_lang}`
+                              ? `${lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
+                              }: ${Number.parseFloat(variant.price).toFixed(2)} ${uzs_lang}`
                               : lang === "uz"
                                 ? "Narxi mavjud emas"
                                 : lang === "en"
@@ -445,9 +469,8 @@ function Home({ lang, setSearchText, searchText }) {
                         </h1>
                         <p className="text-black text-[12px] sm:text-[14px] truncate w-full">
                           {variant.price
-                            ? `${
-                                lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
-                              }: ${Number.parseFloat(variant.price).toFixed(2)} ${uzs_lang}`
+                            ? `${lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
+                            }: ${Number.parseFloat(variant.price).toFixed(2)} ${uzs_lang}`
                             : lang === "uz"
                               ? "Narxi mavjud emas"
                               : lang === "en"

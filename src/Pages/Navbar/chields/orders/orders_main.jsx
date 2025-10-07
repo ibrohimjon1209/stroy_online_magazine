@@ -3,16 +3,13 @@ import { Link } from "react-router-dom";
 import { ChevronLeft, X } from "lucide-react";
 import { order_get } from "../../../../Services/order/get_my";
 import no_order from './image.png';
-import { Tooltip as ReactTooltip } from 'react-tooltip'; // Updated import
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 
 const Orders_main = ({ lang }) => {
-  // State to track which orders have expanded product views
   const [expandedOrders, setExpandedOrders] = useState([]);
   const [productDetails, setProductDetails] = useState({});
   const [orders, set_orders] = useState([]);
-  // State for expanded addresses on mobile
   const [expandedAddresses, setExpandedAddresses] = useState(new Set());
-  // State to detect mobile screen size (below sm breakpoint: 640px)
   const [isMobile, setIsMobile] = useState(false);
 
   const toggleProductView = (orderId) => {
@@ -24,24 +21,17 @@ const Orders_main = ({ lang }) => {
     }
   };
 
-  // Toggle address expansion for mobile
   const toggleAddress = (orderId) => {
     setExpandedAddresses((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(orderId)) {
-        newSet.delete(orderId);
-      } else {
-        newSet.add(orderId);
-      }
+      if (newSet.has(orderId)) newSet.delete(orderId);
+      else newSet.add(orderId);
       return newSet;
     });
   };
 
-  // Detect mobile screen size
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 640);
-    };
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
@@ -51,9 +41,7 @@ const Orders_main = ({ lang }) => {
     const fetchOrders = async () => {
       try {
         const res = await order_get(localStorage.getItem("accessToken"));
-        if (res) {
-          set_orders(res);
-        }
+        if (res) set_orders(res);
       } catch (err) {
         console.error("Error fetching orders:", err);
       }
@@ -70,11 +58,7 @@ const Orders_main = ({ lang }) => {
       const res = await fetch(
         `https://backkk.stroybazan1.uz/api/api/products/${id}/`
       );
-
-      if (!res.ok) {
-        throw new Error(`Serverda xatolik: ${res.status}`);
-      }
-
+      if (!res.ok) throw new Error(`Serverda xatolik: ${res.status}`);
       const data = await res.json();
       return data;
     } catch (err) {
@@ -89,19 +73,14 @@ const Orders_main = ({ lang }) => {
 
     const productPromises = order.items.map(async (item) => {
       const productData = await get_product(item.product_variant.id);
-      return {
-        id: item.product_variant.id,
-        data: productData,
-      };
+      return { id: item.product_variant.id, data: productData };
     });
 
     try {
       const products = await Promise.all(productPromises);
       const productMap = {};
       products.forEach((product) => {
-        if (product.data) {
-          productMap[product.id] = product.data;
-        }
+        if (product.data) productMap[product.id] = product.data;
       });
 
       setProductDetails((prev) => ({
@@ -117,13 +96,12 @@ const Orders_main = ({ lang }) => {
     lang === "uz"
       ? "so'm"
       : lang === "en"
-        ? "uzs"
-        : lang === "ru"
-          ? "сум"
-          : "so'm";
+      ? "uzs"
+      : lang === "ru"
+      ? "сум"
+      : "so'm";
 
-  // Faqat pending va in_payment bo‘lmagan orderlar
-  const [filteredOrders, set_filteredOrders] = useState(null)
+  const [filteredOrders, set_filteredOrders] = useState(null);
   useEffect(() => {
     set_filteredOrders(
       orders.filter(
@@ -133,9 +111,9 @@ const Orders_main = ({ lang }) => {
     );
   }, [orders]);
 
-
   return (
     <div className="flex flex-col w-full h-full">
+      {/* Mobile header */}
       <div className="w-full fixed z-50 h-[65px] bg-[#DCC38B] sm:hidden block">
         <Link
           className="w-full h-full flex items-center gap-[10px] pl-[13px]"
@@ -146,88 +124,76 @@ const Orders_main = ({ lang }) => {
             {lang === "uz"
               ? "Buyurtmalar"
               : lang === "en"
-                ? "Orders"
-                : lang === "ru"
-                  ? "Заказы"
-                  : "Buyurtmalar"}
+              ? "Orders"
+              : lang === "ru"
+              ? "Заказы"
+              : "Buyurtmalar"}
           </h1>
         </Link>
       </div>
+
       <div className="scale-[100%] container p-4 mx-auto my-4 mt-16">
         {filteredOrders?.length ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {filteredOrders?.map((order) => (
+            {filteredOrders.map((order) => (
               <div
                 key={order.id}
                 className="p-6 space-y-4 border rounded-lg shadow-md"
                 style={{ borderStyle: "dashed" }}
               >
-          
                 {/* Order Header */}
                 <div className="flex items-start justify-between">
                   <div className="text-lg font-bold text-gray-900 sm:text-xl">
                     {lang === "uz"
                       ? `${order.id}-sonli buyurtma`
                       : lang === "en"
-                        ? `Order № ${order.id}`
-                        : lang === "ru"
-                          ? `Заказ № ${order.id}`
-                          : `${order.id}-sonli buyurtma`}
+                      ? `Order № ${order.id}`
+                      : lang === "ru"
+                      ? `Заказ № ${order.id}`
+                      : `${order.id}-sonli buyurtma`}
                   </div>
                   <div
                     className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium
-                  ${order.status === "delivered"
-                        ? "text-green-700 bg-green-100"
-                        : ""
-                      }
-                  ${order.status === "processing"
-                        ? "text-yellow-700 bg-yellow-100"
-                        : ""
-                      }
-                  ${order.status === "shipped"
-                        ? "text-blue-700 bg-blue-100"
-                        : ""
-                      }
-                  ${order.status === "cancelled"
-                        ? "text-red-700 bg-red-100"
-                        : ""
-                      }`}
+                    ${order.status === "delivered" ? "text-green-700 bg-green-100" : ""}
+                    ${order.status === "processing" ? "text-yellow-700 bg-yellow-100" : ""}
+                    ${order.status === "shipped" ? "text-blue-700 bg-blue-100" : ""}
+                    ${order.status === "cancelled" ? "text-red-700 bg-red-100" : ""}`}
                   >
                     {order.status === "delivered"
                       ? lang === "uz"
                         ? "Yetkazilgan"
                         : lang === "en"
-                          ? "Delivered"
-                          : lang === "ru"
-                            ? "Доставлен"
-                            : "Yetkazilgan"
+                        ? "Delivered"
+                        : lang === "ru"
+                        ? "Доставлен"
+                        : "Yetkazilgan"
                       : ""}
                     {order.status === "processing"
                       ? lang === "uz"
                         ? "Jarayonda"
                         : lang === "en"
-                          ? "In progress"
-                          : lang === "ru"
-                            ? "В процессе"
-                            : "Jarayonda"
+                        ? "In progress"
+                        : lang === "ru"
+                        ? "В процессе"
+                        : "Jarayonda"
                       : ""}
                     {order.status === "shipped"
                       ? lang === "uz"
                         ? "Yetkazilmoqda"
                         : lang === "en"
-                          ? "Delivering"
-                          : lang === "ru"
-                            ? "Доставляется"
-                            : "Yetkazilmoqda"
+                        ? "Delivering"
+                        : lang === "ru"
+                        ? "Доставляется"
+                        : "Yetkazilmoqda"
                       : ""}
                     {order.status === "cancelled"
                       ? lang === "uz"
                         ? "Bekor qilingan"
                         : lang === "en"
-                          ? "Cancelled"
-                          : lang === "ru"
-                            ? "Отменён"
-                            : "Bekor qilingan"
+                        ? "Cancelled"
+                        : lang === "ru"
+                        ? "Отменён"
+                        : "Bekor qilingan"
                       : ""}
                   </div>
                 </div>
@@ -239,18 +205,18 @@ const Orders_main = ({ lang }) => {
                       {lang === "uz"
                         ? "Yaratilgan sanasi"
                         : lang === "en"
-                          ? "Created date"
-                          : lang === "ru"
-                            ? "Дата создания"
-                            : "Yaratilgan sanasi"}
+                        ? "Created date"
+                        : lang === "ru"
+                        ? "Дата создания"
+                        : "Yaratilgan sanasi"}
                     </span>
                     <span className="font-medium text-gray-900">
                       {new Date(order.created_at).toLocaleString(
                         lang === "uz"
                           ? "uz-UZ"
                           : lang === "en"
-                            ? "en-US"
-                            : "ru-RU",
+                          ? "en-US"
+                          : "ru-RU",
                         {
                           year: "numeric",
                           month: "2-digit",
@@ -261,24 +227,25 @@ const Orders_main = ({ lang }) => {
                       )}
                     </span>
                   </div>
+
                   <div className="flex justify-between text-base">
                     <span className="text-gray-600">
                       {lang === "uz"
                         ? "Olib ketish manzili"
                         : lang === "en"
-                          ? "Pickup address"
-                          : lang === "ru"
-                            ? "Адрес самовывоза"
-                            : "Olib ketish manzili"}
+                        ? "Pickup address"
+                        : lang === "ru"
+                        ? "Адрес самовывоза"
+                        : "Olib ketish manzili"}
                     </span>
-                    <p 
+                    <p
                       className={`font-medium text-gray-900 cursor-pointer ${
-                        isMobile 
-                          ? expandedAddresses.has(order.id) 
-                            ? 'max-w-[60%]' 
-                            : 'max-w-[50%] truncate' 
-                          : 'max-w-[50%] truncate'
-                      }`} 
+                        isMobile
+                          ? expandedAddresses.has(order.id)
+                            ? "max-w-[60%]"
+                            : "max-w-[50%] truncate"
+                          : "max-w-[50%] truncate"
+                      }`}
                       onClick={isMobile ? () => toggleAddress(order.id) : undefined}
                       title={!isMobile ? order.delivery_address : undefined}
                       data-tip={!isMobile ? order.delivery_address : undefined}
@@ -287,64 +254,67 @@ const Orders_main = ({ lang }) => {
                     </p>
                     <ReactTooltip place="top" effect="solid" />
                   </div>
+
                   <div className="flex justify-between text-base">
                     <span className="text-gray-600">
                       {lang === "uz"
                         ? "To'lov usuli"
                         : lang === "en"
-                          ? "Payment method"
-                          : lang === "ru"
-                            ? "Способ оплаты"
-                            : "To'lov usuli"}
+                        ? "Payment method"
+                        : lang === "ru"
+                        ? "Способ оплаты"
+                        : "To'lov usuli"}
                     </span>
                     <span className="font-medium text-gray-900">
                       {order.payment_method === "cash"
                         ? lang === "uz"
                           ? "Naqd"
                           : lang === "en"
-                            ? "Cash"
-                            : lang === "ru"
-                              ? "Наличные"
-                              : "Naqd"
+                          ? "Cash"
+                          : lang === "ru"
+                          ? "Наличные"
+                          : "Naqd"
                         : order.payment_method === "payme"
-                          ? "Payme"
-                          : order.payment_method === "click"
-                            ? "Click"
-                            : order.payment_method === "installments_payment"
-                              ? lang === "uz"
-                                ? "Nasiya to'lov"
-                                : lang === "en"
-                                  ? "Installment payment"
-                                  : lang === "ru"
-                                    ? "Рассрочка"
-                                    : "Nasiya to'lov"
-                              : order.payment_method}
+                        ? "Payme"
+                        : order.payment_method === "click"
+                        ? "Click"
+                        : order.payment_method === "installments_payment"
+                        ? lang === "uz"
+                          ? "Nasiya to'lov"
+                          : lang === "en"
+                          ? "Installment payment"
+                          : lang === "ru"
+                          ? "Рассрочка"
+                          : "Nasiya to'lov"
+                        : order.payment_method}
                     </span>
                   </div>
+
                   <div className="flex justify-between text-base">
                     <span className="text-gray-600">
-                      {order.items.map((item) => item.quantity).reduce((a, b) => a + b, 0)}{" "}
+                      {order.items.map((i) => i.quantity).reduce((a, b) => a + b, 0)}{" "}
                       {lang === "uz"
                         ? "dona mahsulot"
                         : lang === "en"
-                          ? "piece of product"
-                          : lang === "ru"
-                            ? "штук товара"
-                            : "dona mahsulot"}
+                        ? "piece of product"
+                        : lang === "ru"
+                        ? "штук товара"
+                        : "dona mahsulot"}
                     </span>
                     <span className="font-medium text-gray-900">
                       {order.total_amount} {uzs_lang}
                     </span>
                   </div>
+
                   <div className="flex justify-between text-base">
                     <span className="text-gray-600">
                       {lang === "uz"
                         ? "Ishlatilgan keshbek"
                         : lang === "en"
-                          ? "Used cashback"
-                          : lang === "ru"
-                            ? "Использованный кешбек"
-                            : "Ishlatilgan keshbek"}
+                        ? "Used cashback"
+                        : lang === "ru"
+                        ? "Использованный кешбек"
+                        : "Ishlatilgan keshbek"}
                     </span>
                     <span className="font-medium text-gray-900">
                       {order.cashback_used} {uzs_lang}
@@ -360,14 +330,14 @@ const Orders_main = ({ lang }) => {
                         {lang === "uz"
                           ? "Mahsulotlar ro'yxati"
                           : lang === "en"
-                            ? "Product list"
-                            : lang === "ru"
-                              ? "Список товаров"
-                              : "Mahsulotlar ro'yxati"}
+                          ? "Product list"
+                          : lang === "ru"
+                          ? "Список товаров"
+                          : "Mahsulotlar ro'yxati"}
                       </h3>
                       <button
                         onClick={() => toggleProductView(order.id)}
-                        className="text-gray-500 cursor-pointer hover:text-gray-700 focus:outline-none"
+                        className="text-gray-500 hover:text-gray-700 focus:outline-none"
                         aria-label="Close"
                       >
                         <X size={20} />
@@ -378,11 +348,10 @@ const Orders_main = ({ lang }) => {
                       {order.items.map((product) => {
                         const productData =
                           productDetails[order.id]?.[product.product_variant.id];
-
                         return (
                           <div
                             key={product.product_variant.id}
-                            className="flex items-center justify-between p-3 rounded-md bg-gray-50"
+                            className="flex items-center justify-between p-3 bg-gray-50 rounded-md"
                           >
                             <div className="flex items-center gap-3">
                               <img
@@ -396,25 +365,25 @@ const Orders_main = ({ lang }) => {
                                 <div className="font-medium">
                                   {productData
                                     ? productData[`name_${lang}`] ||
-                                    productData.name ||
-                                    "Mahsulot nomi"
+                                      productData.name ||
+                                      "Mahsulot nomi"
                                     : lang === "uz"
-                                      ? "Yuklanmoqda..."
-                                      : lang === "en"
-                                        ? "Loading..."
-                                        : lang === "ru"
-                                          ? "Загрузка..."
-                                          : "Yuklanmoqda..."}
+                                    ? "Yuklanmoqda..."
+                                    : lang === "en"
+                                    ? "Loading..."
+                                    : lang === "ru"
+                                    ? "Загрузка..."
+                                    : "Yuklanmoqda..."}
                                 </div>
                                 <div className="text-sm text-gray-600">
                                   {product.quantity}{" "}
                                   {lang === "uz"
                                     ? "dona"
                                     : lang === "en"
-                                      ? "pcs"
-                                      : lang === "ru"
-                                        ? "шт."
-                                        : "dona"}
+                                    ? "pcs"
+                                    : lang === "ru"
+                                    ? "шт."
+                                    : "dona"}
                                 </div>
                               </div>
                             </div>
@@ -428,15 +397,15 @@ const Orders_main = ({ lang }) => {
 
                     <button
                       onClick={() => toggleProductView(order.id)}
-                      className="w-full py-2 text-center text-white transition-colors bg-orange-500 rounded-md cursor-pointer hover:bg-orange-600"
+                      className="w-full py-2 text-center text-white bg-orange-500 rounded-md hover:bg-orange-600"
                     >
                       {lang === "uz"
                         ? "Yopish"
                         : lang === "en"
-                          ? "Close"
-                          : lang === "ru"
-                            ? "Закрыть"
-                            : "Yopish"}
+                        ? "Close"
+                        : lang === "ru"
+                        ? "Закрыть"
+                        : "Yopish"}
                     </button>
                   </div>
                 )}
@@ -445,37 +414,36 @@ const Orders_main = ({ lang }) => {
                 {!expandedOrders.includes(order.id) && (
                   <button
                     onClick={() => toggleProductView(order.id)}
-                    className="text-base font-medium text-orange-500 cursor-pointer hover:underline"
+                    className="text-base font-medium text-orange-500 hover:underline"
                   >
                     {lang === "uz"
                       ? "Maxsulotlarni ko'rsatish"
                       : lang === "en"
-                        ? "View products"
-                        : lang === "ru"
-                          ? "Просмотр товаров"
-                          : "Maxsulotlarni ko'rsatish"}
+                      ? "View products"
+                      : lang === "ru"
+                      ? "Просмотр товаров"
+                      : "Maxsulotlarni ko'rsatish"}
                   </button>
                 )}
               </div>
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center scale-[151%] mb-[10%] justify-center mt-19 ml-8">
+          <div className="flex flex-col items-center justify-center mt-10 sm:mt-[50px] mb-10 sm:mb-[10%]">
             <img
               src={no_order}
               alt="No orders"
-              className="w-[250px] hover:scale-105 transition-all duration-300"
+              className="w-[160px] sm:w-[250px] hover:scale-105 transition-all duration-300"
             />
-            <h1 className="mt-6 text-xl font-semibold text-gray-700">
+            <h1 className="mt-3 sm:mt-6 text-base sm:text-xl font-semibold text-gray-700 text-center leading-snug sm:leading-normal">
               {lang === "uz"
                 ? "Buyurtmalaringiz yo'q"
                 : lang === "en"
-                  ? "No orders found"
-                  : lang === "ru"
-                    ? "Заказы не найдены"
-                    : "Buyurtmalaringiz yo'q"}
+                ? "No orders found"
+                : lang === "ru"
+                ? "Заказы не найдены"
+                : "Buyurtmalaringiz yo'q"}
             </h1>
-
           </div>
         )}
       </div>
