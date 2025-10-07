@@ -339,9 +339,10 @@ const App = () => {
               } w-[100%]`}
               style={{
                 ...customScrollbar,
-                overflowY: "auto",
-                scrollbarWidth: "none",
-                scrollbarColor: "rgba(244,244,244,1) rgba(255, 255, 255, 1)",
+                overflowY: "scroll",
+                scrollbarWidth: "thin",
+                scrollbarColor: "rgba(0, 0, 0, 0.5) rgba(255, 255, 255, 1)",
+                paddingRight: "0px"
               }}
             >
               <div style={transitionStyles}>

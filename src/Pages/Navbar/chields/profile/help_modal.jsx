@@ -13,8 +13,8 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
     localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
-      ? 1
-      : 2;
+        ? 1
+        : 2;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,10 +84,10 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
               {lang == "uz"
                 ? "Qo'llab-quvvatlash xizmati"
                 : lang == "en"
-                ? "Support"
-                : lang == "ru"
-                ? "Поддержка"
-                : "Qo'llab-quvvatlash"}
+                  ? "Support"
+                  : lang == "ru"
+                    ? "Поддержка"
+                    : "Qo'llab-quvvatlash"}
             </h2>
             <button onClick={onClose} className="p-1" aria-label="Close">
               <svg
@@ -110,9 +110,10 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
             {support.map((item) => (
               <div key={item.id} onClick={() => handleCopy(item.phone_number, item.id)} className="flex items-center justify-between">
                 <div>
-                  <href className="font-medium">
+                  <a href={`tel:${item.phone_number}`} className="font-medium">
                     {item.phone_number}
-                  </href>
+                  </a>
+
                   <p className="text-sm text-gray-500">
                     {item[`title_${lang}`]}
                   </p>
