@@ -58,8 +58,9 @@ const Category = ({ searchText }) => {
         const categoryProducts = productsData.filter(
           (item) => item.category == category_id
         );
-        setProducts(categoryProducts);
-        setFilteredProducts(categoryProducts);
+        console.log("categoryProducts", categoryProducts);
+        setProducts(categoryProducts.filter((item) => item.is_available === true));
+        setFilteredProducts(categoryProducts.filter((item) => item.is_available === true));
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {

@@ -1,4 +1,10 @@
-import { Check, ChevronLeft, ChevronRight, User } from "lucide-react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  CloudSnow,
+  User,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import arrive_icon from "./imgs/arrive_icon.png";
 import cash_icon from "./imgs/cash_icon.png";
@@ -31,7 +37,7 @@ const Formalization_main = ({
   set_basket,
   set_modal_method,
   set_is_modal_open,
-  notify
+  notify,
 }) => {
   const [userData, setUserData] = useState({ name: "...", phone: "..." });
   const [deliver_type, set_deliver_type] = useState("pickup");
@@ -70,11 +76,21 @@ const Formalization_main = ({
     localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
-        ? 1
-        : 2;
+      ? 1
+      : 2;
 
   set_is_another_nav(is_delivery || is_payment_variant || is_pickup);
   set_is_footer_visible(!is_pickup);
+
+  useEffect(() => {
+    setSelectedPaymentIndex(Number(localStorage.getItem("selectedPaymentIndex")) || 0);
+  }, []);
+
+  useEffect(() => {
+    if (localStorage.getItem("paymentType") == "installment") {
+      setSelectedMethod("installment");
+    }
+  }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -90,12 +106,12 @@ const Formalization_main = ({
           name: user_data.first_name
             ? `${user_data.first_name} ${user_data.last_name}`
             : lang === "uz"
-              ? "Foydalanuvchi"
-              : lang === "en"
-                ? "User"
-                : lang === "ru"
-                  ? "Пользователь"
-                  : "Foydalanuvchi",
+            ? "Foydalanuvchi"
+            : lang === "en"
+            ? "User"
+            : lang === "ru"
+            ? "Пользователь"
+            : "Foydalanuvchi",
           phone: user_data.phone_number || "...",
         });
 
@@ -146,43 +162,42 @@ const Formalization_main = ({
   // klklklklklklklkl
   useEffect(() => {
     if (deliver_type == "deliver") {
-      set_address_inform(
-        JSON.parse(localStorage.getItem("pickup_address"))
-      );
+      set_address_inform(JSON.parse(localStorage.getItem("pickup_address")));
+    } else if (deliver_type == "pickup") {
+      let address = JSON.parse(localStorage.getItem("deliver_address"));
+      set_address_inform(address?.branch == sl_option_id ? address : null);
     }
-    else if (deliver_type == "pickup") {
-      let address = JSON.parse(localStorage.getItem("deliver_address"))
-      set_address_inform(address?.branch == sl_option_id ? address : null)
-  }}, [deliver_type, lang]);
+  }, [deliver_type, lang]);
 
   const uzs_lang =
     lang === "uz"
       ? "so'm"
       : lang === "en"
-        ? "uzs"
-        : lang === "ru"
-          ? "сум"
-          : "so'm";
+      ? "uzs"
+      : lang === "ru"
+      ? "сум"
+      : "so'm";
 
   const label_delivery =
     deliver_type === "pickup"
       ? lang === "uz"
         ? "Olib ketish manzilini tanlang"
         : lang === "en"
-          ? "Select pickup location"
-          : lang === "ru"
-            ? "Выберите место самовывоза"
-            : "Olib ketish manzilini tanlang"
+        ? "Select pickup location"
+        : lang === "ru"
+        ? "Выберите место самовывоза"
+        : "Olib ketish manzilini tanlang"
       : lang === "uz"
-        ? "Yetkazib berish manzilini tanlang"
-        : lang === "en"
-          ? "Select delivery address"
-          : lang === "ru"
-            ? "Выберите адрес доставки"
-            : "Yetkazib berish manzilini tanlang";
+      ? "Yetkazib berish manzilini tanlang"
+      : lang === "en"
+      ? "Select delivery address"
+      : lang === "ru"
+      ? "Выберите адрес доставки"
+      : "Yetkazib berish manzilini tanlang";
 
   const handlePaymentClick = (index) => {
     setSelectedPaymentIndex(index);
+    localStorage.setItem("selectedPaymentIndex", index);
   };
 
   const plans = [
@@ -218,13 +233,16 @@ const Formalization_main = ({
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("userId");
-      notify(lang === "uz"
-        ? "Sessiya tugadi, iltimos qayta kiring"
-        : lang === "en"
+      notify(
+        lang === "uz"
+          ? "Sessiya tugadi, iltimos qayta kiring"
+          : lang === "en"
           ? "Session expired, please log in again"
           : lang === "ru"
-            ? "Сессия истекла, пожалуйста, войдите снова"
-            : "Sessiya tugadi, iltimos qayta kiring", "warning");
+          ? "Сессия истекла, пожалуйста, войдите снова"
+          : "Sessiya tugadi, iltimos qayta kiring",
+        "warning"
+      );
       return null;
     }
   };
@@ -287,10 +305,11 @@ const Formalization_main = ({
         lang === "uz"
           ? "To'lov jarayonida xatolik yuz berdi"
           : lang === "en"
-            ? "Error occurred during payment"
-            : lang === "ru"
-              ? "Ошибка при обработке платежа"
-              : "To'lov jarayonida xatolik yuz berdi", "error"
+          ? "Error occurred during payment"
+          : lang === "ru"
+          ? "Ошибка при обработке платежа"
+          : "To'lov jarayonida xatolik yuz berdi",
+        "error"
       );
     }
   };
@@ -302,10 +321,10 @@ const Formalization_main = ({
           lang === "uz"
             ? "Iltimos tizimdan ro'yxatdan o'ting"
             : lang === "en"
-              ? "Please log in"
-              : lang === "ru"
-                ? "Пожалуйста, войдите в систему"
-                : "Iltimos tizimdan ro'yxatdan o'ting",
+            ? "Please log in"
+            : lang === "ru"
+            ? "Пожалуйста, войдите в систему"
+            : "Iltimos tizimdan ro'yxatdan o'ting",
           "warning"
         );
         return;
@@ -315,10 +334,10 @@ const Formalization_main = ({
           lang === "uz"
             ? "Iltimos yetkazib berish manzilini tanlang"
             : lang === "en"
-              ? "Please select a delivery address"
-              : lang === "ru"
-                ? "Пожалуйста, выберите адрес доставки"
-                : "Iltimos yetkazib berish manzilini tanlang",
+            ? "Please select a delivery address"
+            : lang === "ru"
+            ? "Пожалуйста, выберите адрес доставки"
+            : "Iltimos yetkazib berish manzilini tanlang",
           "warning"
         );
         return;
@@ -364,10 +383,10 @@ const Formalization_main = ({
         lang === "uz"
           ? "Buyurtma yaratishda xatolik"
           : lang === "en"
-            ? "Error creating order"
-            : lang === "ru"
-              ? "Ошибка при создании заказа"
-              : "Buyurtma yaratishda xatolik",
+          ? "Error creating order"
+          : lang === "ru"
+          ? "Ошибка при создании заказа"
+          : "Buyurtma yaratishda xatolik",
         "error"
       );
     }
@@ -392,26 +411,27 @@ const Formalization_main = ({
               {lang === "uz"
                 ? "Buyurtma"
                 : lang === "en"
-                  ? "Order"
-                  : lang === "ru"
-                    ? "Заказ"
-                    : "Buyurtma"}
+                ? "Order"
+                : lang === "ru"
+                ? "Заказ"
+                : "Buyurtma"}
             </h1>
           </Link>
         </div>
         <div
-          className={`w-full sm:w-[76%] sm:mt-0 mt-12 ${is_delivery || is_payment_variant || is_pickup ? "hidden" : "block"
-            } mx-auto bg-white mb-[20px]`}
+          className={`w-full sm:w-[76%] sm:mt-0 mt-12 ${
+            is_delivery || is_payment_variant || is_pickup ? "hidden" : "block"
+          } mx-auto bg-white mb-[20px]`}
         >
           <div className="p-6 pt-[35px]">
             <h2 className="font-inter font-[600] text-[16px] leading-[22px] text-black">
               {lang === "uz"
                 ? "Qabul qiluvchi"
                 : lang === "en"
-                  ? "Receiver"
-                  : lang === "ru"
-                    ? "Получатель"
-                    : "Qabul qiluvchi"}
+                ? "Receiver"
+                : lang === "ru"
+                ? "Получатель"
+                : "Qabul qiluvchi"}
             </h2>
             {userSignIn ? (
               <div className="border border-[#D5D5D5] rounded-lg p-4 mt-[15px] sm:mt-[20px] mb-6 w-full sm:w-[40%] h-[70px] flex items-center justify-start">
@@ -436,10 +456,10 @@ const Formalization_main = ({
                     {lang === "uz"
                       ? "Kirish"
                       : lang === "en"
-                        ? "Login"
-                        : lang === "ru"
-                          ? "Входить"
-                          : "Kirish"}
+                      ? "Login"
+                      : lang === "ru"
+                      ? "Входить"
+                      : "Kirish"}
                   </p>
                 </div>
               </Link>
@@ -448,38 +468,41 @@ const Formalization_main = ({
             <div className="relative flex p-1 bg-gray-100 rounded-xl mt-[20px] sm:mt-[35px] mb-4 h-[50px] sm:h-[60px] w-full sm:w-[95%] mx-auto font-inter font-[500] text-[14px] sm:text-[18px] leading-[22px] text-black">
               <button
                 onClick={() => set_deliver_type("pickup")}
-                className={`flex-1 py-2 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${deliver_type === "pickup"
-                  ? "bg-white shadow-sm duration-500"
-                  : "text-gray-500"
-                  }`}
+                className={`flex-1 py-2 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
+                  deliver_type === "pickup"
+                    ? "bg-white shadow-sm duration-500"
+                    : "text-gray-500"
+                }`}
               >
                 {lang === "uz"
                   ? "Olib ketish"
                   : lang === "en"
-                    ? "Pickup"
-                    : lang === "ru"
-                      ? "Забрать"
-                      : "Olib ketish"}
+                  ? "Pickup"
+                  : lang === "ru"
+                  ? "Забрать"
+                  : "Olib ketish"}
               </button>
               <button
                 onClick={() => set_deliver_type("deliver")}
-                className={`flex-1 py-2 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${deliver_type === "deliver"
-                  ? "bg-white shadow-sm duration-500"
-                  : "text-gray-500"
-                  }`}
+                className={`flex-1 py-2 sm:py-2.5 text-center rounded-lg font-medium cursor-pointer ${
+                  deliver_type === "deliver"
+                    ? "bg-white shadow-sm duration-500"
+                    : "text-gray-500"
+                }`}
               >
                 {lang === "uz"
                   ? "Yetkazib berish"
                   : lang === "en"
-                    ? "Delivery"
-                    : lang === "ru"
-                      ? "Доставить"
-                      : "Yetkazib berish"}
+                  ? "Delivery"
+                  : lang === "ru"
+                  ? "Доставить"
+                  : "Yetkazib berish"}
               </button>
             </div>
             <div
-              className={`border border-[#D5D5D5] rounded-lg mb-4 mt-[25px] sm:mt-[35px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300 ${isVibrating ? "animate-[vibrate_0.3s_linear]" : ""
-                }`}
+              className={`border border-[#D5D5D5] rounded-lg mb-4 mt-[25px] sm:mt-[35px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300 ${
+                isVibrating ? "animate-[vibrate_0.3s_linear]" : ""
+              }`}
             >
               <style jsx>{`
                 @keyframes vibrate {
@@ -524,18 +547,19 @@ const Formalization_main = ({
                   </div>
                   <div className="flex-row items-center justify-center hidden gap-1 sm:flex max-w-[80%]">
                     <h1
-                      className={`${address_inform ? "max-w-[60%]" : ""
-                        } text-[12px] whitespace-nowrap truncate sm:block hidden sm:text-[18px] sm:font-medium`}
+                      className={`${
+                        address_inform ? "max-w-[60%]" : ""
+                      } text-[12px] whitespace-nowrap truncate sm:block hidden sm:text-[18px] sm:font-medium`}
                     >
                       {address_inform
                         ? address_inform[`address_${lang}`]
                         : lang == "uz"
-                          ? "Manzil tanlash"
-                          : lang == "en"
-                            ? "Address"
-                            : lang == "ru"
-                              ? "Адрес"
-                              : "Manzil tanlash"}
+                        ? "Manzil tanlash"
+                        : lang == "en"
+                        ? "Address"
+                        : lang == "ru"
+                        ? "Адрес"
+                        : "Manzil tanlash"}
                     </h1>
                     <ChevronRight className="mt-0.5 text-gray-400 h-6 w-6" />
                   </div>
@@ -545,12 +569,12 @@ const Formalization_main = ({
                     {address_inform
                       ? address_inform[`address_${lang}`]
                       : lang == "uz"
-                        ? "Manzil tanlash"
-                        : lang == "en"
-                          ? "Address"
-                          : lang == "ru"
-                            ? "Адрес"
-                            : "Manzil tanlash"}
+                      ? "Manzil tanlash"
+                      : lang == "en"
+                      ? "Address"
+                      : lang == "ru"
+                      ? "Адрес"
+                      : "Manzil tanlash"}
                   </h1>
                   <ChevronRight className="w-4 h-4 mt-0.5 text-gray-400" />
                 </div>
@@ -565,8 +589,9 @@ const Formalization_main = ({
                   set_cashback_is_using(!cashback_is_using);
                 }
               }}
-              className={`border overflow-hidden border-[#D5D5D5] rounded-lg mb-4 mt-[20px] sm:mt-[30px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300 ${isVibrating ? "animate-[vibrate_0.3s_linear]" : ""
-                }`}
+              className={`border overflow-hidden border-[#D5D5D5] rounded-lg mb-4 mt-[20px] sm:mt-[30px] w-[95%] mx-auto hover:scale-[1.008] active:scale-[1] duration-300 ${
+                isVibrating ? "animate-[vibrate_0.3s_linear]" : ""
+              }`}
             >
               <style jsx>{`
                 @keyframes vibrate {
@@ -601,31 +626,35 @@ const Formalization_main = ({
                     {lang === "uz"
                       ? "Keshbekni ishlatish"
                       : lang === "en"
-                        ? "Use cashback"
-                        : lang === "ru"
-                          ? "Использовать кешбек"
-                          : "Keshbekni ishlatish"}
+                      ? "Use cashback"
+                      : lang === "ru"
+                      ? "Использовать кешбек"
+                      : "Keshbekni ishlatish"}
                   </span>
                 </div>
                 <div className="flex items-center gap-[25px] sm:gap-[13px]">
                   <span
-                    className={`${cashback_is_using ? "translate-x-0" : "translate-x-11"
-                      } text-[13px] duration-200 sm:text-[18px] sm:font-medium ${cashbackAmount < 1000 ? "text-red-500 font-bold" : ""
-                      }`}
+                    className={`${
+                      cashback_is_using ? "translate-x-0" : "translate-x-11"
+                    } text-[13px] duration-200 sm:text-[18px] sm:font-medium ${
+                      cashbackAmount < 1000 ? "text-red-500 font-bold" : ""
+                    }`}
                   >
                     {cashbackAmount.toLocaleString()}{" "}
                     {lang === "uz"
                       ? "so'm"
                       : lang === "en"
-                        ? "uzs"
-                        : lang === "ru"
-                          ? "сум"
-                          : "so'm"}
+                      ? "uzs"
+                      : lang === "ru"
+                      ? "сум"
+                      : "so'm"}
                   </span>
                   <div
-                    className={`${cashback_is_using ? "translate-x-0" : "translate-x-11"
-                      } p-1 duration-200 ${cashbackAmount < 1000 ? "bg-white" : "bg-green-500"
-                      } rounded-full`}
+                    className={`${
+                      cashback_is_using ? "translate-x-0" : "translate-x-11"
+                    } p-1 duration-200 ${
+                      cashbackAmount < 1000 ? "bg-white" : "bg-green-500"
+                    } rounded-full`}
                   >
                     <Check className="w-3 h-3 text-white sm:h-4 sm:w-4" />
                   </div>
@@ -638,15 +667,16 @@ const Formalization_main = ({
               {lang === "uz"
                 ? "To'lov usuli"
                 : lang === "en"
-                  ? "Payment method"
-                  : lang === "ru"
-                    ? "Способ оплаты"
-                    : "To'lov usuli"}
+                ? "Payment method"
+                : lang === "ru"
+                ? "Способ оплаты"
+                : "To'lov usuli"}
             </h1>
             <div className="grid w-full gap-4 md:grid-cols-2">
               <div
-                className={`border border-[#D5D5D5] ${selectedMethod === "installment" ? "w-[70%]" : "w-[115%]"
-                  } sm:w-[90%] rounded-lg p-4 bg-white`}
+                className={`border border-[#D5D5D5] ${
+                  selectedMethod === "installment" ? "w-[70%]" : "w-[115%]"
+                } sm:w-[90%] rounded-lg p-4 bg-white`}
               >
                 <div className="space-y-3.5 sm:space-y-4">
                   <div
@@ -664,8 +694,9 @@ const Formalization_main = ({
                       </span>
                     </div>
                     <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${selectedMethod === "click" ? "bg-[#BEA086]" : ""
-                        }`}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
+                        selectedMethod === "click" ? "bg-[#BEA086]" : ""
+                      }`}
                     >
                       {selectedMethod === "click" && (
                         <Check className="w-4 h-4 text-white" />
@@ -687,8 +718,9 @@ const Formalization_main = ({
                       </span>
                     </div>
                     <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${selectedMethod === "payme" ? "bg-[#BEA086]" : ""
-                        }`}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
+                        selectedMethod === "payme" ? "bg-[#BEA086]" : ""
+                      }`}
                     >
                       {selectedMethod === "payme" && (
                         <Check className="w-4 h-4 text-white" />
@@ -709,15 +741,16 @@ const Formalization_main = ({
                         {lang === "uz"
                           ? "Qabul qilinganda"
                           : lang === "en"
-                            ? "On arrive"
-                            : lang === "ru"
-                              ? "При прибытии"
-                              : "Qabul qilinganda"}
+                          ? "On arrive"
+                          : lang === "ru"
+                          ? "При прибытии"
+                          : "Qabul qilinganda"}
                       </span>
                     </div>
                     <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${selectedMethod === "qabul" ? "bg-[#BEA086]" : ""
-                        }`}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
+                        selectedMethod === "qabul" ? "bg-[#BEA086]" : ""
+                      }`}
                     >
                       {selectedMethod === "qabul" && (
                         <Check className="w-4 h-4 text-white" />
@@ -738,15 +771,16 @@ const Formalization_main = ({
                         {lang === "uz"
                           ? "Muddatli to'lov"
                           : lang === "en"
-                            ? "Installment"
-                            : lang === "ru"
-                              ? "Рассрочка"
-                              : "Muddatli to'lov"}
+                          ? "Installment"
+                          : lang === "ru"
+                          ? "Рассрочка"
+                          : "Muddatli to'lov"}
                       </span>
                     </div>
                     <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${selectedMethod === "installment" ? "bg-[#BEA086]" : ""
-                        }`}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] border-[#BEA086] cursor-pointer duration-300 ${
+                        selectedMethod === "installment" ? "bg-[#BEA086]" : ""
+                      }`}
                     >
                       {selectedMethod === "installment" && (
                         <Check className="w-4 h-4 text-white" />
@@ -767,10 +801,10 @@ const Formalization_main = ({
                           {lang === "uz"
                             ? "Muddatli to'lov turi"
                             : lang === "en"
-                              ? "Installment type"
-                              : lang === "ru"
-                                ? "Тип рассрочки"
-                                : "Muddatli to'lov turi"}
+                            ? "Installment type"
+                            : lang === "ru"
+                            ? "Тип рассрочки"
+                            : "Muddatli to'lov turi"}
                         </span>
                         <span className="font-inter font-[600] text-[14px] sm:text-[16px] leading-[22px] text-black">
                           Open
@@ -784,13 +818,14 @@ const Formalization_main = ({
                       {paymentOptions[lang].map((option, index) => (
                         <div
                           key={index}
-                          className={`transition-all duration-100 flex justify-center items-center w-[80px] h-[26px] rounded-[5px] cursor-pointer ${selectedPaymentIndex === index
-                            ? "bg-white border-[1.5px] border-[rgba(190,160,134,1)]"
-                            : ""
-                            }`}
+                          className={`transition-all duration-100 flex justify-center items-center w-[80px] h-[26px] rounded-[5px] cursor-pointer ${
+                            selectedPaymentIndex === index
+                              ? "bg-white border-[1.5px] border-[rgba(190,160,134,1)]"
+                              : ""
+                          }`}
                           onClick={() => handlePaymentClick(index)}
                         >
-                          <h1 className="font-inter font-[500] text-[10px] text-black">
+                          <h1 className="font-inter font-[500] text-[12px] text-black">
                             {option}
                           </h1>
                         </div>
@@ -801,15 +836,15 @@ const Formalization_main = ({
                       <h1 className="w-[89px] h-[28px] rounded-[2.5px] bg-[rgba(254,242,157,1)] font-inter font-[500] text-[13px] leading-[22px] flex justify-center items-center">
                         {monthlyPayments[selectedPaymentIndex]} {uzs_lang}
                       </h1>
-                      <h1 className="font-inter font-[500] text-[10px] leading-[22px] text-black">
+                      <h1 className="font-inter font-[500] text-[12px] leading-[22px] text-black">
                         x {plans[selectedPaymentIndex].months}{" "}
                         {lang === "uz"
                           ? "oy"
                           : lang === "en"
-                            ? "month"
-                            : lang === "ru"
-                              ? "мес."
-                              : "oy"}
+                          ? "month"
+                          : lang === "ru"
+                          ? "мес."
+                          : "oy"}
                       </h1>
                     </div>
                   </div>
@@ -823,10 +858,10 @@ const Formalization_main = ({
                 {lang === "uz"
                   ? "Sizning buyurtmangiz"
                   : lang === "en"
-                    ? "Your order"
-                    : lang === "ru"
-                      ? "Ваш заказ"
-                      : "Sizning buyurtmangiz"}
+                  ? "Your order"
+                  : lang === "ru"
+                  ? "Ваш заказ"
+                  : "Sizning buyurtmangiz"}
               </h2>
               <div className="space-y-5 w-[100%] text-[#000000BF] font-inter font-[500] text-[14px] sm:text-[20px] leading-[22px]">
                 <div className="flex items-center justify-between">
@@ -834,10 +869,10 @@ const Formalization_main = ({
                     {lang === "uz"
                       ? "Maxsulotlar narxi"
                       : lang === "en"
-                        ? "Products price"
-                        : lang === "ru"
-                          ? "Стоимость товаров"
-                          : "Maxsulotlar narxi"}
+                      ? "Products price"
+                      : lang === "ru"
+                      ? "Стоимость товаров"
+                      : "Maxsulotlar narxi"}
                   </span>
                   <span>
                     {basket
@@ -850,10 +885,10 @@ const Formalization_main = ({
                     {lang === "uz"
                       ? "so'm"
                       : lang === "en"
-                        ? "uzs"
-                        : lang === "ru"
-                          ? "сум"
-                          : "so'm"}
+                      ? "uzs"
+                      : lang === "ru"
+                      ? "сум"
+                      : "so'm"}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -861,10 +896,10 @@ const Formalization_main = ({
                     {lang === "uz"
                       ? "Ishlatilayotgan keshbek"
                       : lang === "en"
-                        ? "Used cashback"
-                        : lang === "ru"
-                          ? "Использованный кешбек"
-                          : "Ishlatilayotgan keshbek"}
+                      ? "Used cashback"
+                      : lang === "ru"
+                      ? "Использованный кешбек"
+                      : "Ishlatilayotgan keshbek"}
                   </span>
                   <span>
                     {(cashback_is_using && cashbackAmount) || 0}
@@ -872,10 +907,10 @@ const Formalization_main = ({
                     {lang === "uz"
                       ? "so'm"
                       : lang === "en"
-                        ? "uzs"
-                        : lang === "ru"
-                          ? "сум"
-                          : "so'm"}
+                      ? "uzs"
+                      : lang === "ru"
+                      ? "сум"
+                      : "so'm"}
                   </span>
                 </div>
                 <hr className="border-[#D5D5D5] border-[1.5px] my-[23px]" />
@@ -884,10 +919,10 @@ const Formalization_main = ({
                     {lang === "uz"
                       ? "Jami"
                       : lang === "en"
-                        ? "Total"
-                        : lang === "ru"
-                          ? "Итого"
-                          : "Jami"}
+                      ? "Total"
+                      : lang === "ru"
+                      ? "Итого"
+                      : "Jami"}
                   </span>
                   <span>
                     {(cashback_is_using && payable.toLocaleString()) ||
@@ -895,10 +930,10 @@ const Formalization_main = ({
                     {lang === "uz"
                       ? "so'm"
                       : lang === "en"
-                        ? "uzs"
-                        : lang === "ru"
-                          ? "сум"
-                          : "so'm"}
+                      ? "uzs"
+                      : lang === "ru"
+                      ? "сум"
+                      : "so'm"}
                   </span>
                 </div>
               </div>
@@ -914,36 +949,36 @@ const Formalization_main = ({
                   {lang === "uz"
                     ? "Xaridni rasmiylashtirish"
                     : lang === "en"
-                      ? "Purchase clearance"
-                      : lang === "ru"
-                        ? "Подтверждение покупки"
-                        : "Xaridni rasmiylashtirish"}
+                    ? "Purchase clearance"
+                    : lang === "ru"
+                    ? "Подтверждение покупки"
+                    : "Xaridni rasmiylashtirish"}
                 </button>
               </Link>
               <div className="text-center font-inter font-[400] mt-8 text-[13px] sm:text-[18px] leading-[19px] sm:leading-[33px]">
                 {lang === "uz"
                   ? "Buyurtmani tasdiqlash orqali men "
                   : lang === "en"
-                    ? "By confirming the order, I accept the "
-                    : lang === "ru"
-                      ? "Подтверждая заказ, я принимаю "
-                      : ""}
+                  ? "By confirming the order, I accept the "
+                  : lang === "ru"
+                  ? "Подтверждая заказ, я принимаю "
+                  : ""}
                 <Link to="/terms" className="text-purple-600 hover:underline">
                   {lang === "uz"
                     ? "foydalanuvchi shartnomasini"
                     : lang === "en"
-                      ? "the user agreement"
-                      : lang === "ru"
-                        ? "пользовательское соглашение"
-                        : "foydalanuvchi shartnomasini"}
+                    ? "the user agreement"
+                    : lang === "ru"
+                    ? "пользовательское соглашение"
+                    : "foydalanuvchi shartnomasini"}
                 </Link>{" "}
                 {lang === "uz"
                   ? "shartlarini qabul qilaman."
                   : lang === "en"
-                    ? "terms."
-                    : lang === "ru"
-                      ? "и условия."
-                      : "shartlarini qabul qilaman."}
+                  ? "terms."
+                  : lang === "ru"
+                  ? "и условия."
+                  : "shartlarini qabul qilaman."}
               </div>
             </div>
           </div>

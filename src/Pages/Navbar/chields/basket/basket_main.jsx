@@ -14,20 +14,24 @@ export default function Basket_main({
   const [contentHeight, setContentHeight] = useState("auto");
   const immediateRef = useRef(null);
   const installmentRef = useRef(null);
+  const [selectedPaymentIndex, setSelectedPaymentIndex] = useState(3);
+  useEffect(() => {
+    setSelectedPaymentIndex(Number(localStorage.getItem("selectedPaymentIndex")) || 0);
+  }, []);
   const sl_option_id =
     localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
-        ? 1
-        : 2;
+      ? 1
+      : 2;
   const uzs_lang =
     lang == "uz"
       ? "so'm"
       : lang == "en"
-        ? "uzs"
-        : lang == "ru"
-          ? "сум"
-          : "so'm";
+      ? "uzs"
+      : lang == "ru"
+      ? "сум"
+      : "so'm";
 
   useEffect(() => {
     const savedBasket = localStorage.getItem("basket");
@@ -46,6 +50,10 @@ export default function Basket_main({
   }, [basket]);
 
   useEffect(() => {
+    localStorage.setItem("paymentType", paymentType);
+  }, [paymentType]);
+
+  useEffect(() => {
     if (products.length === 1 && !products[0].selected) {
       const updatedProducts = [{ ...products[0], selected: true }];
       setProducts(updatedProducts);
@@ -57,6 +65,9 @@ export default function Basket_main({
   const visibleProducts = products.filter(
     (item) => item.branch_id == sl_option_id
   );
+  const totalPrice = visibleProducts
+    .filter((product) => product.selected)
+    .reduce((sum, product) => sum + product.price * product.quantity, 0);
 
   const allSelected = visibleProducts.every((product) => product.selected);
 
@@ -75,8 +86,8 @@ export default function Basket_main({
     setProducts((prevProducts) => {
       const updatedProducts = prevProducts.map((product) =>
         product.id === productId &&
-          product.size[lang] === size &&
-          product.color[lang] === color
+        product.size[lang] === size &&
+        product.color[lang] === color
           ? { ...product, selected: !product.selected }
           : product
       );
@@ -84,6 +95,29 @@ export default function Basket_main({
       localStorage.setItem("basket", JSON.stringify(updatedProducts));
       return updatedProducts;
     });
+  };
+
+  const paymentOptions = {
+    uz: ["6 oy", "12 oy", "15 oy", "18 oy", "24 oy"],
+    en: ["6 mth", "12 mth", "15 mth", "18 mth", "24 mth"],
+    ru: ["6 мес", "12 мес", "15 мес", "18 мес", "24 мес"],
+  };
+  const plans = [
+    { months: 6, percent: 26 },
+    { months: 12, percent: 42 },
+    { months: 15, percent: 50 },
+    { months: 18, percent: 56 },
+    { months: 24, percent: 75 },
+  ];
+
+  const monthlyPayments = plans.map(({ months, percent }) => {
+    const priceWithPercent = totalPrice + (totalPrice * percent) / 100;
+    return Math.ceil(priceWithPercent / months);
+  });
+
+  const handlePaymentClick = (index) => {
+    setSelectedPaymentIndex(index);
+    localStorage.setItem("selectedPaymentIndex", index);
   };
 
   const deleteQuantity = (productId, size, color) => {
@@ -133,8 +167,8 @@ export default function Basket_main({
     setProducts((prevProducts) => {
       const updatedProducts = prevProducts.map((product) =>
         product.id === productId &&
-          product.size[lang] === size &&
-          product.color[lang] === color
+        product.size[lang] === size &&
+        product.color[lang] === color
           ? { ...product, quantity: product.quantity + 1 }
           : product
       );
@@ -144,10 +178,6 @@ export default function Basket_main({
     });
   };
 
-  const totalPrice = visibleProducts
-    .filter((product) => product.selected)
-    .reduce((sum, product) => sum + product.price * product.quantity, 0);
-
   const monthlyPayment = Math.round(totalPrice / 24);
 
   useEffect(() => {
@@ -156,7 +186,13 @@ export default function Basket_main({
     setContentHeight(`${Math.max(immediateHeight, installmentHeight)}px`);
   }, [totalPrice]);
 
-  const handleQuantityChange = (id, size, color, newQuantity, validate = false) => {
+  const handleQuantityChange = (
+    id,
+    size,
+    color,
+    newQuantity,
+    validate = false
+  ) => {
     setProducts((prevProducts) =>
       prevProducts.map((p) => {
         if (p.id === id && p.size[lang] === size && p.color[lang] === color) {
@@ -173,17 +209,23 @@ export default function Basket_main({
           const updatedProduct = { ...p, quantity: parsedQuantity };
 
           // Basket va localStorage ni yangilash
-          set_basket(prevProducts.map((item) =>
-            item.id === id && item.size[lang] === size && item.color[lang] === color
-              ? updatedProduct
-              : item
-          ));
+          set_basket(
+            prevProducts.map((item) =>
+              item.id === id &&
+              item.size[lang] === size &&
+              item.color[lang] === color
+                ? updatedProduct
+                : item
+            )
+          );
 
           localStorage.setItem(
             "basket",
             JSON.stringify(
               prevProducts.map((item) =>
-                item.id === id && item.size[lang] === size && item.color[lang] === color
+                item.id === id &&
+                item.size[lang] === size &&
+                item.color[lang] === color
                   ? updatedProduct
                   : item
               )
@@ -211,10 +253,10 @@ export default function Basket_main({
             {lang === "uz"
               ? "Savatcha"
               : lang === "en"
-                ? "Basket"
-                : lang === "ru"
-                  ? "Корзина"
-                  : "Savatcha"}
+              ? "Basket"
+              : lang === "ru"
+              ? "Корзина"
+              : "Savatcha"}
           </h1>
         </Link>
       </div>
@@ -231,15 +273,15 @@ export default function Basket_main({
               {lang === "uz"
                 ? "Savatchangiz bo'sh"
                 : lang === "en"
-                  ? "Your basket is empty"
-                  : "Ваша корзина пуста"}
+                ? "Your basket is empty"
+                : "Ваша корзина пуста"}
             </h1>
             <h1 className="ml-[40px] w-full mt-[10px] text-[18px] text-center text-gray-700 font-[500] font-inter">
               {lang === "uz"
                 ? "Iltimos, mahsulotlarni tanlang"
                 : lang === "en"
-                  ? "Please select some products"
-                  : "Пожалуйста, выберите товары"}
+                ? "Please select some products"
+                : "Пожалуйста, выберите товары"}
             </h1>
           </div>
         ) : (
@@ -254,26 +296,30 @@ export default function Basket_main({
                     {lang === "uz"
                       ? "Hammasini tanlash"
                       : lang === "en"
-                        ? "Select all"
-                        : lang === "ru"
-                          ? "Выбрать все"
-                          : "Hammasini tanlash"}{" "}
+                      ? "Select all"
+                      : lang === "ru"
+                      ? "Выбрать все"
+                      : "Hammasini tanlash"}{" "}
                     <span>
-                      {visibleProducts.filter((p) => p.selected).map((p)=> p.quantity).reduce((a, b) => a + b, 0)}{" "}
+                      {visibleProducts
+                        .filter((p) => p.selected)
+                        .map((p) => p.quantity)
+                        .reduce((a, b) => a + b, 0)}{" "}
                       {lang == "uz"
                         ? "ta maxsulot"
                         : lang === "en"
-                          ? "products"
-                          : lang === "ru"
-                            ? "продукт"
-                            : "ta maxsulot"}
+                        ? "products"
+                        : lang === "ru"
+                        ? "продукт"
+                        : "ta maxsulot"}
                     </span>
                   </h1>
                   <div
-                    className={`sm:w-6 sm:h-6 w-5 h-5 ${allSelected && products.length > 0
-                      ? "bg-[#DCC38B]"
-                      : "bg-gray-300"
-                      } rounded-md flex items-center border border-gray-500 justify-center cursor-pointer`}
+                    className={`sm:w-6 sm:h-6 w-5 h-5 ${
+                      allSelected && products.length > 0
+                        ? "bg-[#DCC38B]"
+                        : "bg-gray-300"
+                    } rounded-md flex items-center border border-gray-500 justify-center cursor-pointer`}
                   >
                     {allSelected && products.length > 0 && (
                       <Check className="w-4 h-4 text-white" />
@@ -318,8 +364,9 @@ export default function Basket_main({
                               product.color[lang]
                             )
                           }
-                          className={`sm:w-6 sm:h-6 w-5 h-5 ${product.selected ? "bg-[#DCC38B]" : "bg-gray-300"
-                            } rounded-md flex items-center justify-center border border-gray-500 cursor-pointer sm:mr-0`}
+                          className={`sm:w-6 sm:h-6 w-5 h-5 ${
+                            product.selected ? "bg-[#DCC38B]" : "bg-gray-300"
+                          } rounded-md flex items-center justify-center border border-gray-500 cursor-pointer sm:mr-0`}
                         >
                           {product.selected && (
                             <Check className="w-4 h-4 text-white" />
@@ -331,8 +378,8 @@ export default function Basket_main({
                       {lang == "uz"
                         ? "O'lchami"
                         : lang == "en"
-                          ? "Size"
-                          : "Размер"}
+                        ? "Size"
+                        : "Размер"}
                       : {product.size[lang]}
                     </p>
                     <p className="font-inter font-[600] text-[16px] leading-[22px] text-black mt-2">
@@ -341,7 +388,6 @@ export default function Basket_main({
 
                     <div className="flex justify-between">
                       <div className="flex items-center mt-4 sm:mt-10">
-                        {/* Chap tarafdagi minus/trash tugmasi */}
                         {product.quantity > 1 ? (
                           <button
                             onClick={() =>
@@ -425,8 +471,8 @@ export default function Basket_main({
                             {lang == "uz"
                               ? "Yo'q qilish"
                               : lang == "en"
-                                ? "Delete"
-                                : "Удалить"}
+                              ? "Delete"
+                              : "Удалить"}
                           </h1>
                         </button>
                       </div>
@@ -437,38 +483,40 @@ export default function Basket_main({
             </div>
 
             {products.length > 0 && (
-              <div className="w-full relative h-[370px] sm:w-[350px] sm:h-[450px] bg-white border border-[#D5D5D5] rounded-2xl p-4 sm:p-6 flex flex-col justify-between">
+              <div className="w-full relative h-[370px] sm:w-[350px] sm:h-[450px] bg-white border border-[#D5D5D5] rounded-2xl sm:pb-0 pb-105 p-4 sm:p-6 flex flex-col justify-between">
                 <div>
                   <div className="relative flex p-1 bg-gray-100 rounded-xl">
                     <button
                       onClick={() => setPaymentType("immediate")}
-                      className={`flex-1 py-2.5 text-center rounded-lg text-sm font-medium cursor-pointer ${paymentType === "immediate"
-                        ? "bg-white shadow-sm duration-400"
-                        : "text-gray-500"
-                        }`}
+                      className={`flex-1 py-2.5 text-center rounded-lg text-sm font-medium cursor-pointer ${
+                        paymentType === "immediate"
+                          ? "bg-white shadow-sm duration-400"
+                          : "text-gray-500"
+                      }`}
                     >
                       {lang === "uz"
                         ? "Hoziroq to'lash"
                         : lang === "en"
-                          ? "Pay now"
-                          : lang === "ru"
-                            ? "Сразу"
-                            : "Hoziroq to'lash"}
+                        ? "Pay now"
+                        : lang === "ru"
+                        ? "Сразу"
+                        : "Hoziroq to'lash"}
                     </button>
                     <button
                       onClick={() => setPaymentType("installment")}
-                      className={`flex-1 py-2.5 text-center rounded-lg text-sm font-medium cursor-pointer ${paymentType === "installment"
-                        ? "bg-white shadow-sm duration-400"
-                        : "text-gray-500"
-                        }`}
+                      className={`flex-1 py-2.5 text-center rounded-lg text-sm font-medium cursor-pointer ${
+                        paymentType === "installment"
+                          ? "bg-white shadow-sm duration-400"
+                          : "text-gray-500"
+                      }`}
                     >
                       {lang === "uz"
                         ? "Muddatli to'lov"
                         : lang === "en"
-                          ? "Installment"
-                          : lang === "ru"
-                            ? "Рассрочка"
-                            : "Muddatli to'lov"}
+                        ? "Installment"
+                        : lang === "ru"
+                        ? "Рассрочка"
+                        : "Muddatli to'lov"}
                     </button>
                   </div>
                   <div
@@ -477,20 +525,21 @@ export default function Basket_main({
                   >
                     <div
                       ref={immediateRef}
-                      className={`absolute top-0 left-0 w-full ${paymentType === "immediate"
-                        ? "opacity-100 z-10 duration-400"
-                        : "opacity-0 z-0"
-                        }`}
+                      className={`absolute top-0 left-0 w-full ${
+                        paymentType === "immediate"
+                          ? "opacity-100 z-10 duration-400"
+                          : "opacity-0 z-0"
+                      }`}
                     >
                       <div className="flex justify-between items-center font-inter font-[700] text-[16px] leading-[22px] text-black">
                         <span>
                           {lang === "uz"
                             ? "Umumiy"
                             : lang === "en"
-                              ? "Total"
-                              : lang === "ru"
-                                ? "Итого"
-                                : "Umumiy"}
+                            ? "Total"
+                            : lang === "ru"
+                            ? "Итого"
+                            : "Umumiy"}
                           :
                         </span>
                         <span>
@@ -500,44 +549,84 @@ export default function Basket_main({
                     </div>
                     <div
                       ref={installmentRef}
-                      className={`absolute top-0 left-0 w-full ${paymentType === "installment"
-                        ? "opacity-100 z-10 duration-400"
-                        : "opacity-0 z-0"
-                        }`}
+                      className={`absolute top-0 left-0 w-full ${
+                        paymentType === "installment"
+                          ? "opacity-100 z-10 duration-400"
+                          : "opacity-0 z-0"
+                      }`}
                     >
                       <div className="flex justify-between">
                         <h1 className="font-inter font-[500] text-[16px] leading-[22px] text-black">
-                          {visibleProducts.length}{" "}
+                          {visibleProducts
+                            .filter((p) => p.selected)
+                            .map((p) => p.quantity)
+                            .reduce((a, b) => a + b, 0)}{" "}
                           {lang == "uz"
                             ? "ta maxsulot"
                             : lang === "en"
-                              ? "products"
-                              : lang === "ru"
-                                ? "продукт"
-                                : "ta maxsulot"}
+                            ? "products"
+                            : lang === "ru"
+                            ? "продукт"
+                            : "ta maxsulot"}
                         </h1>
                         <p className="font-inter font-[500] text-[16px] leading-[22px] text-black">
                           {totalPrice.toLocaleString()} {uzs_lang}
                         </p>
                       </div>
-                      <p className="font-inter font-[500] text-[16px] leading-[22px] text-[#000000BF] mt-[30px]">
+                      <p className="font-inter font-[500] text-[15px] leading-[17px] text-[#000000BF] mt-[10px]">
                         {lang == "uz"
                           ? "Siz buyurtmani 6 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."
                           : lang == "en"
-                            ? "You can purchase an order for a period of 6 to 24 months for a fixed fee. "
-                            : lang == "ru"
-                              ? "Вы можете приобрести заказ на срок от 6 до 24 месяцев за фиксированную плату."
-                              : "Siz buyurtmani 6 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin. "}
+                          ? "You can purchase an order for a period of 6 to 24 months for a fixed fee. "
+                          : lang == "ru"
+                          ? "Вы можете приобрести заказ на срок от 6 до 24 месяцев за фиксированную плату."
+                          : "Siz buyurtmani 6 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin. "}
                       </p>
-                      <p className="font-inter font-[500] text-[14px] xs:text-[16px] leading-[22px] text-black bg-yellow-100 rounded-lg p-2 xs:p-3 mt-[10px]">{lang == "uz"
-                        ? "Mahsulotni nasiya tolovga olish uchun biz bilan bog'laning: "
-                        : lang == "en"
+                      <p className="font-inter font-[500] text-[14px] xs:text-[16px] leading-[22px] text-black bg-yellow-100 rounded-lg p-2 xs:p-3 mt-[15px]">
+                        {lang == "uz"
+                          ? "Mahsulotni nasiya tolovga olish uchun biz bilan bog'laning: "
+                          : lang == "en"
                           ? "Contact us to purchase the product on installment: "
                           : lang == "ru"
-                            ? "Свяжитесь с нами, чтобы приобрести товар в рассрочку: "
-                            : "Mahsulotni nasiya tolovga olish uchun biz bilan bog'laning: "}
+                          ? "Свяжитесь с нами, чтобы приобрести товар в рассрочку: "
+                          : "Mahsulotni nasiya tolovga olish uchun biz bilan bog'laning: "}
                         <span className="font-[700]">+998902074004</span>
                       </p>
+                      <div className="flex flex-col mt-[17px] mb-[1px] justify-between w-full py-[11px] px-[14px] h-[94px] rounded-[8px] border-[1px] border-[rgba(213,213,213,1)] bg-[rgba(242,242,241,1)]">
+                        <div className="w-full h-[30px] rounded-[5px] flex justify-between gap-[3.75px] bg-[rgba(213,213,213,1)]">
+                          {paymentOptions[lang].map((option, index) => (
+                            <div
+                              key={index}
+                              className={`transition-all duration-100 flex justify-center items-center w-[80px] h-[30px] rounded-[5px] cursor-pointer ${
+                                selectedPaymentIndex === index
+                                  ? "bg-white border-[1.5px] border-[rgba(190,160,134,1)]"
+                                  : ""
+                              }`}
+                              onClick={() => handlePaymentClick(index)}
+                            >
+                              <h1 className="font-inter font-[500] text-[14px] text-black">
+                                {option}
+                              </h1>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="flex gap-[10px] items-center">
+                          <h1 className="w-auto h-[28px] px-3 rounded-[4px] bg-[rgba(254,242,157,1)] font-inter font-[500] text-[14px] leading-[22px] flex justify-center items-center">
+                            {monthlyPayments[selectedPaymentIndex]} {uzs_lang}
+                          </h1>
+                          <h1 className="font-inter font-[500] text-[14px] leading-[22px] text-black">
+                            x {plans[selectedPaymentIndex].months}{" "}
+                            {lang === "uz"
+                              ? "oy"
+                              : lang === "en"
+                              ? "month"
+                              : lang === "ru"
+                              ? "мес."
+                              : "oy"}
+                          </h1>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -550,18 +639,19 @@ export default function Basket_main({
                         e.preventDefault();
                       }
                     }}
-                    className={`sm:w-[87%] w-[90%] absolute flex items-center justify-center py-4 sm:mt-[25%] mt-[4%] ${hasSelectedProducts
-                      ? "bg-[#E6D1A7] hover:bg-[#dac59b] cursor-pointer"
-                      : "bg-[#c9bb9d] cursor-not-allowed"
-                      } rounded-xl font-inter font-[600] text-[15px] leading-[22px] text-black transition-colors duration-300`}
+                    className={`sm:w-[87%] w-[90%] absolute flex items-center justify-center py-4 mt-[4%] ${
+                      hasSelectedProducts
+                        ? "bg-[#E6D1A7] hover:bg-[#dac59b] cursor-pointer"
+                        : "bg-[#c9bb9d] cursor-not-allowed"
+                    } rounded-xl font-inter font-[600] text-[15px] leading-[22px] text-black transition-colors duration-300`}
                   >
                     {lang === "uz"
                       ? "Rasmiylashtirish"
                       : lang === "en"
-                        ? "Formalization"
-                        : lang === "ru"
-                          ? "Формализация"
-                          : "Rasmiylashtirish"}
+                      ? "Formalization"
+                      : lang === "ru"
+                      ? "Формализация"
+                      : "Rasmiylashtirish"}
                   </Link>
                 </div>
               </div>

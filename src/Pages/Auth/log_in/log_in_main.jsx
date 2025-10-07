@@ -125,8 +125,8 @@ export default function Log_in_main({ set_is_found, setUserSignIn, lang }) {
           </form>
         </div>
 
-        <div className="mt-[40vh] sm:pt-16 text-center">
-          <Link to="/register" className="text-[#4726BCBF] hover:underline">
+        <div className="mt-[3vh] sm:pt-0 text-center">
+          <Link to="/register" className="text-[#2400a5bf] hover:underline">
             {translations[lang]?.register || translations.uz.register}
           </Link>
         </div>
