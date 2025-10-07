@@ -110,9 +110,9 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
             {support.map((item) => (
               <div key={item.id} onClick={() => handleCopy(item.phone_number, item.id)} className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">
+                  <href className="font-medium">
                     {item.phone_number}
-                  </p>
+                  </href>
                   <p className="text-sm text-gray-500">
                     {item[`title_${lang}`]}
                   </p>
