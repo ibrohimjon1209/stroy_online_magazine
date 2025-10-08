@@ -75,8 +75,8 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
     set_basket((prevBasket) => {
       const updatedBasket = prevBasket.map((item) =>
         item.id === productId &&
-        item.size[lang] === size &&
-        item.color[lang] === color
+          item.size[lang] === size &&
+          item.color[lang] === color
           ? { ...item, quantity: item.quantity + 1 }
           : item
       );
@@ -94,8 +94,8 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
     set_basket((prevBasket) => {
       const updatedBasket = prevBasket.map((item) =>
         item.id === productId &&
-        item.size[lang] === size &&
-        item.color[lang] === color
+          item.size[lang] === size &&
+          item.color[lang] === color
           ? { ...item, quantity: newQuantity }
           : item
       );
@@ -695,7 +695,7 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
               />
             </div>
           </div>
-          <div className="w-auto">
+          <div className="w-auto sm:block hidden">
             <div className="mt-[40px] flex flex-col gap-[15px] sm:w-[681px] w-full">
               <h1 className="font-inter font-[600] text-[28px] leading-[22px] text-black">
                 {lang == "uz"
@@ -820,6 +820,23 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
             <h1 className="font-inter font-[700] text-[20px] leading-[22px] text-black">
               {productData.variants[selectedColorIndex].price} {uzs_lang}
             </h1>
+          </div>
+
+          <div className="w-auto sm:hidden block">
+            <div className="mt-[40px] flex flex-col gap-[15px] sm:w-[681px] w-full">
+              <h1 className="font-inter font-[600] text-[28px] leading-[22px] text-black">
+                {lang == "uz"
+                  ? "Tasnif"
+                  : lang == "en"
+                    ? "Description"
+                    : lang == "ru"
+                      ? "Описание"
+                      : "Tasnif"}
+              </h1>
+              <p className="font-inter font-[500] text-[13px] sm:text-[16px] leading-[18px] sm:leading-[22px] text-black">
+                {productData[`description_${lang}`]}
+              </p>
+            </div>
           </div>
 
           <div className="term-payment mt-[20px]">
