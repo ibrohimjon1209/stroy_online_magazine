@@ -263,7 +263,7 @@ export default function Basket_main({
 
       <div className="w-full mx-auto p-5 sm:p-6 sm:mt-0 mt-16 pt-[20px] sm:pt-[35px]">
         {visibleProducts.length == 0 ? (
-          <div className="w-full mt-[50px] mb-[6%] flex flex-col justify-center items-center">
+          <div className="w-full sm:scale-0 scale-60 mt-[50px] mb-[6%] flex flex-col justify-center items-center">
             <img
               src={no_basket}
               alt="No basket"

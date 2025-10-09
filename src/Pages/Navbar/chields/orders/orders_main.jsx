@@ -460,7 +460,7 @@ const Orders_main = ({ lang }) => {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center scale-[151%] mb-[10%] justify-center mt-19 ml-8">
+          <div className="flex sm:scale-0 scale-84 flex-col items-center  mb-[10%] justify-center mt-28 ml-5">
             <img
               src={no_order}
               alt="No orders"

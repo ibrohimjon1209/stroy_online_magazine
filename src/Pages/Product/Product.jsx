@@ -20,6 +20,7 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [uniqueSizes, setUniqueSizes] = useState([]);
   const [sizeVariants, setSizeVariants] = useState({});
+  const [localQuantity, setLocalQuantity] = useState(1);
   const uzs_lang =
     lang == "uz"
       ? "so'm"
@@ -162,7 +163,7 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
             ru: productData.variants[selectedColorIndex].size_ru,
           },
           price: productData.variants[selectedColorIndex].price,
-          quantity: 1,
+          quantity: localQuantity,
         };
 
         updatedBasket.push(newItem);
@@ -223,6 +224,10 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
   useEffect(() => {
     fetchProduct();
   }, []);
+
+  useEffect(() => {
+    setLocalQuantity(1);
+  }, [selectedColorIndex]);
 
   const handleThumbnailClick = (index) => {
     if (index > selectedColorIndex) {
@@ -405,10 +410,12 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
     { months: 24, percent: 75 },
   ];
 
-  const quantity = currentItem ? currentItem.quantity : 1;
+  const isInBasket = !!currentItem;
+  const displayQuantity = isInBasket ? currentItem.quantity : localQuantity;
+  const calcQuantity = isInBasket ? currentItem.quantity : (localQuantity === '' ? 1 : localQuantity);
 
   const monthlyPayments = plans.map(({ months, percent }) => {
-    const basePrice = productData.variants[selectedColorIndex].price * quantity;
+    const basePrice = productData.variants[selectedColorIndex].price * calcQuantity;
     const priceWithPercent = basePrice + (basePrice * percent) / 100;
     return Math.ceil(priceWithPercent / months);
   });
@@ -902,99 +909,118 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
             </div>
 
             <div className="relative">
-              {currentItem && (
-                <div className="flex justify-between">
-                  <div className="flex items-center mt-4 sm:mt-10">
-                    {currentItem.quantity > 1 ? (
-                      <button
-                        onClick={() =>
-                          decreaseQuantity(
-                            currentItem.id,
-                            currentItem.size[lang],
-                            currentItem.color[lang]
-                          )
-                        }
-                        className="flex items-center justify-center w-8 h-8 border rounded-md cursor-pointer hover:bg-gray-50"
-                      >
-                        <Minus className="w-4 h-4 text-gray-600" />
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() =>
-                          deleteQuantity(
-                            currentItem.id,
-                            currentItem.size[lang],
-                            currentItem.color[lang]
-                          )
-                        }
-                        className="flex items-center justify-center w-8 h-8 text-red-500 border rounded-md cursor-pointer hover:bg-red-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    )}
-
-                    <input
-                      className="w-16 mx-3 text-center border rounded-md sm:mx-4 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#DCC38B] focus:border-transparent"
-                      type="number"
-                      value={currentItem.quantity}
-                      onChange={(e) =>
-                        handleQuantityChange(
-                          currentItem.id,
-                          currentItem.size[lang],
-                          currentItem.color[lang],
-                          e.target.value,
-                          false
-                        )
-                      }
-                      onBlur={(e) =>
-                        handleQuantityChange(
-                          currentItem.id,
-                          currentItem.size[lang],
-                          currentItem.color[lang],
-                          e.target.value,
-                          true
-                        )
-                      }
-                    />
-
+              <div className="flex justify-between">
+                <div className="flex items-center mt-4 sm:mt-10">
+                  {displayQuantity > 1 ? (
                     <button
-                      onClick={() =>
-                        increaseQuantity(
-                          currentItem.id,
-                          currentItem.size[lang],
-                          currentItem.color[lang]
-                        )
-                      }
+                      onClick={() => {
+                        if (isInBasket) {
+                          decreaseQuantity(
+                            productData.id,
+                            selectedSize,
+                            productData.variants[selectedColorIndex][`color_${lang}`]
+                          );
+                        } else {
+                          setLocalQuantity((q) => q - 1);
+                        }
+                      }}
                       className="flex items-center justify-center w-8 h-8 border rounded-md cursor-pointer hover:bg-gray-50"
                     >
-                      <Plus className="w-4 h-4 text-gray-600" />
+                      <Minus className="w-4 h-4 text-gray-600" />
                     </button>
-                  </div>
-
-                  {/* O'ng tarafdagi "Yo'q qilish" tugmasi - har doim bir xil */}
-                  <div className="flex items-end justify-center">
+                  ) : (
                     <button
-                      onClick={() =>
-                        deleteQuantity(
-                          currentItem.id,
-                          currentItem.size[lang],
-                          currentItem.color[lang]
-                        )
-                      }
-                      className="sm:w-37 sm:h-8.5 w-9 h-7.5 opacity-70 sm:opacity-50 hover:opacity-100 duration-200 overflow-hidden justify-end gap-[8px] rounded-md flex items-center cursor-pointer sm:mr-0 text-gray-600 hover:text-gray-800"
+                      onClick={() => {
+                        if (isInBasket) {
+                          deleteQuantity(
+                            productData.id,
+                            selectedSize,
+                            productData.variants[selectedColorIndex][`color_${lang}`]
+                          );
+                        }
+                      }}
+                      className={`flex items-center justify-center w-8 h-8 text-red-500 border rounded-md ${isInBasket ? "cursor-pointer hover:bg-red-50" : "cursor-not-allowed opacity-50"}`}
                     >
                       <Trash2 className="w-4 h-4" />
-                      <h1 className="hidden sm:block">
-                        {lang == "uz"
-                          ? "Yo'q qilish"
-                          : lang == "en"
-                            ? "Delete"
-                            : "Удалить"}
-                      </h1>
                     </button>
-                  </div>
+                  )}
+
+                  <input
+                    className="w-16 mx-3 text-center border rounded-md sm:mx-4 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#DCC38B] focus:border-transparent"
+                    type="number"
+                    value={displayQuantity}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (isInBasket) {
+                        handleQuantityChange(
+                          productData.id,
+                          selectedSize,
+                          productData.variants[selectedColorIndex][`color_${lang}`],
+                          val,
+                          false
+                        );
+                      } else {
+                        setLocalQuantity(val === '' ? '' : parseInt(val) || 1);
+                      }
+                    }}
+                    onBlur={(e) => {
+                      if (isInBasket) {
+                        handleQuantityChange(
+                          productData.id,
+                          selectedSize,
+                          productData.variants[selectedColorIndex][`color_${lang}`],
+                          e.target.value,
+                          true
+                        );
+                      } else {
+                        let newQ = parseInt(e.target.value, 10);
+                        if (isNaN(newQ) || newQ < 1) newQ = 1;
+                        setLocalQuantity(newQ);
+                      }
+                    }}
+                  />
+
+                  <button
+                    onClick={() => {
+                      if (isInBasket) {
+                        increaseQuantity(
+                          productData.id,
+                          selectedSize,
+                          productData.variants[selectedColorIndex][`color_${lang}`]
+                        );
+                      } else {
+                        setLocalQuantity((q) => (typeof q === 'number' ? q + 1 : 2));
+                      }
+                    }}
+                    className="flex items-center justify-center w-8 h-8 border rounded-md cursor-pointer hover:bg-gray-50"
+                  >
+                    <Plus className="w-4 h-4 text-gray-600" />
+                  </button>
                 </div>
-              )}
+
+                <div className="flex items-end justify-center">
+                  <button
+                    onClick={() =>
+                      isInBasket &&
+                      deleteQuantity(
+                        productData.id,
+                        selectedSize,
+                        productData.variants[selectedColorIndex][`color_${lang}`]
+                      )
+                    }
+                    className={`sm:w-37 sm:h-8.5 w-9 h-7.5 ${isInBasket ? "opacity-70 sm:opacity-50 hover:opacity-100" : "opacity-0 pointer-events-none"} duration-200 overflow-hidden justify-end gap-[8px] rounded-md flex items-center cursor-pointer sm:mr-0 text-gray-600 hover:text-gray-800`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <h1 className="hidden sm:block">
+                      {lang == "uz"
+                        ? "Yo'q qilish"
+                        : lang == "en"
+                          ? "Delete"
+                          : "Удалить"}
+                    </h1>
+                  </button>
+                </div>
+              </div>
               <button
                 className={`mt-[20px] w-full h-[60px] rounded-[10px] bg-[rgba(220,195,139,1)] cursor-pointer hover:bg-[#e9d8b2] transition-all duration-200 font-inter font-[600] text-[15px] leading-[22px] text-black ${isAnimating ? "animate-circle" : ""
                   }`}
@@ -1013,7 +1039,7 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
                   : ""}
               </button>
               {isAnimating && (
-                <div className="absolute mt-[20px] inset-0 flex justify-center items-center">
+                <div className="absolute mt-[90px] inset-0 flex justify-center items-center">
                   <div className="w-8 h-8 border-4 border-t-4 border-t-[#ffffff] border-transparent rounded-full animate-spin"></div>
                 </div>
               )}
