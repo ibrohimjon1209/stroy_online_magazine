@@ -5,7 +5,7 @@ import {
   CloudSnow,
   User,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import arrive_icon from "./imgs/arrive_icon.png";
 import cash_icon from "./imgs/cash_icon.png";
 import payment_time from "./imgs/open.png";
@@ -53,6 +53,7 @@ const Formalization_main = ({
   const [notification, setNotification] = useState("");
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
   const [addresses_list, set_addresses_list] = useState([]);
+  const navigate = useNavigate();
   const paymentOptions = {
     uz: ["6 oy", "12 oy", "15 oy", "18 oy", "24 oy"],
     en: ["6 mon", "12 mon", "15 mon", "18 mon", "24 mon"],
@@ -83,7 +84,9 @@ const Formalization_main = ({
   set_is_footer_visible(!is_pickup);
 
   useEffect(() => {
-    setSelectedPaymentIndex(Number(localStorage.getItem("selectedPaymentIndex")) || 0);
+    setSelectedPaymentIndex(
+      Number(localStorage.getItem("selectedPaymentIndex")) || 0
+    );
   }, []);
 
   useEffect(() => {
@@ -244,6 +247,20 @@ const Formalization_main = ({
         "warning"
       );
       return null;
+    }
+  };
+
+  const handleClick = (e) => {
+    if (!userSignIn) {
+      e.preventDefault();
+      navigate("/login");
+      return;
+    }
+
+    if (selectedMethod === "installment") {
+      handleInstallment();
+    } else {
+      handleOrderCreation();
     }
   };
 
@@ -939,11 +956,7 @@ const Formalization_main = ({
               </div>
               <Link
                 to={selectedMethod === "installment" ? "/installment" : ""}
-                onClick={
-                  selectedMethod === "installment"
-                    ? handleInstallment
-                    : handleOrderCreation
-                }
+                onClick={handleClick}
               >
                 <button className="w-[100%] py-4 sm:py-6 bg-[#DCC38B] font-inter mt-5 sm:mt-2 font-[600] text-[16px] sm:text-[22px] leading-[22px] text-black rounded-[10px] cursor-pointer hover:scale-[101%] active:scale-[99%] duration-300">
                   {lang === "uz"

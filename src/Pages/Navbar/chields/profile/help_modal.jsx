@@ -1,5 +1,6 @@
 import youtube_icon from "./chields/imgs/youtube_icon.svg";
 import telegram_icon from "./chields/imgs/telegram_icon.svg";
+import logo from './nsd.png';
 import instagram_icon from "./chields/imgs/instagram_icon.svg";
 import { Phone } from "lucide-react";
 import { support_get } from "../../../../Services/general/support";
@@ -13,8 +14,8 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
     localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
-      ? 1
-      : 2;
+        ? 1
+        : 2;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,10 +85,10 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
               {lang == "uz"
                 ? "Qo'llab-quvvatlash xizmati"
                 : lang == "en"
-                ? "Support"
-                : lang == "ru"
-                ? "Поддержка"
-                : "Qo'llab-quvvatlash"}
+                  ? "Support"
+                  : lang == "ru"
+                    ? "Поддержка"
+                    : "Qo'llab-quvvatlash"}
             </h2>
             <button onClick={onClose} className="p-1" aria-label="Close">
               <svg
@@ -110,9 +111,10 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
             {support.map((item) => (
               <div key={item.id} onClick={() => handleCopy(item.phone_number, item.id)} className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">
+                  <a href={`tel:${item.phone_number}`} className="font-medium">
                     {item.phone_number}
-                  </p>
+                  </a>
+
                   <p className="text-sm text-gray-500">
                     {item[`title_${lang}`]}
                   </p>
@@ -167,16 +169,24 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
 
             <div className="text-center font-inter font-[500] text-[16px] leading-[22px] text-gray-500">
               {lang == "uz" ? (
-                <>
-                  <a
-                    href="https://t.me/nsd_corporation"
-                    target="_blank"
-                    className="text-purple-600 font-[600]"
-                  >
-                    NSD CORPORATION
-                  </a>{" "}
-                  tomonidan yaratilgan
-                </>
+                <div className="flex flex-col items-center">
+                  <a href="https://t.me/nsd_corporation">
+                    <img href="https://t.me/nsd_corporation" src={logo} className="w-[150px]" alt="" />
+
+                  </a>
+                  
+                  <div>
+
+                    <a
+                      href="https://t.me/nsd_corporation"
+                      target="_blank"
+                      className="text-purple-600  font-[600]"
+                    >
+                      NSD CORPORATION
+                    </a>{" "}
+                    tomonidan yaratilgan
+                  </div>
+                </div>
               ) : lang == "en" ? (
                 <>
                   Powered by{" "}

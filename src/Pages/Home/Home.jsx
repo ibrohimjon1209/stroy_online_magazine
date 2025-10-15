@@ -11,6 +11,7 @@ import Download_page from "./Download"
 import { products_get } from "../../Services/products_get"
 import create_favorites from "../../Services/favorites/create_favorites"
 import delete_favorites from "../../Services/favorites/delete_favorites"
+import like_icon from './Images/like_a.svg'
 
 const getStoredTopics = () => {
   try {
@@ -258,26 +259,39 @@ function Home({ lang, setSearchText, searchText }) {
             className={sl_option_id == 2 ? "h-[71px] mt-[10px]" : "w-[77px] h-[71px] mt-[10px]"}
             alt="Logo"
           />
-          <div className="w-[90%] h-[40px] pl-[23.5px] bg-[#FFFFFF] rounded-[10px] flex items-center mt-4">
-            <Search className="cursor-pointer" onClick={handleSearchClick} />
-            <input
-              type="text"
-              placeholder="Search"
-              className="w-full border-none pl-[15px] pr-[20px] focus:outline-none"
-              ref={inputRef}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              onKeyDown={(e) => {
-                e.key == "Enter" && handleSearchClick()
-              }}
-            />
-            {searchText && (
-              <CirclePlus
-                className="rotate-[45deg] mr-[15px] cursor-pointer"
-                strokeWidth={1.75}
-                onClick={() => setSearchText("")}
+          <div className="w-full flex gap-[9px] justify-center px-[20px] items-center">
+            <div className="w-[90%] h-[40px] pl-[23.5px] bg-[#FFFFFF] rounded-[10px] flex items-center mt-4">
+              <Search className="cursor-pointer" onClick={handleSearchClick} />
+              <input
+                type="text"
+                placeholder="Search"
+                className="w-full border-none pl-[15px] pr-[20px] focus:outline-none"
+                ref={inputRef}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onKeyDown={(e) => {
+                  e.key == "Enter" && handleSearchClick()
+                }}
               />
-            )}
+              {searchText && (
+                <CirclePlus
+                  className="rotate-[45deg] mr-[15px] cursor-pointer"
+                  strokeWidth={1.75}
+                  onClick={() => setSearchText("")}
+                />
+              )}
+            </div>
+
+
+            <div className="mt-[15px]">
+              <Link to="/profile/favorites">
+                <img
+                  className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
+                  src={like_icon}
+                  alt="likes"
+                />
+              </Link>
+            </div>
           </div>
           {isSearchOpen && (
             <div
@@ -337,9 +351,8 @@ function Home({ lang, setSearchText, searchText }) {
               <div
                 key={idx}
                 onClick={() => handleBranchClick(branch)}
-                className={`font-inter font-[500] text-[13px] leading-[22px] cursor-pointer ${
-                  selectedBranch === branch ? "text-[#DA9700]" : "text-[#0D1218]"
-                }`}
+                className={`font-inter font-[500] text-[13px] leading-[22px] cursor-pointer ${selectedBranch === branch ? "text-[#DA9700]" : "text-[#0D1218]"
+                  }`}
               >
                 {branch}
               </div>
@@ -388,9 +401,8 @@ function Home({ lang, setSearchText, searchText }) {
                           </h1>
                           <p className="text-black text-[12px] sm:text-[14px] max-w-[120px] sm:max-w-[180px] truncate">
                             {variant.price
-                              ? `${
-                                  lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
-                                }: ${Number.parseFloat(variant.price).toFixed(2)} ${uzs_lang}`
+                              ? `${lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
+                              }: ${Number.parseFloat(variant.price).toFixed(2)} ${uzs_lang}`
                               : lang === "uz"
                                 ? "Narxi mavjud emas"
                                 : lang === "en"
@@ -445,9 +457,8 @@ function Home({ lang, setSearchText, searchText }) {
                         </h1>
                         <p className="text-black text-[12px] sm:text-[14px] truncate w-full">
                           {variant.price
-                            ? `${
-                                lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
-                              }: ${Number.parseFloat(variant.price).toFixed(2)} ${uzs_lang}`
+                            ? `${lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
+                            }: ${Number.parseFloat(variant.price).toFixed(2)} ${uzs_lang}`
                             : lang === "uz"
                               ? "Narxi mavjud emas"
                               : lang === "en"

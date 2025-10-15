@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react"
 import { Search, CirclePlus, History, X, ChevronRight } from "lucide-react"
 import { Link } from "react-router-dom"
 import get_categories from "../../Services/category/get_categories"
+import { products_get } from "../../Services/products_get";  // Import the products_get service
 
 const getStoredTopics = () => {
   try {
@@ -18,6 +19,7 @@ const Category_mobile = () => {
   const [searchText, setSearchText] = useState("")
   const [search_topics, setSearchTopics] = useState(getStoredTopics())
   const [categories, setCategories] = useState([])
+  const [products, setProducts] = useState([]);  // New state for products
   const [loading, setLoading] = useState(true)
   const lang = window.localStorage.getItem("lang") || "uz"
   const sl_option_id =
@@ -28,23 +30,28 @@ const Category_mobile = () => {
       : 2;
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true)
-        const categoriesData = await get_categories()
+        const [categoriesData, productsData] = await Promise.all([
+          get_categories(),
+          products_get(sl_option_id),  // Fetch products
+        ]);
         const filtered = categoriesData.filter((item) => {
           return item.branch == sl_option_id;
         });
         setCategories(filtered || [])
+        setProducts(productsData || []);  // Set products state
       } catch (error) {
-        console.error("Error fetching categories:", error)
+        console.error("Error fetching data:", error)
         setCategories([])
+        setProducts([])
       } finally {
         setLoading(false)
       }
     }
-    fetchCategories()
-  }, [])
+    fetchData()
+  }, [sl_option_id])
 
   const getPlaceholderText = () => {
     return lang === "uz" ? "Kategoriya" : lang === "en" ? "Category" : lang === "ru" ? "Категория" : "Kategoriya"
@@ -222,16 +229,23 @@ const Category_mobile = () => {
             <div className="loader"></div>
           </div>
         ) : filteredCategories.length > 0 ? (
-          filteredCategories.map((category, index) => (
-            <Link to={`/category/${category.id}`} key={index}>
-              <div className="flex justify-between items-center pl-[22px] pr-[31px] w-full h-[52px] hover:bg-gray-50 transition-colors">
-                <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">
-                  {category[`name_${lang}`] || category.name}
-                </h1>
-                <ChevronRight className="text-[#737373]" />
-              </div>
-            </Link>
-          ))
+          filteredCategories.map((category, index) => {
+            // Calculate product count for this category
+            const productCount = products.filter(
+              (product) => product.category == category.id && product.is_available === true
+            ).length;
+
+            return (
+              <Link to={`/category/${category.id}`} key={index}>
+                <div className="flex justify-between items-center pl-[22px] pr-[31px] w-full h-[52px] hover:bg-gray-50 transition-colors">
+                  <h1 className="category_quan font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">
+                    {category[`name_${lang}`] || category.name} ({productCount})
+                  </h1>
+                  <ChevronRight className="text-[#737373]" />
+                </div>
+              </Link>
+            );
+          })
         ) : (
           <div className="flex justify-center items-center w-full h-[100px]">
             <p className="text-center text-gray-500 font-inter">

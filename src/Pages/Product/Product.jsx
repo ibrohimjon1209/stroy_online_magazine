@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Minus, Plus, Trash2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
@@ -20,18 +20,89 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [uniqueSizes, setUniqueSizes] = useState([]);
   const [sizeVariants, setSizeVariants] = useState({});
+  const [localQuantity, setLocalQuantity] = useState(1);
   const uzs_lang =
     lang == "uz"
       ? "so'm"
       : lang == "en"
-      ? "uzs"
-      : lang == "ru"
-      ? "сум"
-      : "so'm";
+        ? "uzs"
+        : lang == "ru"
+          ? "сум"
+          : "so'm";
   const paymentOptions = {
     uz: ["6 oy", "12 oy", "15 oy", "18 oy", "24 oy"],
     en: ["6 mth", "12 mth", "15 mth", "18 mth", "24 mth"],
     ru: ["6 мес", "12 мес", "15 мес", "18 мес", "24 мес"],
+  };
+
+  const decreaseQuantity = (productId, size, color) => {
+    set_basket((prevBasket) => {
+      const updatedBasket = prevBasket
+        .map((item) => {
+          if (
+            item.id === productId &&
+            item.size[lang] === size &&
+            item.color[lang] === color
+          ) {
+            const newQuantity = item.quantity - 1;
+            return newQuantity > 0
+              ? { ...item, quantity: newQuantity }
+              : null;
+          }
+          return item;
+        })
+        .filter(Boolean);
+      localStorage.setItem("basket", JSON.stringify(updatedBasket));
+      return updatedBasket;
+    });
+  };
+
+  const deleteQuantity = (productId, size, color) => {
+    set_basket((prevBasket) => {
+      const updatedBasket = prevBasket.filter(
+        (item) =>
+          !(
+            item.id === productId &&
+            item.size[lang] === size &&
+            item.color[lang] === color
+          )
+      );
+      localStorage.setItem("basket", JSON.stringify(updatedBasket));
+      return updatedBasket;
+    });
+  };
+
+  const increaseQuantity = (productId, size, color) => {
+    set_basket((prevBasket) => {
+      const updatedBasket = prevBasket.map((item) =>
+        item.id === productId &&
+          item.size[lang] === size &&
+          item.color[lang] === color
+          ? { ...item, quantity: item.quantity + 1 }
+          : item
+      );
+      localStorage.setItem("basket", JSON.stringify(updatedBasket));
+      return updatedBasket;
+    });
+  };
+
+  const handleQuantityChange = (productId, size, color, value, isBlur) => {
+    let newQuantity = parseInt(value, 10);
+    if (isNaN(newQuantity) || newQuantity < 1) {
+      if (isBlur) newQuantity = 1;
+      else return;
+    }
+    set_basket((prevBasket) => {
+      const updatedBasket = prevBasket.map((item) =>
+        item.id === productId &&
+          item.size[lang] === size &&
+          item.color[lang] === color
+          ? { ...item, quantity: newQuantity }
+          : item
+      );
+      localStorage.setItem("basket", JSON.stringify(updatedBasket));
+      return updatedBasket;
+    });
   };
 
   useEffect(() => {
@@ -92,7 +163,7 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
             ru: productData.variants[selectedColorIndex].size_ru,
           },
           price: productData.variants[selectedColorIndex].price,
-          quantity: 1,
+          quantity: localQuantity,
         };
 
         updatedBasket.push(newItem);
@@ -153,6 +224,10 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
   useEffect(() => {
     fetchProduct();
   }, []);
+
+  useEffect(() => {
+    setLocalQuantity(1);
+  }, [selectedColorIndex]);
 
   const handleThumbnailClick = (index) => {
     if (index > selectedColorIndex) {
@@ -322,6 +397,11 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
     return <div></div>;
   }
 
+  const currentItem = basket.find(
+    (item) =>
+      item.variant_id === productData.variants[selectedColorIndex].id
+  );
+
   const plans = [
     { months: 6, percent: 26 },
     { months: 12, percent: 42 },
@@ -330,12 +410,16 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
     { months: 24, percent: 75 },
   ];
 
+  const isInBasket = !!currentItem;
+  const displayQuantity = isInBasket ? currentItem.quantity : localQuantity;
+  const calcQuantity = isInBasket ? currentItem.quantity : (localQuantity === '' ? 1 : localQuantity);
+
   const monthlyPayments = plans.map(({ months, percent }) => {
-    const priceWithPercent =
-      productData.variants[selectedColorIndex].price +
-      (productData.variants[selectedColorIndex].price * percent) / 100;
+    const basePrice = productData.variants[selectedColorIndex].price * calcQuantity;
+    const priceWithPercent = basePrice + (basePrice * percent) / 100;
     return Math.ceil(priceWithPercent / months);
   });
+
   const selectedVariant = productData?.variants?.[selectedColorIndex];
 
   const currentSize = selectedVariant?.[`size_${lang}`]
@@ -575,11 +659,10 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
               {productData.variants.map((variant, index) => (
                 <div
                   key={index}
-                  className={`border-[3px] ${
-                    selectedColorIndex === index
-                      ? "border-[rgba(190,160,134,1)]"
-                      : "border-transparent"
-                  } overflow-hidden w-[158px] h-[156px] bg-[rgba(242,242,241,1)] rounded-[15px] flex justify-center items-center cursor-pointer`}
+                  className={`border-[3px] ${selectedColorIndex === index
+                    ? "border-[rgba(190,160,134,1)]"
+                    : "border-transparent"
+                    } overflow-hidden w-[158px] h-[156px] bg-[rgba(242,242,241,1)] rounded-[15px] flex justify-center items-center cursor-pointer`}
                   onClick={() => handleColorClick(index)}
                 >
                   <img
@@ -592,17 +675,15 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
             </div>
             <div className="flex justify-center items-center big-selected-image relative w-full sm:w-[504px] h-[330px] sm:h-[504px] overflow-hidden bg-[rgba(242,242,241,1)] rounded-[15px]">
               <div
-                className={`nav-button cursor-pointer nav-button-left ${
-                  !hasMultipleVariants ? "disabled-nav" : ""
-                }`}
+                className={`nav-button cursor-pointer nav-button-left ${!hasMultipleVariants ? "disabled-nav" : ""
+                  }`}
                 onClick={handlePrevImage}
               >
                 <ChevronLeft size={24} />
               </div>
               <div
-                className={`nav-button cursor-pointer nav-button-right ${
-                  !hasMultipleVariants ? "disabled-nav" : ""
-                }`}
+                className={`nav-button cursor-pointer nav-button-right ${!hasMultipleVariants ? "disabled-nav" : ""
+                  }`}
                 onClick={handleNextImage}
               >
                 <ChevronRight size={24} />
@@ -610,30 +691,29 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
               <img
                 src={getImageSource(productData.variants[selectedColorIndex])}
                 onError={handleImageError}
-                className={`w-full sm:w-[504px] h-full sm:h-[504px] object-cover ${
-                  isTransitioning
-                    ? slideDirection
-                    : slideDirection
+                className={`w-full sm:w-[504px] h-full sm:h-[504px] object-cover ${isTransitioning
+                  ? slideDirection
+                  : slideDirection
                     ? slideDirection === "slide-left"
                       ? "slide-in-right"
                       : "slide-in-left"
                     : ""
-                }`}
+                  }`}
               />
             </div>
           </div>
-          <div className="hidden sm:block">
-            <div className="mt-[40px] flex flex-col gap-[15px] w-[681px]">
+          <div className="w-auto sm:block hidden">
+            <div className="mt-[40px] flex flex-col gap-[15px] sm:w-[681px] w-full">
               <h1 className="font-inter font-[600] text-[28px] leading-[22px] text-black">
                 {lang == "uz"
                   ? "Tasnif"
                   : lang == "en"
-                  ? "Description"
-                  : lang == "ru"
-                  ? "Описание"
-                  : "Tasnif"}
+                    ? "Description"
+                    : lang == "ru"
+                      ? "Описание"
+                      : "Tasnif"}
               </h1>
-              <p className="font-inter font-[500] text-[16px] leading-[22px] text-black">
+              <p className="font-inter font-[500] text-[13px] sm:text-[16px] leading-[18px] sm:leading-[22px] text-black">
                 {productData[`description_${lang}`]}
               </p>
             </div>
@@ -647,17 +727,17 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
                 ? lang == "uz"
                   ? "Mavjud"
                   : lang == "en"
-                  ? "Available"
-                  : lang == "ru"
-                  ? "Доступно"
-                  : "Mavjud"
+                    ? "Available"
+                    : lang == "ru"
+                      ? "Доступно"
+                      : "Mavjud"
                 : lang == "uz"
-                ? "Mavjud emas"
-                : lang == "en"
-                ? "Not available"
-                : lang == "ru"
-                ? "Недоступно"
-                : "Mavjud emas"}
+                  ? "Mavjud emas"
+                  : lang == "en"
+                    ? "Not available"
+                    : lang == "ru"
+                      ? "Недоступно"
+                      : "Mavjud emas"}
             </h5>
             <h1 className="font-inter font-[600] text-[24px] leading-[22px] text-black">
               {productData[`name_${lang}`]}
@@ -666,59 +746,57 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
           {productData?.variants?.some(
             (v) => v.color_uz || v.color_ru || v.color_en
           ) && (
-            <div className="color-div mt-[7px] flex flex-col gap-[6px] max-w-full">
-              <h1 className="font-inter font-[400] text-[13px] leading-[22px] text-black">
-                {lang == "uz"
-                  ? "Rang"
-                  : lang == "en"
-                  ? "Color"
-                  : lang == "ru"
-                  ? "Цвет"
-                  : "Rang"}{" "}
-                :{" "}
-                <span className="font-[500]">
-                  {productData?.variants?.[selectedColorIndex]?.[
-                    `color_${lang}`
-                  ] || ""}{" "}
-                </span>
-              </h1>
-              <div className="select-color flex flex-wrap gap-[10px] max-w-full">
-                {productData?.variants
-                  ?.filter(
-                    (variant) =>
-                      variant.color_uz || variant.color_ru || variant.color_en
-                  )
-                  .map((variant, index) => {
-                    const originalIndex = productData.variants.findIndex(
-                      (v) => v.id === variant.id
-                    );
+              <div className="color-div mt-[7px] flex flex-col gap-[6px] max-w-full">
+                <h1 className="font-inter font-[400] text-[13px] leading-[22px] text-black">
+                  {lang == "uz"
+                    ? "Rang"
+                    : lang == "en"
+                      ? "Color"
+                      : lang == "ru"
+                        ? "Цвет"
+                        : "Rang"}{" "}
+                  :{" "}
+                  <span className="font-[500]">
+                    {productData?.variants?.[selectedColorIndex]?.[
+                      `color_${lang}`
+                    ] || ""}{" "}
+                  </span>
+                </h1>
+                <div className="select-color flex flex-wrap gap-[10px] max-w-full">
+                  {productData?.variants
+                    ?.filter(
+                      (variant) =>
+                        variant.color_uz || variant.color_ru || variant.color_en
+                    )
+                    .map((variant, index) => {
+                      const originalIndex = productData.variants.findIndex(
+                        (v) => v.id === variant.id
+                      );
 
-                    return (
-                      <div
-                        key={variant.id}
-                        className={`transition-all duration-200 overflow-hidden min-w-[62px] w-[62px] h-[80px] flex-shrink-0 flex justify-center items-center rounded-[5px] 
-                    ${
-                      selectedColorIndex === originalIndex
-                        ? "border-[1.5px] border-[rgba(190,160,134,1)]"
-                        : "border-transparent"
-                    } 
-                    bg-[rgba(247,247,246,1)] cursor-pointer ${
-                      !isCurrentSizeVariant(originalIndex) ? "dimmed" : ""
-                    }`}
-                        onClick={() => handleColorClick(originalIndex)}
-                      >
-                        <img
-                          src={getImageSource(variant)}
-                          onError={handleImageError}
-                          alt={variant.color_uz || productData[`name_${lang}`]}
-                          className="object-contain w-full h-full"
-                        />
-                      </div>
-                    );
-                  })}
+                      return (
+                        <div
+                          key={variant.id}
+                          className={`transition-all duration-200 overflow-hidden min-w-[62px] w-[62px] h-[80px] flex-shrink-0 flex justify-center items-center rounded-[5px] 
+                    ${selectedColorIndex === originalIndex
+                              ? "border-[1.5px] border-[rgba(190,160,134,1)]"
+                              : "border-transparent"
+                            } 
+                    bg-[rgba(247,247,246,1)] cursor-pointer ${!isCurrentSizeVariant(originalIndex) ? "dimmed" : ""
+                            }`}
+                          onClick={() => handleColorClick(originalIndex)}
+                        >
+                          <img
+                            src={getImageSource(variant)}
+                            onError={handleImageError}
+                            alt={variant.color_uz || productData[`name_${lang}`]}
+                            className="object-contain w-full h-full"
+                          />
+                        </div>
+                      );
+                    })}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           <div className="size-div mt-[20px] max-w-full">
             <h1 className="font-inter font-[400] text-[13px] leading-[22px] text-black">
@@ -730,11 +808,10 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
                 <div
                   key={index}
                   className={`active:scale-[99%] transition-all duration-200 flex justify-center items-center px-2 min-w-[62px] flex-shrink-0 h-[62px] rounded-[5px] 
-        ${
-          selectedIndex === index
-            ? "border-[rgba(190,160,134,1)] border-[1.5px]"
-            : "border-transparent"
-        } 
+        ${selectedIndex === index
+                      ? "border-[rgba(190,160,134,1)] border-[1.5px]"
+                      : "border-transparent"
+                    } 
         bg-[rgba(247,247,246,1)]`}
                   onClick={() => handleSizeClick(sizeObj.size, index)}
                 >
@@ -752,17 +829,33 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
             </h1>
           </div>
 
+          <div className="w-auto sm:hidden block">
+            <div className="mt-[40px] flex flex-col gap-[15px] sm:w-[681px] w-full">
+              <h1 className="font-inter font-[600] text-[28px] leading-[22px] text-black">
+                {lang == "uz"
+                  ? "Tasnif"
+                  : lang == "en"
+                    ? "Description"
+                    : lang == "ru"
+                      ? "Описание"
+                      : "Tasnif"}
+              </h1>
+              <p className="font-inter font-[500] text-[13px] sm:text-[16px] leading-[18px] sm:leading-[22px] text-black">
+                {productData[`description_${lang}`]}
+              </p>
+            </div>
+          </div>
+
           <div className="term-payment mt-[20px]">
             <div className="flex flex-col mt-8 justify-between w-full py-[11px] px-[14px] h-[94px] rounded-[8px] border-[1px] border-[rgba(213,213,213,1)] bg-[rgba(242,242,241,1)]">
               <div className="w-full h-[30px] rounded-[5px] flex justify-between gap-[3.75px] bg-[rgba(213,213,213,1)]">
                 {paymentOptions[lang].map((option, index) => (
                   <div
                     key={index}
-                    className={`transition-all duration-100 flex justify-center items-center w-[80px] h-[30px] rounded-[5px] cursor-pointer ${
-                      selectedPaymentIndex === index
-                        ? "bg-white border-[1.5px] border-[rgba(190,160,134,1)]"
-                        : ""
-                    }`}
+                    className={`transition-all duration-100 flex justify-center items-center w-[80px] h-[30px] rounded-[5px] cursor-pointer ${selectedPaymentIndex === index
+                      ? "bg-white border-[1.5px] border-[rgba(190,160,134,1)]"
+                      : ""
+                      }`}
                     onClick={() => handlePaymentClick(index)}
                   >
                     <h1 className="font-inter font-[500] text-[14px] text-black">
@@ -781,10 +874,10 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
                   {lang === "uz"
                     ? "oy"
                     : lang === "en"
-                    ? "month"
-                    : lang === "ru"
-                    ? "мес."
-                    : "oy"}
+                      ? "month"
+                      : lang === "ru"
+                        ? "мес."
+                        : "oy"}
                 </h1>
               </div>
             </div>
@@ -793,10 +886,10 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
               {lang == "uz"
                 ? "Siz buyurtmani 6 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."
                 : lang == "en"
-                ? "You can pay for your order for 6 months to 24 months."
-                : lang == "ru"
-                ? "Вы можете оплатить заказ на 6 месяца до 24 месяцев."
-                : "Siz buyurtmani 6 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."}
+                  ? "You can pay for your order for 6 months to 24 months."
+                  : lang == "ru"
+                    ? "Вы можете оплатить заказ на 6 месяца до 24 месяцев."
+                    : "Siz buyurtmani 6 oydan 24 oygacha muddatli to'lov evaziga xarid qilishingiz mumkin."}
             </p>
 
             <div className="payment-options p-[20px] mt-[20px] w-full h-fit rounded-[10px] border-[1px] border-[rgba(213,213,213,1)]">
@@ -816,26 +909,137 @@ const Product = ({ lang, basket, set_basket, userSignIn, notify }) => {
             </div>
 
             <div className="relative">
+              <div className="flex justify-between">
+                <div className="flex items-center mt-4 sm:mt-10">
+                  {displayQuantity > 1 ? (
+                    <button
+                      onClick={() => {
+                        if (isInBasket) {
+                          decreaseQuantity(
+                            productData.id,
+                            selectedSize,
+                            productData.variants[selectedColorIndex][`color_${lang}`]
+                          );
+                        } else {
+                          setLocalQuantity((q) => q - 1);
+                        }
+                      }}
+                      className="flex items-center justify-center w-8 h-8 border rounded-md cursor-pointer hover:bg-gray-50"
+                    >
+                      <Minus className="w-4 h-4 text-gray-600" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        if (isInBasket) {
+                          deleteQuantity(
+                            productData.id,
+                            selectedSize,
+                            productData.variants[selectedColorIndex][`color_${lang}`]
+                          );
+                        }
+                      }}
+                      className={`flex items-center justify-center w-8 h-8 text-red-500 border rounded-md ${isInBasket ? "cursor-pointer hover:bg-red-50" : "cursor-not-allowed opacity-50"}`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+
+                  <input
+                    className="w-16 mx-3 text-center border rounded-md sm:mx-4 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#DCC38B] focus:border-transparent"
+                    type="number"
+                    value={displayQuantity}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (isInBasket) {
+                        handleQuantityChange(
+                          productData.id,
+                          selectedSize,
+                          productData.variants[selectedColorIndex][`color_${lang}`],
+                          val,
+                          false
+                        );
+                      } else {
+                        setLocalQuantity(val === '' ? '' : parseInt(val) || 1);
+                      }
+                    }}
+                    onBlur={(e) => {
+                      if (isInBasket) {
+                        handleQuantityChange(
+                          productData.id,
+                          selectedSize,
+                          productData.variants[selectedColorIndex][`color_${lang}`],
+                          e.target.value,
+                          true
+                        );
+                      } else {
+                        let newQ = parseInt(e.target.value, 10);
+                        if (isNaN(newQ) || newQ < 1) newQ = 1;
+                        setLocalQuantity(newQ);
+                      }
+                    }}
+                  />
+
+                  <button
+                    onClick={() => {
+                      if (isInBasket) {
+                        increaseQuantity(
+                          productData.id,
+                          selectedSize,
+                          productData.variants[selectedColorIndex][`color_${lang}`]
+                        );
+                      } else {
+                        setLocalQuantity((q) => (typeof q === 'number' ? q + 1 : 2));
+                      }
+                    }}
+                    className="flex items-center justify-center w-8 h-8 border rounded-md cursor-pointer hover:bg-gray-50"
+                  >
+                    <Plus className="w-4 h-4 text-gray-600" />
+                  </button>
+                </div>
+
+                <div className="flex items-end justify-center">
+                  <button
+                    onClick={() =>
+                      isInBasket &&
+                      deleteQuantity(
+                        productData.id,
+                        selectedSize,
+                        productData.variants[selectedColorIndex][`color_${lang}`]
+                      )
+                    }
+                    className={`sm:w-37 sm:h-8.5 w-9 h-7.5 ${isInBasket ? "opacity-70 sm:opacity-50 hover:opacity-100" : "opacity-0 pointer-events-none"} duration-200 overflow-hidden justify-end gap-[8px] rounded-md flex items-center cursor-pointer sm:mr-0 text-gray-600 hover:text-gray-800`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <h1 className="hidden sm:block">
+                      {lang == "uz"
+                        ? "Yo'q qilish"
+                        : lang == "en"
+                          ? "Delete"
+                          : "Удалить"}
+                    </h1>
+                  </button>
+                </div>
+              </div>
               <button
-                className={`mt-[20px] w-full h-[60px] rounded-[10px] bg-[rgba(220,195,139,1)] cursor-pointer hover:bg-[#e9d8b2] transition-all duration-200 font-inter font-[600] text-[15px] leading-[22px] text-black ${
-                  isAnimating ? "animate-circle" : ""
-                }`}
+                className={`mt-[20px] w-full h-[60px] rounded-[10px] bg-[rgba(220,195,139,1)] cursor-pointer hover:bg-[#e9d8b2] transition-all duration-200 font-inter font-[600] text-[15px] leading-[22px] text-black ${isAnimating ? "animate-circle" : ""
+                  }`}
                 onClick={handleClick}
               >
                 <h1 className="uppercase font-inter font-[600] text-[16px] leading-[22px] text-[#FFDF02] whitespace-nowrap"></h1>
 
                 {!isAnimating
                   ? lang == "uz"
-                    ? "Savatchaga qo'shish"
+                    ? "Savatga qo'shish"
                     : lang == "en"
-                    ? "Add to cart"
-                    : lang == "ru"
-                    ? "Добавить в корзину"
-                    : "Savatchaga qo'shish"
+                      ? "Add to cart"
+                      : lang == "ru"
+                        ? "Добавить в корзину"
+                        : "Savatga qo'shish"
                   : ""}
               </button>
               {isAnimating && (
-                <div className="absolute mt-[20px] inset-0 flex justify-center items-center">
+                <div className="absolute mt-[90px] inset-0 flex justify-center items-center">
                   <div className="w-8 h-8 border-4 border-t-4 border-t-[#ffffff] border-transparent rounded-full animate-spin"></div>
                 </div>
               )}
