@@ -1,8 +1,9 @@
 "use client";
 
+import { ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const Installment = () => {
+const Installment = ({ set_is_another_nav }) => {
   const [formData, setFormData] = useState({
     pinfl: "",
     birth_date: "",
@@ -19,6 +20,10 @@ const Installment = () => {
     pinfl: "",
     birth_date: "",
   });
+
+  useEffect(()=>{
+    set_is_another_nav(true)
+  },[])
 
   const translations = {
     phone: {
@@ -47,9 +52,9 @@ const Installment = () => {
       ru: "Продолжить",
     },
     format: {
-      uz: "Format: oy/kun/yil (masalan: 01/21/2000)",
-      en: "Format: mm/dd/yyyy (e.g. 01/21/2000)",
-      ru: "Формат: мм/дд/гггг (например: 01/21/2000)",
+      uz: "Format: oy/kun/yil (masalan: 01/01/2000)",
+      en: "Format: mm/dd/yyyy (e.g. 01/01/2000)",
+      ru: "Формат: мм/дд/гггг (например: 01/01/2000)",
     },
     success: {
       uz: "Muvaffaqiyatli yaratildi!",
@@ -362,42 +367,23 @@ const Installment = () => {
         display: "flex",
         justifyContent: "center",
         backgroundColor: "#f9fafb",
-        padding: "20px",
+        padding: "6px"
       }}
     >
       <div style={{ width: "100%", maxWidth: "1440px" }}>
-        <div
-          style={{
-            width: "100%",
-            height: "82px",
-            backgroundColor: "#DCC38B",
-            borderRadius: "15px",
-            marginTop: "5px",
-            display: "flex",
-            alignItems: "center",
-            paddingLeft: "77px",
-          }}
-        >
-          <h1
-            style={{
-              fontFamily: "Inter, sans-serif",
-              fontWeight: "600",
-              fontSize: "20px",
-              lineHeight: "22px",
-              color: "#000000",
-              margin: 0,
-            }}
-          >
-            {lang == "uz"
-              ? "Passport ma'lumotlari"
-              : lang == "en"
-              ? "Passport information"
-              : lang == "ru"
-              ? "Паспортные данные"
-              : "Passport ma'lumotlari"}
-          </h1>
+        <div className="flex justify-center w-full h-[65px] sm:h-[80px] top-0 z-50">
+          <div className="bg-[#DCC38B] flex items-center gap-[10px] w-[1450px] rounded-[15px] mt-[5px] h-full font-inter font-[600] text-[17px] sm:text-[20px] leading-[22px] text-black pl-[13px] sm:pl-[50px]">
+            <p>
+              {lang == "uz"
+                ? "Passport ma'lumotlari"
+                : lang == "en"
+                ? "Passport information"
+                : lang == "ru"
+                ? "Паспортные данные"
+                : "Passport ma'lumotlari"}
+            </p>
+          </div>
         </div>
-
         {/* Form */}
         <div
           style={{
@@ -618,11 +604,12 @@ const Installment = () => {
                   ? "Произошла ошибка"
                   : "Xatolik yuz berdi"}
               </h2>
-              <p style={{ color: "#6b7280", marginBottom: "24px" }}>
-                {error}
-              </p>
+              <p style={{ color: "#6b7280", marginBottom: "24px" }}>{error}</p>
               <button
-                onClick={() => setError("")}
+                onClick={() => {
+                  setError("")
+                  window.location.reload();
+                }}
                 style={{
                   width: "100%",
                   height: "40px",
@@ -689,7 +676,7 @@ const Installment = () => {
               <button
                 onClick={() => {
                   setShowSuccessModal(false);
-                  window.location.href = "/";
+                  window.location.reload();
                 }}
                 style={{
                   width: "100%",
