@@ -186,13 +186,14 @@ const App = () => {
     }
 
     if (currentLocation == "") set_is_found(true);
-    if (currentLocation == "installment" && is_SI) set_is_found(false);
+    if (currentLocation == "installment") set_is_another_nav(true);
     if (
       currentLocation == "delivery" ||
       currentLocation == "terms" ||
       currentLocation == "payment-variant" ||
       currentLocation == "login" ||
       currentLocation == "register" ||
+      currentLocation == "installment" ||
       currentLocation == "terms"
     ) {
       set_is_another_nav(true);
@@ -488,7 +489,7 @@ const App = () => {
                   />
                   <Route
                     path="/installment"
-                    element={is_SI ? <Installment /> : <Navigate to="/" />}
+                    element={is_SI ? <Installment set_is_another_nav={set_is_another_nav}/> : <Navigate to="/" />}
                   />
                   <Route
                     path="/terms"
