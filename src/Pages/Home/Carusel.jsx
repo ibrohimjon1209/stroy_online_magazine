@@ -118,6 +118,9 @@ export default function KitchenCarousel() {
         ))}
       </div>
 
+
+
+
     </div>
   );
 }

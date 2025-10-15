@@ -1,7 +1,7 @@
 import youtube_icon from "./chields/imgs/youtube_icon.svg";
-import telegram_icon from "./chields/imgs/telegram_icon.svg";
+import telegram_icon from "./chields/imgs/telegram.png";
 import logo from './nsd.png';
-import instagram_icon from "./chields/imgs/instagram_icon.svg";
+import instagram_icon from "./chields/imgs/instagram.png";
 import { Phone } from "lucide-react";
 import { support_get } from "../../../../Services/general/support";
 import { useEffect, useState } from "react";
@@ -138,7 +138,7 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
                     target="_blank"
                     className="flex flex-row gap-[8px] items-center"
                   >
-                    <img src={instagram_icon} />
+                    <img src={instagram_icon} className="w-[36px]" />
                     <span className="font-inter text-[15px] font-[600] leading-[22px]">
                       Instagram
                     </span>
@@ -158,7 +158,7 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
                     target="_blank"
                     className="flex flex-row gap-[8px] items-center"
                   >
-                    <img src={telegram_icon} />
+                    <img src={telegram_icon}  className="w-[36px]"/>
                     <span className="font-inter text-[15px] font-[600] leading-[22px]">
                       Telegram
                     </span>
@@ -167,7 +167,7 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
               )}
             </div>
 
-            <div className="text-center font-inter font-[500] text-[16px] leading-[22px] text-gray-500">
+            <div className="text-center mb-[40px] font-inter font-[500] text-[16px] leading-[22px] text-gray-500">
               {lang == "uz" ? (
                 <div className="flex flex-col items-center">
                   <a href="https://t.me/nsd_corporation">
