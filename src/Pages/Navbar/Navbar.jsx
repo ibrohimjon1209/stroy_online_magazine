@@ -23,10 +23,12 @@ import {
   Search,
   ShoppingCart,
   User,
+  Phone,
   X,
 } from "lucide-react";
 import get_categories from "../../Services/category/get_categories";
-import { products_get } from "../../Services/products_get";  // Import the products_get service
+import { products_get } from "../../Services/products_get"; // Import the products_get service
+import { support_get } from "../../Services/general/support";
 
 const getStoredTopics = () => {
   try {
@@ -40,28 +42,33 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
   const navigate = useNavigate();
   const inputRef = useRef(null);
   const categoryCloseTimeout = useRef(null);
+  const infoCloseTimeout = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [is_category_open, set_is_category_open] = useState(false);
+  const [is_info_open, set_is_info_open] = useState(false);
   const [is_search_open, set_is_search_open] = useState(false);
+  const [support, set_support] = useState([]);
   const [is_likes_hovered, set_is_likes_hovered] = useState(false);
   const [is_orders_hovered, set_is_orders_hovered] = useState(false);
   const [is_basket_hovered, set_is_basket_hovered] = useState(false);
   const [is_profile_hovered, set_is_profile_hovered] = useState(false);
   const location = useLocation().pathname.split("/")[1];
   const [categoryAnimation, setCategoryAnimation] = useState(false);
+  const [infoAnimation, setInfoAnimation] = useState(false);
   const [searchAnimation, setSearchAnimation] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [search_topics, setSearchTopics] = useState(getStoredTopics());
   const [categories, setCategories] = useState([]);
-  const [products, setProducts] = useState([]);  // New state for products
+  const [products, setProducts] = useState([]);
+  const [copiedId, setCopiedId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [basket, set_basket] = useState([]);
   const sl_option_id =
     localStorage.getItem("sl_option_nav") == "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") == "Giaz Mebel"
-        ? 1
-        : 2;
+      ? 1
+      : 2;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,7 +76,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
         setIsLoading(true);
         const [categoriesResponse, productsResponse] = await Promise.all([
           get_categories(),
-          products_get(sl_option_id),  // Fetch products
+          products_get(sl_option_id), // Fetch products
         ]);
         if (!categoriesResponse || !productsResponse) {
           throw new Error("Failed to fetch data");
@@ -79,7 +86,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
             return item.branch == sl_option_id;
           })
         );
-        setProducts(productsResponse);  // Set products state
+        setProducts(productsResponse); // Set products state
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -88,7 +95,27 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
     };
 
     fetchData();
-  }, [sl_option_id]);  // Fetch on sl_option_id change
+  }, [sl_option_id]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await support_get();
+        const filtered = res.filter((item) => {
+          return item.branch == sl_option_id;
+        });
+        set_support(filtered);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      console.error("Cleanup function ishladi");
+    };
+  }, []);
 
   useEffect(() => {
     set_basket(JSON.parse(localStorage.getItem("basket")));
@@ -99,6 +126,13 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
     updatedTopics.splice(index, 1);
     setSearchTopics(updatedTopics);
     localStorage.setItem("searchTopics", JSON.stringify(updatedTopics));
+  };
+
+  const handleCopy = (phoneNumber, id) => {
+    navigator.clipboard.writeText(phoneNumber).then(() => {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
   };
 
   const handleCategoryClick = () => {
@@ -123,6 +157,28 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
     }
   };
 
+  const handleInfoClick = () => {
+    if (is_info_open) {
+      if (infoCloseTimeout.current) {
+        clearTimeout(infoCloseTimeout.current);
+      }
+      setInfoAnimation(false);
+      setTimeout(() => {
+        set_is_info_open(false);
+      }, 300);
+    } else {
+      if (infoCloseTimeout.current) {
+        clearTimeout(infoCloseTimeout.current);
+      }
+      set_is_info_open(true);
+      setTimeout(() => {
+        setInfoAnimation(true);
+      }, 100);
+      set_is_search_open(false);
+      setSearchAnimation(false);
+    }
+  };
+
   const handleMouseEnterCategory = () => {
     if (categoryCloseTimeout.current) {
       clearTimeout(categoryCloseTimeout.current);
@@ -133,6 +189,22 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
         setCategoryAnimation(true);
       }, 100);
       set_is_search_open(false);
+      set_is_info_open(false);
+      setSearchAnimation(false);
+    }
+  };
+
+  const handleMouseEnterInfo = () => {
+    if (infoCloseTimeout.current) {
+      clearTimeout(infoCloseTimeout.current);
+    }
+    if (!is_info_open) {
+      set_is_info_open(true);
+      setTimeout(() => {
+        setInfoAnimation(true);
+      }, 100);
+      set_is_search_open(false);
+      set_is_category_open(false);
       setSearchAnimation(false);
     }
   };
@@ -142,6 +214,15 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
       setCategoryAnimation(false);
       setTimeout(() => {
         set_is_category_open(false);
+      }, 300);
+    }, 500);
+  };
+
+  const handleMouseLeaveInfo = () => {
+    infoCloseTimeout.current = setTimeout(() => {
+      setInfoAnimation(false);
+      setTimeout(() => {
+        set_is_info_open(false);
       }, 300);
     }, 500);
   };
@@ -260,7 +341,8 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
               opacity: 1;
               transform: translateY(0);
               max-height: 500px;
-              transition: opacity 300ms ease-in-out, transform 300ms ease-in-out, max-height 300ms ease-in-out;
+              transition: opacity 300ms ease-in-out, transform 300ms ease-in-out,
+                max-height 300ms ease-in-out;
             }
 
             .dropdown-exit {
@@ -273,7 +355,8 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
               opacity: 0;
               transform: translateY(-10px);
               max-height: 0;
-              transition: opacity 300ms ease-in-out, transform 300ms ease-in-out, max-height 300ms ease-in-out;
+              transition: opacity 300ms ease-in-out, transform 300ms ease-in-out,
+                max-height 300ms ease-in-out;
               overflow: hidden;
             }
           `}</style>
@@ -285,8 +368,8 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                   sl_option == "Stroy Baza №1"
                     ? logo1
                     : sl_option == "Giaz Mebel"
-                      ? logo2
-                      : logo3
+                    ? logo2
+                    : logo3
                 }
                 alt="Logo"
                 className="cursor-pointer w-7 h-7"
@@ -313,8 +396,8 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                 sl_option == "Stroy Baza №1"
                   ? logo1
                   : sl_option == "Giaz Mebel"
-                    ? logo2
-                    : logo3
+                  ? logo2
+                  : logo3
               }
               alt="Logo"
               className="cursor-pointer"
@@ -331,8 +414,9 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
           </div>
 
           <div
-            className={`${isMobileMenuOpen ? "flex" : "hidden"
-              } md:hidden flex-col w-full gap-4 mt-4`}
+            className={`${
+              isMobileMenuOpen ? "flex" : "hidden"
+            } md:hidden flex-col w-full gap-4 mt-4`}
           >
             <div className="flex items-center justify-between gap-2">
               <div
@@ -347,16 +431,18 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
 
               <div className="relative w-[calc(100%-120px)]">
                 <div
-                  className={`w-full h-[40px] bg-white ${isOpen ? "rounded-t-[5px]" : "rounded-[5px]"
-                    } flex items-center justify-between pl-2 pr-2 cursor-pointer`}
+                  className={`w-full h-[40px] bg-white ${
+                    isOpen ? "rounded-t-[5px]" : "rounded-[5px]"
+                  } flex items-center justify-between pl-2 pr-2 cursor-pointer`}
                   onClick={toggleDropdown}
                 >
                   <span className="truncate">
                     {selectedOption.name} ({points.length})
                   </span>
                   <ChevronDown
-                    className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""
-                      }`}
+                    className={`transition-transform duration-300 ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
                   />
                 </div>
                 {isOpen && (
@@ -374,8 +460,6 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                   </div>
                 )}
               </div>
-
-
             </div>
 
             <div className="w-full h-[40px] pl-[23.5px] bg-[#FFFFFF] rounded-[5px] flex items-center">
@@ -386,10 +470,10 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                   lang == "uz"
                     ? "Qidiruv"
                     : lang == "en"
-                      ? "Search"
-                      : lang == "ru"
-                        ? "Поиск"
-                        : "Qidiruv"
+                    ? "Search"
+                    : lang == "ru"
+                    ? "Поиск"
+                    : "Qidiruv"
                 }
                 className="w-full placeholder:font-inter placeholder:font-[500] placeholder:text-[15px] placeholder:text-[#737373] border-none pl-[15px] pr-[20px] focus:outline-none focus:ring-0 font-inter font-[500] text-[15px]"
                 ref={inputRef}
@@ -407,26 +491,84 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
             </div>
           </div>
 
-          <div className="w-full md:w-[653px] hidden md:flex gap-[20px]">
-            <div
-              className="relative inline-block"
-            >
+          <div className="w-full md:w-[740px] md:mr-[1%] hidden md:flex gap-[20px]">
+            <div className="relative inline-block">
+              <div
+                onMouseEnter={handleMouseEnterInfo}
+                onMouseLeave={handleMouseLeaveInfo}
+                onClick={handleInfoClick}
+                className="border-[2px] border-white drop-shadow-xl hover:opacity-75 cursor-pointer w-[110px] h-[40px] bg-transparent flex justify-center items-center rounded-[5px] gap-[5px]"
+              >
+                <Phone strokeWidth={1.5} width={20} color="white" />
+                <h1 className="font-inter font-[500] text-[13px] text-white uppercase">
+                  {lang == "uz"
+                    ? "Ma'lumot"
+                    : lang == "en"
+                    ? "Information"
+                    : lang == "ru"
+                    ? "Информация"
+                    : "Ma'lumot"}
+                </h1>
+              </div>
+
+              {is_info_open && (
+                <div
+                  className="absolute left-0 z-50 mt-2 top-[100%]"
+                  onMouseEnter={handleMouseEnterInfo}
+                  onMouseLeave={handleMouseLeaveInfo}
+                >
+                  <div
+                    className={`search_modal w-[400px] p-5 flex flex-col gap-5 max-h-[450px] bg-white border-[1px] overflow-auto border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${
+                      infoAnimation ? "dropdown-enter-active" : "dropdown-enter"
+                    }`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {support.map((item) => (
+                      <div
+                        key={item.id}
+                        onClick={() => handleCopy(item.phone_number, item.id)}
+                        className="flex items-center justify-between cursor-pointer"
+                      >
+                        <div>
+                          <p className="font-medium">{item.phone_number}</p>
+                          <p className="text-sm text-gray-500">
+                            {item[`title_${lang}`]}
+                          </p>
+                          {copiedId === item.id && (
+                            <p className="text-green-500">
+                              {lang === "uz" ? "Nushalandi" : "Copied"}
+                            </p>
+                          )}{" "}
+                        </div>
+                        <Phone className="h-[28px] w-[28px]" />
+                      </div>
+                    ))}
+                    {support.length === 0 && (
+                      <div className="w-full h-[100px] flex justify-center items-center">
+                          <div className="w-8 h-8 border-4 border-t-4 border-t-[#DCC38B] border-transparent rounded-full animate-spin"></div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="relative inline-block">
               <div
                 onMouseEnter={handleMouseEnterCategory}
                 onMouseLeave={handleMouseLeaveCategory}
-
                 onClick={handleCategoryClick}
-                className="border-[3px] border-white drop-shadow-xl hover:opacity-75 cursor-pointer w-[100px] h-[40px] bg-transparent flex justify-center items-center rounded-[5px] gap-[5px]"
+                className="border-[2px] border-white drop-shadow-xl hover:opacity-75 cursor-pointer w-[100px] h-[40px] bg-transparent flex justify-center items-center rounded-[5px] gap-[5px]"
               >
-                <Menu strokeWidth={1.5} color="white" />
+                <Menu strokeWidth={1.5} width={20} color="white" />
                 <h1 className="font-inter font-[500] text-[13px] text-white uppercase">
                   {lang == "uz"
                     ? "Katalog"
                     : lang == "en"
-                      ? "Category"
-                      : lang == "ru"
-                        ? "Каталог"
-                        : "Katalog"}
+                    ? "Category"
+                    : lang == "ru"
+                    ? "Каталог"
+                    : "Katalog"}
                 </h1>
               </div>
 
@@ -437,10 +579,11 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                   onMouseLeave={handleMouseLeaveCategory}
                 >
                   <div
-                    className={`search_modal w-[600px] h-[450px] bg-white border-[1px] overflow-auto border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${categoryAnimation
+                    className={`search_modal w-[600px] h-[450px] bg-white border-[1px] overflow-auto border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${
+                      categoryAnimation
                         ? "dropdown-enter-active"
                         : "dropdown-enter"
-                      }`}
+                    }`}
                     onClick={(e) => e.stopPropagation()}
                   >
                     {isLoading ? (
@@ -451,7 +594,9 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                       categories.map((category) => {
                         // Calculate product count for this category
                         const productCount = products.filter(
-                          (product) => product.category == category.id && product.is_available === true
+                          (product) =>
+                            product.category == category.id &&
+                            product.is_available === true
                         ).length;
 
                         return (
@@ -463,7 +608,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                             <h1 className="font-inter font-[500] text-[20px] leading-[22px] text-[#0000008C]">
                               {category[`name_${lang}`]} ({productCount})
                             </h1>
-                            
+
                             <img
                               src={vector || "/placeholder.svg"}
                               className="rotate-[270deg]"
@@ -492,10 +637,10 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                   lang == "uz"
                     ? "Qidiruv"
                     : lang == "en"
-                      ? "Search"
-                      : lang == "ru"
-                        ? "Поиск"
-                        : "Qidiruv"
+                    ? "Search"
+                    : lang == "ru"
+                    ? "Поиск"
+                    : "Qidiruv"
                 }
                 className="w-full placeholder:font-inter placeholder:font-[500] placeholder:text-[15px] placeholder:text-[#737373] border-none pl-[15px] pr-[20px] focus:outline-none focus:ring-0 font-inter font-[500] text-[15px]"
                 ref={inputRef}
@@ -522,8 +667,9 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                 onClick={handleClickOutside_search}
               >
                 <div
-                  className={`search_modal w-[520px] h-fit ml-[160px] bg-white border-[1px] overflow-hidden border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${searchAnimation ? "dropdown-enter-active" : "dropdown-enter"
-                    }`}
+                  className={`search_modal w-[520px] h-fit ml-[160px] bg-white border-[1px] overflow-hidden border-[#6D5C5CA6] rounded-[5px] shadow-xl transition-all duration-300 ${
+                    searchAnimation ? "dropdown-enter-active" : "dropdown-enter"
+                  }`}
                   onClick={(e) => e.stopPropagation()}
                 >
                   {search_topics.length > 0 ? (
@@ -555,10 +701,10 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                         {lang == "uz"
                           ? "Qidiruv tarixi bo'm bo'sh"
                           : lang == "en"
-                            ? "Search history is empty"
-                            : lang == "ru"
-                              ? "История поиска пуста"
-                              : "Qidiruv tarixi bo'm bo'sh"}
+                          ? "Search history is empty"
+                          : lang == "ru"
+                          ? "История поиска пуста"
+                          : "Qidiruv tarixi bo'm bo'sh"}
                       </h1>
                     </div>
                   )}
@@ -567,14 +713,16 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
             )}
             <div className="relative w-[206px]">
               <div
-                className={`w-full h-[40px] bg-white ${isOpen ? "rounded-t-[5px]" : "rounded-[5px]"
-                  } flex items-center justify-between pl-2 pr-2 cursor-pointer`}
+                className={`w-full h-[40px] bg-white ${
+                  isOpen ? "rounded-t-[5px]" : "rounded-[5px]"
+                } flex items-center justify-between pl-2 pr-2 cursor-pointer`}
                 onClick={toggleDropdown}
               >
                 <span>{selectedOption.name}</span>
                 <ChevronDown
-                  className={`transition-transform duration-300 ${isOpen ? "rotate-180" : ""
-                    }`}
+                  className={`transition-transform duration-300 ${
+                    isOpen ? "rotate-180" : ""
+                  }`}
                 />
               </div>
               {isOpen && (
@@ -635,9 +783,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                 />
                 {get_basket_len() > 0 && (
                   <span className="absolute flex items-center justify-center w-4.5 h-4.5 text-xs font-bold text-white bg-red-500 rounded-full -top-2 -right-2">
-                    {get_basket_len() > 99
-                      ? "99+"
-                      : get_basket_len()}
+                    {get_basket_len() > 99 ? "99+" : get_basket_len()}
                   </span>
                 )}
               </div>

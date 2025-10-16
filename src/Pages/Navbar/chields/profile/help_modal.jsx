@@ -1,7 +1,6 @@
-import youtube_icon from "./chields/imgs/youtube_icon.svg";
-import telegram_icon from "./chields/imgs/telegram_icon.svg";
-import logo from './nsd.png';
-import instagram_icon from "./chields/imgs/instagram_icon.svg";
+import youtube_icon from "./chields/imgs/youtube_ico.webp";
+import telegram_icon from "./chields/imgs/telegram_ico.webp";
+import instagram_icon from "./chields/imgs/insta_ico.webp";
 import { Phone } from "lucide-react";
 import { support_get } from "../../../../Services/general/support";
 import { useEffect, useState } from "react";
@@ -132,48 +131,35 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
           <div className="pt-1 flex flex-col gap-[10px]">
             <div className="flex justify-center gap-5 mb-4">
               {media && media.length > 0 && (
-                <>
+                <div className="flex items-center justify-between w-[70%]">
                   <a
                     href={media[0]?.instagram}
                     target="_blank"
-                    className="flex flex-row gap-[8px] items-center"
                   >
-                    <img src={instagram_icon} />
-                    <span className="font-inter text-[15px] font-[600] leading-[22px]">
-                      Instagram
-                    </span>
+                    <img src={instagram_icon} width={40} className="rounded-lg" height={40} />
+                    
                   </a>
                   <a
                     href={media[0]?.youtube}
                     target="_blank"
-                    className="flex flex-row gap-[8px] items-center"
                   >
-                    <img src={youtube_icon} />
-                    <span className="font-inter text-[15px] font-[600] leading-[22px]">
-                      Youtube
-                    </span>
+                    <img src={youtube_icon} width={52} className="object-contain ml-4" height={42}/>
+                    
                   </a>
                   <a
                     href={media[0]?.telegram}
                     target="_blank"
-                    className="flex flex-row gap-[8px] items-center"
                   >
-                    <img src={telegram_icon} />
-                    <span className="font-inter text-[15px] font-[600] leading-[22px]">
-                      Telegram
-                    </span>
+                    <img src={telegram_icon} width={65} className="object-contain" height={65}/>
+                    
                   </a>
-                </>
+                </div>
               )}
             </div>
 
             <div className="text-center font-inter font-[500] text-[16px] leading-[22px] text-gray-500">
               {lang == "uz" ? (
                 <div className="flex flex-col items-center">
-                  <a href="https://t.me/nsd_corporation">
-                    <img href="https://t.me/nsd_corporation" src={logo} className="w-[150px]" alt="" />
-
-                  </a>
                   
                   <div>
 
