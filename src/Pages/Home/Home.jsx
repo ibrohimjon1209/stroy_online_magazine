@@ -6,12 +6,12 @@ import logo from "./Images/logo_mobile.svg"
 import logo2 from "../Enter/Images/photo_1.png"
 import logo3 from "../Enter/Images/photo_3.png"
 import Carusel from "./Carusel"
-import { Search, CirclePlus, Heart, History, X } from "lucide-react"
+import { Search, CirclePlus, Heart, History, X, Play, Pause, Volume2, VolumeX, Maximize } from "lucide-react"
 import Download_page from "./Download"
 import { products_get } from "../../Services/products_get"
 import create_favorites from "../../Services/favorites/create_favorites"
 import delete_favorites from "../../Services/favorites/delete_favorites"
-import like_icon from './Images/like_a.svg'
+import like_icon from "./Images/like_a.svg"
 
 const getStoredTopics = () => {
   try {
@@ -20,6 +20,214 @@ const getStoredTopics = () => {
   } catch (error) {
     return []
   }
+}
+
+function VideoPlayer({ video, onEnded, autoplay = false }) {
+  const videoRef = useRef(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [isMuted, setIsMuted] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [volume, setVolume] = useState(1)
+  const [showControls, setShowControls] = useState(true)
+  const controlsTimeoutRef = useRef(null)
+
+  useEffect(() => {
+    const videoElement = videoRef.current
+    if (!videoElement) return
+
+    const handleLoadedMetadata = () => {
+      setDuration(videoElement.duration)
+    }
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(videoElement.currentTime)
+    }
+
+    const handleEnded = () => {
+      setIsPlaying(false)
+      if (onEnded) onEnded()
+    }
+
+    const handlePlay = () => setIsPlaying(true)
+    const handlePause = () => setIsPlaying(false)
+
+    videoElement.addEventListener("loadedmetadata", handleLoadedMetadata)
+    videoElement.addEventListener("timeupdate", handleTimeUpdate)
+    videoElement.addEventListener("ended", handleEnded)
+    videoElement.addEventListener("play", handlePlay)
+    videoElement.addEventListener("pause", handlePause)
+
+    if (autoplay) {
+      videoElement.play().catch((err) => console.log("[v0] Autoplay prevented:", err))
+    }
+
+    return () => {
+      videoElement.removeEventListener("loadedmetadata", handleLoadedMetadata)
+      videoElement.removeEventListener("timeupdate", handleTimeUpdate)
+      videoElement.removeEventListener("ended", handleEnded)
+      videoElement.removeEventListener("play", handlePlay)
+      videoElement.removeEventListener("pause", handlePause)
+    }
+  }, [autoplay, onEnded])
+
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause()
+      } else {
+        videoRef.current.play()
+      }
+    }
+  }
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted
+      setIsMuted(!isMuted)
+    }
+  }
+
+  const handleVolumeChange = (e) => {
+    const newVolume = Number.parseFloat(e.target.value)
+    setVolume(newVolume)
+    if (videoRef.current) {
+      videoRef.current.volume = newVolume
+      if (newVolume === 0) {
+        setIsMuted(true)
+      } else if (isMuted) {
+        setIsMuted(false)
+      }
+    }
+  }
+
+  const handleProgressChange = (e) => {
+    const newTime = Number.parseFloat(e.target.value)
+    setCurrentTime(newTime)
+    if (videoRef.current) {
+      videoRef.current.currentTime = newTime
+    }
+  }
+
+  const toggleFullscreen = () => {
+    if (videoRef.current) {
+      if (document.fullscreenElement) {
+        document.exitFullscreen()
+      } else {
+        videoRef.current.requestFullscreen()
+      }
+    }
+  }
+
+  const formatTime = (time) => {
+    if (isNaN(time)) return "0:00"
+    const minutes = Math.floor(time / 60)
+    const seconds = Math.floor(time % 60)
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`
+  }
+
+  const handleMouseMove = () => {
+    setShowControls(true)
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current)
+    }
+    controlsTimeoutRef.current = setTimeout(() => {
+      if (isPlaying) {
+        setShowControls(false)
+      }
+    }, 3000)
+  }
+
+  return (
+    <div
+      className="relative w-full sm:h-[600px] h-[170px] bg-black rounded-lg overflow-hidden group"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={() => isPlaying && setShowControls(false)}
+    >
+      <video
+        ref={videoRef}
+        src={video.video}
+        className="w-full h-full object-contain cursor-pointer"
+        onClick={togglePlay}
+        playsInline
+      />
+
+      {/* Controls overlay */}
+      <div
+        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-2 sm:p-4 transition-opacity duration-300 ${
+          showControls ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        {/* Progress bar */}
+        <div className="mb-2 sm:mb-3">
+          <input
+            type="range"
+            min="0"
+            max={duration || 0}
+            value={currentTime}
+            onChange={handleProgressChange}
+            className="w-full h-1 sm:h-1.5 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-[#DCC38B]"
+            style={{
+              background: `linear-gradient(to right, #DCC38B 0%, #DCC38B ${(currentTime / duration) * 100}%, #4B5563 ${(currentTime / duration) * 100}%, #4B5563 100%)`,
+            }}
+          />
+          <div className="flex justify-between text-white text-[10px] sm:text-xs mt-1">
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(duration)}</span>
+          </div>
+        </div>
+
+        {/* Control buttons */}
+        <div className="flex items-center justify-between gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button onClick={togglePlay} className="text-white hover:text-[#DCC38B] transition-colors p-1 sm:p-2">
+              {isPlaying ? <Pause className="w-5 h-5 sm:w-6 sm:h-6" /> : <Play className="w-5 h-5 sm:w-6 sm:h-6" />}
+            </button>
+
+            <button onClick={toggleMute} className="text-white hover:text-[#DCC38B] transition-colors p-1 sm:p-2">
+              {isMuted || volume === 0 ? (
+                <VolumeX className="w-5 h-5 sm:w-6 sm:h-6" />
+              ) : (
+                <Volume2 className="w-5 h-5 sm:w-6 sm:h-6" />
+              )}
+            </button>
+
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={volume}
+              onChange={handleVolumeChange}
+              className="w-12 sm:w-20 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-[#DCC38B] hidden sm:block"
+            />
+          </div>
+
+          {video.title && (
+            <div className="flex-1 text-center hidden sm:block">
+              <h3 className="text-white text-sm sm:text-base font-medium truncate">{video.title}</h3>
+            </div>
+          )}
+
+          <button onClick={toggleFullscreen} className="text-white hover:text-[#DCC38B] transition-colors p-1 sm:p-2">
+            <Maximize className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+        </div>
+      </div>
+
+      {/* Play button overlay when paused */}
+      {!isPlaying && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+          <button
+            onClick={togglePlay}
+            className="bg-[#DCC38B] hover:bg-[#c9b077] rounded-full p-4 sm:p-6 transition-all transform hover:scale-110"
+          >
+            <Play className="w-8 h-8 sm:w-12 sm:h-12 text-black" fill="black" />
+          </button>
+        </div>
+      )}
+    </div>
+  )
 }
 
 function Home({ lang, setSearchText, searchText }) {
@@ -94,6 +302,11 @@ function Home({ lang, setSearchText, searchText }) {
   const [categoryAnimation, setCategoryAnimation] = useState(false)
   const [isCategoryOpen, set_is_category_open] = useState(false)
 
+  const [videos, setVideos] = useState([])
+  const [videosLoading, setVideosLoading] = useState(true)
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0)
+  const videoRefs = useRef([])
+
   const uzs_lang = lang === "uz" ? "so'm" : lang === "en" ? "uzs" : lang === "ru" ? "сум" : "so'm"
 
   const sl_option_id =
@@ -104,13 +317,44 @@ function Home({ lang, setSearchText, searchText }) {
         : 2
 
   useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const response = await fetch("https://backkk.stroybazan1.uz/api/api/videos/")
+        const data = await response.json()
+        setVideos(data)
+        setVideosLoading(false)
+      } catch (error) {
+        console.error("[v0] Error fetching videos:", error)
+        setVideosLoading(false)
+      }
+    }
+    fetchVideos()
+  }, [])
+
+  const handleVideoEnd = (index) => {
+    if (index < videos.length - 1) {
+      const nextIndex = index + 1
+      setCurrentVideoIndex(nextIndex)
+
+      // Scroll to next video smoothly
+      setTimeout(() => {
+        if (videoRefs.current[nextIndex]) {
+          videoRefs.current[nextIndex].scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          })
+        }
+      }, 500)
+    }
+  }
+
+  useEffect(() => {
     const getProducts = async () => {
       try {
         const response = await products_get(sl_option_id)
-        // Filter products where is_available is true and at least one variant has is_available: true
         const availableProducts = (response || []).filter(
           (product) =>
-            product.is_available === true && product.variants?.some((variant) => variant.is_available === true)
+            product.is_available === true && product.variants?.some((variant) => variant.is_available === true),
         )
         setProducts(availableProducts)
         setFilteredProducts(availableProducts)
@@ -126,17 +370,17 @@ function Home({ lang, setSearchText, searchText }) {
   useEffect(() => {
     if (searchText.trim()) {
       const filtered = products.filter((product) =>
-        product[`name_${lang}`].toLowerCase().includes(searchText.toLowerCase())
+        product[`name_${lang}`].toLowerCase().includes(searchText.toLowerCase()),
       )
       setLoading(true)
-      setCurrentPage(1) // Reset to first page
+      setCurrentPage(1)
       setTimeout(() => {
         setFilteredProducts(filtered)
         setLoading(false)
       }, 1000)
     } else {
       setLoading(true)
-      setCurrentPage(1) // Reset to first page
+      setCurrentPage(1)
       setTimeout(() => {
         setFilteredProducts(products)
         setLoading(false)
@@ -173,7 +417,7 @@ function Home({ lang, setSearchText, searchText }) {
       const favorite = likedProducts.find((fav) => fav.product === productId && fav.user.toString() === userId)
       if (favorite) {
         try {
-          await delete_favorites(favorite.id) // DELETE request
+          await delete_favorites(favorite.id)
         } catch (error) {
           console.error("DELETE xatosi:", error)
         }
@@ -204,7 +448,7 @@ function Home({ lang, setSearchText, searchText }) {
   const handleBranchClick = (branchName) => {
     setSelectedBranch(branchName)
     localStorage.setItem("sl_option_nav", branchName)
-    window.location.reload() // reload qilmasa ham bo'ladi, aytaman keyin
+    window.location.reload()
   }
 
   const handleDeleteTopic = (index) => {
@@ -226,7 +470,7 @@ function Home({ lang, setSearchText, searchText }) {
     setCategoryAnimation(false)
     setTimeout(() => {
       set_is_category_open(false)
-    }, 300) // Match this to the animation duration
+    }, 300)
   }
 
   const handleClickOutside_search = () => {
@@ -236,8 +480,8 @@ function Home({ lang, setSearchText, searchText }) {
     }, 300)
   }
 
-  const sliderProducts = filteredProducts.slice(0, 8) // First 8 products for slider
-  const gridStartIndex = 4 // Start grid from 5th product to avoid duplication
+  const sliderProducts = filteredProducts.slice(0, 8)
+  const gridStartIndex = 4
   const currentProducts = filteredProducts.slice(gridStartIndex, gridStartIndex + currentPage * itemsPerPage)
   const hasMoreProducts = gridStartIndex + currentPage * itemsPerPage < filteredProducts.length
 
@@ -245,7 +489,6 @@ function Home({ lang, setSearchText, searchText }) {
     setCurrentPage((prevPage) => prevPage + 1)
   }
 
-  // Function to get the first available variant for display
   const getFirstAvailableVariant = (product) => {
     return product.variants.find((variant) => variant.is_available === true) || product.variants[0]
   }
@@ -282,12 +525,11 @@ function Home({ lang, setSearchText, searchText }) {
               )}
             </div>
 
-
             <div className="mt-[15px]">
               <Link to="/profile/favorites">
                 <img
                   className="object-contain transition-shadow duration-100 hover:drop-shadow-md hover:shadow-xl"
-                  src={like_icon}
+                  src={like_icon || "/placeholder.svg"}
                   alt="likes"
                 />
               </Link>
@@ -351,8 +593,9 @@ function Home({ lang, setSearchText, searchText }) {
               <div
                 key={idx}
                 onClick={() => handleBranchClick(branch)}
-                className={`font-inter font-[500] text-[13px] leading-[22px] cursor-pointer ${selectedBranch === branch ? "text-[#DA9700]" : "text-[#0D1218]"
-                  }`}
+                className={`font-inter font-[500] text-[13px] leading-[22px] cursor-pointer ${
+                  selectedBranch === branch ? "text-[#DA9700]" : "text-[#0D1218]"
+                }`}
               >
                 {branch}
               </div>
@@ -363,8 +606,50 @@ function Home({ lang, setSearchText, searchText }) {
 
       <Carusel />
 
-      <div className="popular mt-[60px] w-full px-[15px] sm:px-[77px] mb-[100px]">
-        <h1 className="text-[17px] sm:text-[22px] font-semibold mt-3">
+      <div className="popular sm:mt-[60px] mt-[25px] w-full px-[15px] sm:px-[77px] mb-[100px]">
+        <div className="videos-div sm:mt-[60px] mt-[25px] px-0 sm:px-[50px]">
+          <h1 className="text-[17px] sm:text-[22px] font-semibold mb-4">
+            {lang === "uz" ? "Videolar" : lang === "en" ? "Videos" : lang === "ru" ? "Видео" : "Videolar"}
+          </h1>
+
+          {videosLoading ? (
+            <div className="w-full sm:h-[600px] h-[170px] bg-gray-200 rounded-lg flex justify-center items-center">
+              <div style={styles.loader}></div>
+            </div>
+          ) : videos.length > 0 ? (
+            <div className="space-y-6 sm:space-y-8">
+              {videos.map((video, index) => (
+                <div key={video.id} ref={(el) => (videoRefs.current[index] = el)} className="w-full">
+                  <VideoPlayer
+                    video={video}
+                    onEnded={() => handleVideoEnd(index)}
+                    autoplay={index === currentVideoIndex}
+                  />
+                  {video.title && (
+                    <h3 className="text-black font-semibold text-[14px] sm:text-[18px] mt-2 sm:mt-3">{video.title}</h3>
+                  )}
+                  {video.description && (
+                    <p className="text-gray-600 text-[12px] sm:text-[14px] mt-1">{video.description}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="w-full sm:h-[600px] h-[170px] bg-gray-200 rounded-lg flex justify-center items-center">
+              <p className="text-gray-500 text-[14px] sm:text-[18px]">
+                {lang === "uz"
+                  ? "Videolar topilmadi"
+                  : lang === "en"
+                    ? "No videos found"
+                    : lang === "ru"
+                      ? "Видео не найдены"
+                      : "Videolar topilmadi"}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <h1 className="text-[17px] sm:text-[22px] font-semibold mt-6">
           {lang === "uz"
             ? "Ommabop tavarlar"
             : lang === "en"
@@ -383,7 +668,7 @@ function Home({ lang, setSearchText, searchText }) {
             ) : sliderProducts.length > 0 ? (
               sliderProducts.map((product, index) => {
                 const variant = getFirstAvailableVariant(product)
-                if (!variant.is_available) return null // Skip if the selected variant is not available
+                if (!variant.is_available) return null
                 return (
                   <div key={`slider-${index}`} className="flex-none w-[160px] sm:w-[245px] snap-start">
                     <Link to={`/product/${product.id}`}>
@@ -401,8 +686,9 @@ function Home({ lang, setSearchText, searchText }) {
                           </h1>
                           <p className="text-black text-[12px] sm:text-[14px] max-w-[120px] sm:max-w-[180px] truncate">
                             {variant.price
-                              ? `${lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
-                              }: ${Number.parseFloat(variant.price).toFixed(2)} ${uzs_lang}`
+                              ? `${
+                                  lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
+                                }: ${Number.parseFloat(variant.price).toFixed(2)} ${uzs_lang}`
                               : lang === "uz"
                                 ? "Narxi mavjud emas"
                                 : lang === "en"
@@ -439,7 +725,7 @@ function Home({ lang, setSearchText, searchText }) {
           ) : currentProducts.length > 0 ? (
             currentProducts.map((product, index) => {
               const variant = getFirstAvailableVariant(product)
-              if (!variant.is_available) return null // Skip if the selected variant is not available
+              if (!variant.is_available) return null
               return (
                 <div key={`grid-${gridStartIndex + index}`} className="cursor-pointer">
                   <Link to={`/product/${product.id}`}>
@@ -457,8 +743,9 @@ function Home({ lang, setSearchText, searchText }) {
                         </h1>
                         <p className="text-black text-[12px] sm:text-[14px] truncate w-full">
                           {variant.price
-                            ? `${lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
-                            }: ${Number.parseFloat(variant.price).toFixed(2)} ${uzs_lang}`
+                            ? `${
+                                lang === "uz" ? "Narxi" : lang === "en" ? "Price" : lang === "ru" ? "Цена" : "Narxi"
+                              }: ${Number.parseFloat(variant.price).toFixed(2)} ${uzs_lang}`
                             : lang === "uz"
                               ? "Narxi mavjud emas"
                               : lang === "en"

@@ -157,7 +157,7 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
               )}
             </div>
 
-            <div className="text-center font-inter font-[500] text-[16px] leading-[22px] text-gray-500">
+            <div className="text-center mb-[40px] font-inter font-[500] text-[16px] leading-[22px] text-gray-500">
               {lang == "uz" ? (
                 <div className="flex flex-col items-center">
                   

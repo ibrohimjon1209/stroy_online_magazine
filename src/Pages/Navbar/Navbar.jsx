@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useRef, useEffect } from "react";
 import logo1 from "./Images/logo.svg";
 import logo2 from "../Enter/Images/photo_1.png";
@@ -19,16 +21,95 @@ import {
   History,
   Home,
   Menu,
+  MessageSquareText,
   Package,
   Search,
   ShoppingCart,
   User,
-  Phone,
   X,
+  Send,
+  Phone,
+  Check,
+  CheckCheck,
 } from "lucide-react";
 import get_categories from "../../Services/category/get_categories";
-import { products_get } from "../../Services/products_get"; // Import the products_get service
+import { products_get } from "../../Services/products_get";
 import { support_get } from "../../Services/general/support";
+
+const TELEGRAM_BOT_TOKEN = "7056109266:AAFIzj2wWkLPzbKvg6OyhpsXCZSdXqWnZU4";
+const TELEGRAM_CHAT_ID = "-1002797780224";
+
+const generateDeviceId = () => {
+  const userAgent = navigator.userAgent;
+  const screenResolution = `${window.screen.width}x${window.screen.height}`;
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const language = navigator.language;
+  const platform = navigator.platform;
+
+  const deviceString = `${userAgent}_${screenResolution}_${timezone}_${language}_${platform}`;
+
+  // Simple hash function (MD5 alternative for browser)
+  let hash = 0;
+  for (let i = 0; i < deviceString.length; i++) {
+    const char = deviceString.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(16);
+};
+
+const getDeviceName = () => {
+  const userAgent = navigator.userAgent;
+  let browserName = "Unknown Browser";
+  let osName = "Unknown OS";
+
+  // Detect browser
+  if (userAgent.indexOf("Firefox") > -1) {
+    browserName = "Firefox";
+  } else if (userAgent.indexOf("Chrome") > -1) {
+    browserName = "Chrome";
+  } else if (userAgent.indexOf("Safari") > -1) {
+    browserName = "Safari";
+  } else if (userAgent.indexOf("Edge") > -1) {
+    browserName = "Edge";
+  }
+
+  // Detect OS
+  if (userAgent.indexOf("Win") > -1) osName = "Windows";
+  else if (userAgent.indexOf("Mac") > -1) osName = "MacOS";
+  else if (userAgent.indexOf("Linux") > -1) osName = "Linux";
+  else if (userAgent.indexOf("Android") > -1) osName = "Android";
+  else if (userAgent.indexOf("iOS") > -1) osName = "iOS";
+
+  return `${osName} - ${browserName}`;
+};
+
+const sendToTelegram = async (deviceId, deviceName, message) => {
+  const text = `🆕 Yangi xabar!\n\n👤 Qurilma: ${deviceName}\n🔑 Device ID: ${deviceId}\n\n\n💬 Xabar: ${message}\n\n\n[ID:${deviceId}]`;
+
+  try {
+    const response = await fetch(
+      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: text,
+          parse_mode: "HTML",
+        }),
+      }
+    );
+
+    const data = await response.json();
+    return data.ok;
+  } catch (error) {
+    console.error("Telegram yuborishda xato:", error);
+    return false;
+  }
+};
 
 const getStoredTopics = () => {
   try {
@@ -63,6 +144,20 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
   const [copiedId, setCopiedId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [basket, set_basket] = useState([]);
+
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [deviceId, setDeviceId] = useState("");
+  const [deviceName, setDeviceName] = useState("");
+  const [lastUpdateId, setLastUpdateId] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const chatEndRef = useRef(null);
+  const pollingIntervalRef = useRef(null);
+  const wasAtBottomRef = useRef(true);
+  const chatContainerRef = useRef(null);
+  const [showScrollDown, setShowScrollDown] = useState(false);
+
   const sl_option_id =
     localStorage.getItem("sl_option_nav") == "Stroy Baza №1"
       ? 0
@@ -70,34 +165,62 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
       ? 1
       : 2;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        const [categoriesResponse, productsResponse] = await Promise.all([
-          get_categories(),
-          products_get(sl_option_id), // Fetch products
-        ]);
-        if (!categoriesResponse || !productsResponse) {
-          throw new Error("Failed to fetch data");
-        }
-        setCategories(
-          categoriesResponse.filter((item) => {
-            return item.branch == sl_option_id;
-          })
-        );
-        setProducts(productsResponse); // Set products state
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const initializeBot = async () => {
+    try {
+      // First, try to remove any existing webhook
+      const webhookResponse = await fetch(
+        `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook?drop_pending_updates=true`
+      );
+      const webhookData = await webhookResponse.json();
+      console.log("Webhook cleanup:", webhookData);
 
-    fetchData();
-  }, [sl_option_id]);
+      // Reset getUpdates offset to get fresh updates
+      localStorage.setItem(`chat_last_update_id_${deviceId}`, "0");
+    } catch (error) {
+      console.error("Webhook cleanup error:", error);
+    }
+  };
 
   useEffect(() => {
+    let storedDeviceId = localStorage.getItem("chat_device_id");
+    if (!storedDeviceId) {
+      storedDeviceId = generateDeviceId();
+      localStorage.setItem("chat_device_id", storedDeviceId);
+    }
+    setDeviceId(storedDeviceId);
+    setDeviceName(getDeviceName());
+
+    // Initialize bot (remove webhook)
+    initializeBot();
+
+    // Load chat history after initialization
+    const storedMessages = localStorage.getItem(
+      `chat_messages_${storedDeviceId}`
+    );
+    if (storedMessages) {
+      const messages = JSON.parse(storedMessages);
+      setChatMessages(messages);
+      setUnreadCount(
+        messages.filter((msg) => msg.sender === "admin" && !msg.read).length
+      );
+    } else {
+      const welcomeMsg = {
+        id: Date.now(),
+        text: "Stroy baza online magazin hush kelibsiz, assalmu alaykum deb savol bo'lsa yozing",
+        sender: "bot",
+        timestamp: new Date().toISOString(),
+        status: "delivered",
+        read: true,
+      };
+      setChatMessages([welcomeMsg]);
+      localStorage.setItem(
+        `chat_messages_${storedDeviceId}`,
+        JSON.stringify([welcomeMsg])
+      );
+    }
+  }, []);
+
+    useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await support_get();
@@ -118,6 +241,238 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
   }, []);
 
   useEffect(() => {
+    if (isChatOpen && deviceId) {
+      // Get last update ID from localStorage for this device
+      let storedUpdateId =
+        parseInt(localStorage.getItem(`chat_last_update_id_${deviceId}`)) || 0;
+      setLastUpdateId(storedUpdateId);
+
+      pollingIntervalRef.current = setInterval(async () => {
+        try {
+          const offset = lastUpdateId + 1;
+          console.log(`Polling with offset: ${offset}`); // Debug log
+
+          const response = await fetch(
+            `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${offset}&timeout=30&limit=10`
+          );
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+
+          const data = await response.json();
+
+          if (data.ok && data.result.length > 0) {
+            let maxUpdateId = lastUpdateId;
+
+            data.result.forEach((update) => {
+              if (update.update_id > maxUpdateId) {
+                maxUpdateId = update.update_id;
+              }
+
+              // Check for admin replies to our messages
+              if (
+                update.message &&
+                update.message.reply_to_message &&
+                String(update.message.chat.id) === TELEGRAM_CHAT_ID
+              ) {
+                const originalMessage = update.message.reply_to_message.text;
+                console.log("Found reply_to_message:", originalMessage); // Debug
+
+                const deviceIdMatch =
+                  originalMessage.match(/\[ID:([a-f0-9]+)\]/);
+                console.log("Device ID match:", deviceIdMatch); // Debug
+
+                if (deviceIdMatch && deviceIdMatch[1] === deviceId) {
+                  const adminReplyText = update.message.text;
+                  console.log(
+                    "Matched admin reply for device:",
+                    deviceId,
+                    adminReplyText
+                  ); // Debug
+
+                  const adminMsg = {
+                    id: `admin_${update.update_id}`, // Unique ID for admin messages
+                    text: adminReplyText,
+                    sender: "admin",
+                    timestamp: new Date(
+                      update.message.date * 1000
+                    ).toISOString(),
+                    status: "delivered",
+                    read: false,
+                  };
+
+                  setChatMessages((prev) => {
+                    // Check if message already exists
+                    const exists = prev.some((msg) => msg.id === adminMsg.id);
+                    if (exists) return prev;
+
+                    const newMessages = [...prev, adminMsg];
+                    localStorage.setItem(
+                      `chat_messages_${deviceId}`,
+                      JSON.stringify(newMessages)
+                    );
+                    setUnreadCount((count) => count + 1);
+                    return newMessages;
+                  });
+                }
+              }
+            });
+
+            // Update lastUpdateId and save to localStorage
+            if (maxUpdateId > lastUpdateId) {
+              setLastUpdateId(maxUpdateId);
+              localStorage.setItem(
+                `chat_last_update_id_${deviceId}`,
+                maxUpdateId.toString()
+              );
+            }
+          }
+        } catch (error) {
+          console.error("Polling error:", error);
+          if (error.message.includes("409")) {
+            console.log(
+              "409 Conflict - webhook might still be active. Cleaning up..."
+            );
+            initializeBot(); // Try to clean up webhook again
+          }
+        }
+      }, 3000); // 3 seconds interval to avoid rate limits
+
+      return () => {
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
+        }
+      };
+    }
+  }, [isChatOpen, deviceId, lastUpdateId]);
+
+  useEffect(() => {
+    if (chatEndRef.current) {
+      if (wasAtBottomRef.current) {
+        chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [chatMessages]);
+
+    const handleCopy = (phoneNumber, id) => {
+    navigator.clipboard.writeText(phoneNumber).then(() => {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
+  };
+
+  useEffect(() => {
+    if (isChatOpen) {
+      setChatMessages((prev) => {
+        const updated = prev.map((msg) =>
+          msg.sender === "admin" && !msg.read ? { ...msg, read: true } : msg
+        );
+        localStorage.setItem(
+          `chat_messages_${deviceId}`,
+          JSON.stringify(updated)
+        );
+        setUnreadCount(0);
+        return updated;
+      });
+
+      setTimeout(() => {
+        if (chatEndRef.current) {
+          chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+          wasAtBottomRef.current = true;
+        }
+      }, 100);
+    }
+  }, [isChatOpen, deviceId]);
+
+  const handleChatScroll = () => {
+    if (chatContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } =
+        chatContainerRef.current;
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 10; // Threshold
+      setShowScrollDown(!atBottom);
+      wasAtBottomRef.current = atBottom;
+    }
+  };
+
+  const scrollToBottom = () => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+      setShowScrollDown(false);
+      wasAtBottomRef.current = true;
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim()) return;
+
+    const userMsg = {
+      id: Date.now(),
+      text: newMessage,
+      sender: "user",
+      timestamp: new Date().toISOString(),
+      status: "sending", // 1 tick
+      read: true,
+    };
+
+    setChatMessages((prev) => {
+      const newMessages = [...prev, userMsg];
+      localStorage.setItem(
+        `chat_messages_${deviceId}`,
+        JSON.stringify(newMessages)
+      );
+      return newMessages;
+    });
+    setNewMessage("");
+
+    // Send to Telegram
+    const success = await sendToTelegram(deviceId, deviceName, newMessage);
+
+    // Update message status
+    setTimeout(() => {
+      setChatMessages((prev) => {
+        const updatedMessages = prev.map((msg) =>
+          msg.id === userMsg.id
+            ? { ...msg, status: success ? "sent" : "failed" } // 2 ticks or failed
+            : msg
+        );
+        localStorage.setItem(
+          `chat_messages_${deviceId}`,
+          JSON.stringify(updatedMessages)
+        );
+        return updatedMessages;
+      });
+    }, 2000);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [categoriesResponse, productsResponse] = await Promise.all([
+          get_categories(),
+          products_get(sl_option_id),
+        ]);
+        if (!categoriesResponse || !productsResponse) {
+          throw new Error("Failed to fetch data");
+        }
+        setCategories(
+          categoriesResponse.filter((item) => {
+            return item.branch == sl_option_id;
+          })
+        );
+        setProducts(productsResponse);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [sl_option_id]);
+
+  useEffect(() => {
     set_basket(JSON.parse(localStorage.getItem("basket")));
   }, [localStorage.getItem("basket")]);
 
@@ -126,13 +481,6 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
     updatedTopics.splice(index, 1);
     setSearchTopics(updatedTopics);
     localStorage.setItem("searchTopics", JSON.stringify(updatedTopics));
-  };
-
-  const handleCopy = (phoneNumber, id) => {
-    navigator.clipboard.writeText(phoneNumber).then(() => {
-      setCopiedId(id);
-      setTimeout(() => setCopiedId(null), 2000);
-    });
   };
 
   const handleCategoryClick = () => {
@@ -157,6 +505,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
     }
   };
 
+  
   const handleInfoClick = () => {
     if (is_info_open) {
       if (infoCloseTimeout.current) {
@@ -218,7 +567,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
     }, 500);
   };
 
-  const handleMouseLeaveInfo = () => {
+    const handleMouseLeaveInfo = () => {
     infoCloseTimeout.current = setTimeout(() => {
       setInfoAnimation(false);
       setTimeout(() => {
@@ -327,8 +676,8 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
 
   return (
     <>
-      <div className="hidden sm:block">
-        <div className="w-full h-auto md:h-[80px] flex flex-col md:flex-row justify-between gap-[20px] z-50 items-center px-[4.2%] sticky mt-[5px] rounded-[15px] bg-[#DCC38B] py-4 md:py-0">
+      <div className="hidden sm:block pt-[5px]">
+        <div className="w-full h-auto md:h-[80px] flex flex-col md:flex-row justify-between gap-[20px] z-50 items-center px-[4.2%] sticky rounded-[15px] bg-[#DCC38B] py-4 md:py-0">
           <style jsx="true">{`
             .dropdown-enter {
               opacity: 0;
@@ -454,7 +803,6 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                         onClick={() => handleOptionClick(option, option.id)}
                       >
                         {option.name}
-                        <div className="w-[100px] h-[200px] bg-black"></div>
                       </div>
                     ))}
                   </div>
@@ -491,7 +839,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
             </div>
           </div>
 
-          <div className="w-full md:w-[740px] md:mr-[1%] hidden md:flex gap-[20px]">
+          <div className="w-full md:w-[740px] mr-[1%] hidden md:flex gap-[20px]">
             <div className="relative inline-block">
               <div
                 onMouseEnter={handleMouseEnterInfo}
@@ -558,9 +906,9 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                 onMouseEnter={handleMouseEnterCategory}
                 onMouseLeave={handleMouseLeaveCategory}
                 onClick={handleCategoryClick}
-                className="border-[2px] border-white drop-shadow-xl hover:opacity-75 cursor-pointer w-[100px] h-[40px] bg-transparent flex justify-center items-center rounded-[5px] gap-[5px]"
+                className="border-[3px] border-white drop-shadow-xl hover:opacity-75 cursor-pointer w-[100px] h-[40px] bg-transparent flex justify-center items-center rounded-[5px] gap-[5px]"
               >
-                <Menu strokeWidth={1.5} width={20} color="white" />
+                <Menu strokeWidth={1.5} color="white" />
                 <h1 className="font-inter font-[500] text-[13px] text-white uppercase">
                   {lang == "uz"
                     ? "Katalog"
@@ -592,7 +940,6 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                       </div>
                     ) : categories.length > 0 ? (
                       categories.map((category) => {
-                        // Calculate product count for this category
                         const productCount = products.filter(
                           (product) =>
                             product.category == category.id &&
@@ -869,7 +1216,165 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
           />
         </Link>
       </div>
-      <div className="md:hid  den h-[0px]"></div>
+      <div className="md:hidden h-[0px]"></div>
+
+      <div
+        onClick={() => setIsChatOpen(true)}
+        className="group fixed hover:scale-[125%] bottom-30 right-5  duration-300 sm:bottom-[-100px] sm:right-[250px] w-[70px] h-[70px] rounded-full flex justify-center items-center bg-[#DCC38B] z-50 overflow-visible before:content-[''] before:absolute before:inset-0 before:rounded-full before:bg-[#DCC38B] before:animate-[ripple_1.6s_ease-in-out_infinite] before:opacity-60 cursor-pointer hover:opacity-90 transition-all"
+      >
+        <MessageSquareText className="text-white font-[600]" size={38} />
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-[20px] text-xs font-bold text-white bg-red-500 rounded-full shadow-lg">
+            {unreadCount > 9 ? "9+" : unreadCount}
+          </span>
+        )}
+      </div>
+
+      {isChatOpen && (
+        <div
+          className="fixed bottom-20 right-0 sm:bottom-[-120px] sm:right-[230px] sm:w-[380px] sm:h-[500px] h-[400px] bg-white rounded-lg shadow-[0_30px_80px_rgba(0,0,0,0.4)] z-50 flex flex-col animate-[slideIn_0.3s_ease-out]"
+          style={{
+            animation: "slideIn 0.3s ease-out",
+          }}
+        >
+          <div className="flex items-center justify-between p-4 bg-[#DCC38B] rounded-t-lg">
+            <h3 className="text-lg font-semibold text-white">Chat</h3>
+            <button
+              onClick={() => setIsChatOpen(false)}
+              className="p-1 text-white transition-colors rounded-full hover:bg-white/20"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          <div
+            ref={chatContainerRef}
+            className="relative flex-1 p-4 space-y-3 overflow-y-auto bg-gray-50"
+            onScroll={handleChatScroll}
+          >
+            <div className="flex flex-col items-center w-full">
+              <h1 className="font-inter font-[400] text-gray-700 mb-[5px] ">
+                Powered by{" "}
+                <a
+                  href="https://t.me/nsd_corporation"
+                  target="blank"
+                  className="font-[600] font-inter"
+                >
+                  NSD Corporation
+                </a>{" "}
+              </h1>
+              <div className="w-full bg-gray-600 h-[0.5px]"></div>
+            </div>
+            {chatMessages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex ${
+                  msg.sender === "user" ? "justify-end" : "justify-start"
+                }`}
+              >
+                <div
+                  className={`max-w-[75%] rounded-lg px-4 py-2 ${
+                    msg.sender === "user"
+                      ? "bg-[#DCC38B] text-white"
+                      : msg.sender === "bot"
+                      ? "bg-blue-100 text-gray-800"
+                      : "bg-gray-200 text-gray-800"
+                  }`}
+                >
+                  <p className="text-sm break-words">{msg.text}</p>
+                  <div className="flex items-center justify-end gap-1 mt-1">
+                    <span className="text-xs opacity-70">
+                      {new Date(msg.timestamp).toLocaleTimeString("uz-UZ", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                    {msg.sender === "user" && (
+                      <>
+                        {msg.status === "sending" && (
+                          <Check size={14} className="opacity-70" />
+                        )}
+                        {msg.status === "sent" && (
+                          <CheckCheck size={14} className="opacity-70" />
+                        )}
+                        {msg.status === "failed" && (
+                          <span className="text-xs text-red-500">
+                            Yuborilmadi, qayta urining
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div ref={chatEndRef} />
+            {showScrollDown && (
+              <button
+                onClick={scrollToBottom}
+                className="fixed bottom-[-30px] right-[400px] bg-[#DCC38B] text-white p-2 rounded-full shadow-lg hover:opacity-90 transition-opacity"
+              >
+                <ChevronDown size={20} />
+              </button>
+            )}
+          </div>
+
+          <div className="p-4 bg-white border-t border-gray-200 rounded-b-lg">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }}
+                placeholder="Xabar yozing..."
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DCC38B] placeholder:font-[600] placeholder:text-gray-700 focus:border-transparent"
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!newMessage.trim()}
+                className="px-4 py-2 bg-[#DCC38B] text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Send size={20} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <style>
+        {`
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+`}
+      </style>
     </>
   );
 };

@@ -6,7 +6,7 @@ import telegram from "./Images/telegram.svg";
 import youtube from "./Images/youtube.svg";
 import apple from "./Images/apple.png";
 import play from "./Images/play.png";
-import instagram from "./Images/instagram.svg";
+import instagram from "./Images/instagram_icon.svg";
 import { support_get } from "../../Services/general/support";
 import { Link } from "react-router-dom";
 
@@ -17,8 +17,8 @@ const Footer = ({ lang = "uz" }) => {
     localStorage.getItem("sl_option_nav") === "Stroy Baza №1"
       ? 0
       : localStorage.getItem("sl_option_nav") === "Giaz Mebel"
-      ? 1
-      : 2;
+        ? 1
+        : 2;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -128,7 +128,7 @@ const Footer = ({ lang = "uz" }) => {
           </h1>
           <div className="flex flex-col gap-[27px] mt-[20px]">
             {[
-              { img: apple, store: "App Store", url: "/"},
+              { img: apple, store: "App Store", url: "/" },
               { img: play, store: "Google Play", url: "https://play.google.com/store/apps/details?id=com.gold_house" },
             ].map((item, index) => (
               <Link
@@ -146,10 +146,10 @@ const Footer = ({ lang = "uz" }) => {
                     {lang === "uz"
                       ? "Yuklab olish"
                       : lang === "en"
-                      ? "Download"
-                      : lang === "ru"
-                      ? "Скачать"
-                      : "Yuklab olish"}
+                        ? "Download"
+                        : lang === "ru"
+                          ? "Скачать"
+                          : "Yuklab olish"}
                   </h1>
                   <h1 className="text-white text-[11px]">{item.store}</h1>
                 </div>
@@ -162,15 +162,18 @@ const Footer = ({ lang = "uz" }) => {
             {translations.socialMedia[lang]}
           </h1>
           <div className="flex gap-[11px]">
-            <img
-              src={instagram}
-              onClick={() => {
-                window.open(media[0].instagram)
-                
-              }}
-              className="cursor-pointer w-[37px] h-[37px] p-1 bg-[#111111] rounded-[3px]"
-              alt="Social Icon"
-            />
+            <div className="w-[37px] overflow-hidden rounded-[3px]">
+
+              <img
+                src={instagram}
+                onClick={() => {
+                  window.open(media[0].instagram)
+
+                }}
+                className="cursor-pointer scale-[124%] w-[37px] p-1 bg-[#111111] rounded-[3px]"
+                alt="Social Icon"
+              />
+            </div>
             <img
               src={telegram}
               onClick={() => {
@@ -214,7 +217,7 @@ const Footer = ({ lang = "uz" }) => {
             <a href="https://t.me/nsd_corporation" className="text-blue-400">
               Powered by NSD Co.
             </a>
-            ) v1.00.0
+            ) v3.8.0
           </h1>
         </div>
       </div>
