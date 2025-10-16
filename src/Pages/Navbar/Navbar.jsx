@@ -884,7 +884,7 @@ const Navbar = ({ lang, setSearchText, searchText }) => {
                           </p>
                           {copiedId === item.id && (
                             <p className="text-green-500">
-                              {lang === "uz" ? "Nushalandi" : "Copied"}
+                              {lang === "uz" ? "Nusxalandi" : "Copied"}
                             </p>
                           )}{" "}
                         </div>

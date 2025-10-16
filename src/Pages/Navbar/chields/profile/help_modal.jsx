@@ -119,7 +119,7 @@ const BottomModal = ({ isOpen, onClose, lang }) => {
                   </p>
                   {copiedId === item.id && (
                     <p className="text-green-500">
-                      {lang === "uz" ? "Nushalandi" : "Copied"}
+                      {lang === "uz" ? "Nusxalandi" : "Copied"}
                     </p>
                   )} {/* Display copied message only for the clicked number */}
                 </div>
