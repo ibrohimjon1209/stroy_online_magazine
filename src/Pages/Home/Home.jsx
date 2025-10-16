@@ -6,7 +6,7 @@ import logo from "./Images/logo_mobile.svg"
 import logo2 from "../Enter/Images/photo_1.png"
 import logo3 from "../Enter/Images/photo_3.png"
 import Carusel from "./Carusel"
-import { Search, CirclePlus, Heart, History, X, Play, Pause, Volume2, VolumeX, Maximize } from "lucide-react"
+import { Search, CirclePlus, Heart, History, X } from "lucide-react"
 import Download_page from "./Download"
 import { products_get } from "../../Services/products_get"
 import create_favorites from "../../Services/favorites/create_favorites"
@@ -24,208 +24,42 @@ const getStoredTopics = () => {
 
 function VideoPlayer({ video, onEnded, autoplay = false }) {
   const videoRef = useRef(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [isMuted, setIsMuted] = useState(false)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
-  const [volume, setVolume] = useState(1)
-  const [showControls, setShowControls] = useState(true)
-  const controlsTimeoutRef = useRef(null)
 
   useEffect(() => {
     const videoElement = videoRef.current
     if (!videoElement) return
 
-    const handleLoadedMetadata = () => {
-      setDuration(videoElement.duration)
-    }
-
-    const handleTimeUpdate = () => {
-      setCurrentTime(videoElement.currentTime)
-    }
-
     const handleEnded = () => {
-      setIsPlaying(false)
       if (onEnded) onEnded()
     }
 
-    const handlePlay = () => setIsPlaying(true)
-    const handlePause = () => setIsPlaying(false)
-
-    videoElement.addEventListener("loadedmetadata", handleLoadedMetadata)
-    videoElement.addEventListener("timeupdate", handleTimeUpdate)
     videoElement.addEventListener("ended", handleEnded)
-    videoElement.addEventListener("play", handlePlay)
-    videoElement.addEventListener("pause", handlePause)
+
+    return () => {
+      videoElement.removeEventListener("ended", handleEnded)
+    }
+  }, [onEnded])
+
+  useEffect(() => {
+    const videoElement = videoRef.current
+    if (!videoElement) return
 
     if (autoplay) {
       videoElement.play().catch((err) => console.log("[v0] Autoplay prevented:", err))
+    } else {
+      videoElement.pause()
     }
-
-    return () => {
-      videoElement.removeEventListener("loadedmetadata", handleLoadedMetadata)
-      videoElement.removeEventListener("timeupdate", handleTimeUpdate)
-      videoElement.removeEventListener("ended", handleEnded)
-      videoElement.removeEventListener("play", handlePlay)
-      videoElement.removeEventListener("pause", handlePause)
-    }
-  }, [autoplay, onEnded])
-
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause()
-      } else {
-        videoRef.current.play()
-      }
-    }
-  }
-
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted
-      setIsMuted(!isMuted)
-    }
-  }
-
-  const handleVolumeChange = (e) => {
-    const newVolume = Number.parseFloat(e.target.value)
-    setVolume(newVolume)
-    if (videoRef.current) {
-      videoRef.current.volume = newVolume
-      if (newVolume === 0) {
-        setIsMuted(true)
-      } else if (isMuted) {
-        setIsMuted(false)
-      }
-    }
-  }
-
-  const handleProgressChange = (e) => {
-    const newTime = Number.parseFloat(e.target.value)
-    setCurrentTime(newTime)
-    if (videoRef.current) {
-      videoRef.current.currentTime = newTime
-    }
-  }
-
-  const toggleFullscreen = () => {
-    if (videoRef.current) {
-      if (document.fullscreenElement) {
-        document.exitFullscreen()
-      } else {
-        videoRef.current.requestFullscreen()
-      }
-    }
-  }
-
-  const formatTime = (time) => {
-    if (isNaN(time)) return "0:00"
-    const minutes = Math.floor(time / 60)
-    const seconds = Math.floor(time % 60)
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`
-  }
-
-  const handleMouseMove = () => {
-    setShowControls(true)
-    if (controlsTimeoutRef.current) {
-      clearTimeout(controlsTimeoutRef.current)
-    }
-    controlsTimeoutRef.current = setTimeout(() => {
-      if (isPlaying) {
-        setShowControls(false)
-      }
-    }, 3000)
-  }
+  }, [autoplay])
 
   return (
-    <div
-      className="relative w-full sm:h-[600px] h-[170px] bg-black rounded-lg overflow-hidden group"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={() => isPlaying && setShowControls(false)}
-    >
+    <div className="relative w-full sm:h-[600px] h-[170px] bg-black rounded-lg overflow-hidden">
       <video
         ref={videoRef}
         src={video.video}
-        className="w-full h-full object-contain cursor-pointer"
-        onClick={togglePlay}
+        className="w-full h-full object-contain"
         playsInline
+        muted
       />
-
-      {/* Controls overlay */}
-      <div
-        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-2 sm:p-4 transition-opacity duration-300 ${
-          showControls ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        {/* Progress bar */}
-        <div className="mb-2 sm:mb-3">
-          <input
-            type="range"
-            min="0"
-            max={duration || 0}
-            value={currentTime}
-            onChange={handleProgressChange}
-            className="w-full h-1 sm:h-1.5 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-[#DCC38B]"
-            style={{
-              background: `linear-gradient(to right, #DCC38B 0%, #DCC38B ${(currentTime / duration) * 100}%, #4B5563 ${(currentTime / duration) * 100}%, #4B5563 100%)`,
-            }}
-          />
-          <div className="flex justify-between text-white text-[10px] sm:text-xs mt-1">
-            <span>{formatTime(currentTime)}</span>
-            <span>{formatTime(duration)}</span>
-          </div>
-        </div>
-
-        {/* Control buttons */}
-        <div className="flex items-center justify-between gap-2 sm:gap-4">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button onClick={togglePlay} className="text-white hover:text-[#DCC38B] transition-colors p-1 sm:p-2">
-              {isPlaying ? <Pause className="w-5 h-5 sm:w-6 sm:h-6" /> : <Play className="w-5 h-5 sm:w-6 sm:h-6" />}
-            </button>
-
-            <button onClick={toggleMute} className="text-white hover:text-[#DCC38B] transition-colors p-1 sm:p-2">
-              {isMuted || volume === 0 ? (
-                <VolumeX className="w-5 h-5 sm:w-6 sm:h-6" />
-              ) : (
-                <Volume2 className="w-5 h-5 sm:w-6 sm:h-6" />
-              )}
-            </button>
-
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={volume}
-              onChange={handleVolumeChange}
-              className="w-12 sm:w-20 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-[#DCC38B] hidden sm:block"
-            />
-          </div>
-
-          {video.title && (
-            <div className="flex-1 text-center hidden sm:block">
-              <h3 className="text-white text-sm sm:text-base font-medium truncate">{video.title}</h3>
-            </div>
-          )}
-
-          <button onClick={toggleFullscreen} className="text-white hover:text-[#DCC38B] transition-colors p-1 sm:p-2">
-            <Maximize className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
-        </div>
-      </div>
-
-      {/* Play button overlay when paused */}
-      {!isPlaying && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-          <button
-            onClick={togglePlay}
-            className="bg-[#DCC38B] hover:bg-[#c9b077] rounded-full p-4 sm:p-6 transition-all transform hover:scale-110"
-          >
-            <Play className="w-8 h-8 sm:w-12 sm:h-12 text-black" fill="black" />
-          </button>
-        </div>
-      )}
     </div>
   )
 }
@@ -775,7 +609,7 @@ function Home({ lang, setSearchText, searchText }) {
           )}
         </div>
 
-        {!loading && hasMoreProducts && (
+        {!loading && hasMoreProducts && ( 
           <div className="flex justify-center mt-8">
             <button
               onClick={handleLoadMore}
